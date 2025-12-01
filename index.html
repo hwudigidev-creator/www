@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>DDT GAME</title>
   <style>
     * {
@@ -19,11 +19,54 @@
       width: 100vw;
       user-select: none;
       -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     #app {
       width: 100%;
       height: 100%;
+    }
+
+    /* 強制橫向提示 */
+    #rotate-notice {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #111;
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    #rotate-notice .icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      animation: rotate-phone 1.5s ease-in-out infinite;
+    }
+
+    #rotate-notice .text {
+      font-size: 18px;
+    }
+
+    @keyframes rotate-phone {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(90deg); }
+    }
+
+    /* 手機直向時顯示提示 */
+    @media screen and (max-width: 900px) and (orientation: portrait) {
+      #rotate-notice {
+        display: flex;
+      }
+      #app {
+        display: none;
+      }
     }
   </style>
   <script type="module" crossorigin src="/www/assets/index-7rDgrafd.js"></script>
@@ -31,6 +74,10 @@
 </head>
 
 <body>
+  <div id="rotate-notice">
+    <div class="icon">📱</div>
+    <div class="text">請將裝置轉為橫向</div>
+  </div>
   <div id="app"></div>
 </body>
 
