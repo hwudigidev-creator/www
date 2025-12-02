@@ -75,7 +75,7 @@
       transform: scale(0.95);
     }
 
-    /* 音量控制區 - 直式排列 */
+    /* 音量控制區 - 直式排列，與全螢幕按鈕同寬 */
     #volume-control {
       display: flex;
       flex-direction: column;
@@ -83,17 +83,20 @@
       background: rgba(0, 0, 0, 0.6);
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 8px;
-      padding: 6px;
-      gap: 4px;
+      width: 40px;
+      box-sizing: border-box;
+      padding: 6px 0;
+      gap: 2px;
     }
 
     .volume-btn {
       width: 28px;
-      height: 28px;
+      height: 24px;
       background: transparent;
       border: none;
       color: #fff;
-      font-size: 16px;
+      font-size: 14px;
+      font-weight: bold;
       cursor: pointer;
       display: flex;
       justify-content: center;
@@ -114,8 +117,8 @@
     #volume-bars {
       display: flex;
       flex-direction: column-reverse;
-      gap: 3px;
-      padding: 4px 0;
+      gap: 2px;
+      padding: 2px 0;
     }
 
     .volume-bar {
@@ -193,7 +196,7 @@
       }
     }
   </style>
-  <script type="module" crossorigin src="/www/assets/index-vdkqo8Zv.js"></script>
+  <script type="module" crossorigin src="/www/assets/index-CNJOTPlM.js"></script>
   <link rel="modulepreload" crossorigin href="/www/assets/phaser-0RJB29YE.js">
 </head>
 
@@ -227,7 +230,7 @@
     const volumeDown = document.getElementById('volume-down');
 
     const VOLUME_LEVELS = 10;
-    let currentVolume = 8; // 0-10
+    let currentVolume = 5; // 0-10，預設 50%
 
     // 建立 10 個音量條
     for (let i = 0; i < VOLUME_LEVELS; i++) {
