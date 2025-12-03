@@ -1,0 +1,11 @@
+{
+  "texts": [
+    {
+      "id": "title",
+      "text": "PRESS TO START",
+      "letterSpacing": 2,
+      "position": { "x": 0.5, "y": 0.5 },
+      "color": "#ffffff"
+    }
+  ]
+}

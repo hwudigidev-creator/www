@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>DDT GAME</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #111;
+      overflow: hidden;
+      /* 使用 dvh 排除手機瀏覽器網址列 */
+      height: 100dvh;
+      height: 100vh; /* fallback */
+      width: 100vw;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* 支援 dvh 的瀏覽器 */
+    @supports (height: 100dvh) {
+      body {
+        height: 100dvh;
+      }
+    }
+
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 右上角控制列 - 直式排列 */
+    #controls {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      display: none; /* 預設隱藏，轉場後才顯示 */
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1000;
+    }
+
+    #controls.visible {
+      display: flex;
+    }
+
+    .ctrl-btn {
+      width: clamp(32px, 5vw, 44px);
+      height: clamp(32px, 5vw, 44px);
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      color: #fff;
+      font-size: clamp(14px, 2.5vw, 20px);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .ctrl-btn:hover {
+      background: rgba(0, 0, 0, 0.8);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .ctrl-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* 音量控制區 - 直式排列，與全螢幕按鈕同寬 */
+    #volume-control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      width: clamp(32px, 5vw, 44px);
+      box-sizing: border-box;
+      padding: 6px 0;
+      gap: 2px;
+    }
+
+    .volume-btn {
+      width: clamp(22px, 3.5vw, 30px);
+      height: clamp(20px, 3vw, 26px);
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: clamp(12px, 2vw, 16px);
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.15s ease;
+      border-radius: 4px;
+    }
+
+    .volume-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .volume-btn:active {
+      transform: scale(0.9);
+    }
+
+    /* 音量條容器 */
+    #volume-bars {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 2px;
+      padding: 2px 0;
+    }
+
+    .volume-bar {
+      width: clamp(16px, 2.5vw, 22px);
+      height: clamp(3px, 0.5vw, 5px);
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 2px;
+      transition: background 0.1s ease;
+    }
+
+    .volume-bar.active {
+      background: #fff;
+    }
+
+    .volume-bar.muted {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* 全螢幕時改變圖示 */
+    body.is-fullscreen #fullscreen-btn .expand-icon {
+      display: none;
+    }
+    body.is-fullscreen #fullscreen-btn .compress-icon {
+      display: block;
+    }
+    body:not(.is-fullscreen) #fullscreen-btn .expand-icon {
+      display: block;
+    }
+    body:not(.is-fullscreen) #fullscreen-btn .compress-icon {
+      display: none;
+    }
+
+    /* 強制橫向提示 */
+    #rotate-notice {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #111;
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    #rotate-notice .icon {
+      font-size: clamp(48px, 15vw, 80px);
+      margin-bottom: 20px;
+      animation: rotate-phone 1.5s ease-in-out infinite;
+    }
+
+    #rotate-notice .text {
+      font-size: clamp(14px, 4vw, 24px);
+    }
+
+    @keyframes rotate-phone {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-90deg); }
+    }
+
+    /* 手機直向時顯示提示 */
+    @media screen and (max-width: 900px) and (orientation: portrait) {
+      #rotate-notice {
+        display: flex;
+      }
+      #app {
+        display: none;
+      }
+      #controls {
+        display: none;
+      }
+      #version-info {
+        display: none;
+      }
+    }
+
+    /* 右下角版本資訊 */
+    #version-info {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-family: monospace;
+      font-size: clamp(10px, 1.5vw, 14px);
+      color: rgba(255, 255, 255, 0.3);
+      z-index: 1000;
+      pointer-events: none;
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="rotate-notice">
+    <div class="icon">📱</div>
+    <div class="text">請將裝置轉為橫向</div>
+  </div>
+
+  <!-- 右下角版本資訊（由 JS 動態設定） -->
+  <div id="version-info"></div>
+
+  <!-- 右上角控制列（預設隱藏，轉場後顯示） -->
+  <div id="controls">
+    <!-- 全螢幕按鈕 -->
+    <button id="fullscreen-btn" class="ctrl-btn" title="全螢幕">
+      <span class="expand-icon">⛶</span>
+      <span class="compress-icon">⛶</span>
+    </button>
+    <!-- 音量控制 - 直式，在全螢幕按鈕下方 -->
+    <div id="volume-control">
+      <button id="volume-up" class="volume-btn" title="增加音量">+</button>
+      <div id="volume-bars"></div>
+      <button id="volume-down" class="volume-btn" title="降低音量">−</button>
+    </div>
+  </div>
+
+  <div id="app"></div>
+
+  <script>
+    // ===== 音量控制 =====
+    const volumeBars = document.getElementById('volume-bars');
+    const volumeUp = document.getElementById('volume-up');
+    const volumeDown = document.getElementById('volume-down');
+
+    const VOLUME_LEVELS = 10;
+    let currentVolume = 5; // 0-10，預設 50%
+
+    // 建立 10 個音量條
+    for (let i = 0; i < VOLUME_LEVELS; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'volume-bar';
+      bar.dataset.level = i;
+      volumeBars.appendChild(bar);
+    }
+
+    function updateVolumeBars() {
+      const bars = volumeBars.querySelectorAll('.volume-bar');
+      bars.forEach((bar, index) => {
+        bar.classList.remove('active', 'muted');
+        if (index < currentVolume) {
+          bar.classList.add('active');
+        }
+      });
+      // 發送音量變更事件給遊戲
+      window.dispatchEvent(new CustomEvent('volumechange', { detail: { volume: currentVolume / VOLUME_LEVELS } }));
+    }
+
+    // 長按持續觸發
+    let volumeInterval = null;
+    const INITIAL_DELAY = 300; // 首次觸發後的延遲
+    const REPEAT_DELAY = 100;  // 持續觸發的間隔
+
+    function startVolumeUp() {
+      if (currentVolume < VOLUME_LEVELS) {
+        currentVolume++;
+        updateVolumeBars();
+      }
+    }
+
+    function startVolumeDown() {
+      if (currentVolume > 0) {
+        currentVolume--;
+        updateVolumeBars();
+      }
+    }
+
+    function startHold(action) {
+      action(); // 立即觸發一次
+      let firstTrigger = true;
+      volumeInterval = setInterval(() => {
+        if (firstTrigger) {
+          firstTrigger = false;
+          clearInterval(volumeInterval);
+          volumeInterval = setInterval(action, REPEAT_DELAY);
+        }
+        action();
+      }, INITIAL_DELAY);
+    }
+
+    function stopHold() {
+      if (volumeInterval) {
+        clearInterval(volumeInterval);
+        volumeInterval = null;
+      }
+    }
+
+    // 滑鼠事件
+    volumeUp.addEventListener('mousedown', () => startHold(startVolumeUp));
+    volumeUp.addEventListener('mouseup', stopHold);
+    volumeUp.addEventListener('mouseleave', stopHold);
+
+    volumeDown.addEventListener('mousedown', () => startHold(startVolumeDown));
+    volumeDown.addEventListener('mouseup', stopHold);
+    volumeDown.addEventListener('mouseleave', stopHold);
+
+    // 觸控事件
+    volumeUp.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      startHold(startVolumeUp);
+    });
+    volumeUp.addEventListener('touchend', stopHold);
+    volumeUp.addEventListener('touchcancel', stopHold);
+
+    volumeDown.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      startHold(startVolumeDown);
+    });
+    volumeDown.addEventListener('touchend', stopHold);
+    volumeDown.addEventListener('touchcancel', stopHold);
+
+    // 初始化
+    updateVolumeBars();
+
+    // ===== 全螢幕功能 =====
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+    function isFullscreen() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    }
+
+    function updateFullscreenState() {
+      if (isFullscreen()) {
+        document.body.classList.add('is-fullscreen');
+      } else {
+        document.body.classList.remove('is-fullscreen');
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!isFullscreen()) {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen();
+        } else if (elem.msRequestFullscreen) {
+          elem.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    }
+
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+    document.addEventListener('fullscreenchange', updateFullscreenState);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenState);
+    document.addEventListener('mozfullscreenchange', updateFullscreenState);
+    document.addEventListener('MSFullscreenChange', updateFullscreenState);
+  </script>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
