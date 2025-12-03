@@ -52,13 +52,13 @@
     }
 
     .ctrl-btn {
-      width: 40px;
-      height: 40px;
+      width: clamp(32px, 5vw, 44px);
+      height: clamp(32px, 5vw, 44px);
       background: rgba(0, 0, 0, 0.6);
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 8px;
       color: #fff;
-      font-size: 18px;
+      font-size: clamp(14px, 2.5vw, 20px);
       cursor: pointer;
       display: flex;
       justify-content: center;
@@ -83,19 +83,19 @@
       background: rgba(0, 0, 0, 0.6);
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 8px;
-      width: 40px;
+      width: clamp(32px, 5vw, 44px);
       box-sizing: border-box;
       padding: 6px 0;
       gap: 2px;
     }
 
     .volume-btn {
-      width: 28px;
-      height: 24px;
+      width: clamp(22px, 3.5vw, 30px);
+      height: clamp(20px, 3vw, 26px);
       background: transparent;
       border: none;
       color: #fff;
-      font-size: 14px;
+      font-size: clamp(12px, 2vw, 16px);
       font-weight: bold;
       cursor: pointer;
       display: flex;
@@ -122,8 +122,8 @@
     }
 
     .volume-bar {
-      width: 20px;
-      height: 4px;
+      width: clamp(16px, 2.5vw, 22px);
+      height: clamp(3px, 0.5vw, 5px);
       background: rgba(255, 255, 255, 0.25);
       border-radius: 2px;
       transition: background 0.1s ease;
@@ -169,13 +169,13 @@
     }
 
     #rotate-notice .icon {
-      font-size: 60px;
+      font-size: clamp(48px, 15vw, 80px);
       margin-bottom: 20px;
       animation: rotate-phone 1.5s ease-in-out infinite;
     }
 
     #rotate-notice .text {
-      font-size: 18px;
+      font-size: clamp(14px, 4vw, 24px);
     }
 
     @keyframes rotate-phone {
@@ -194,9 +194,25 @@
       #controls {
         display: none;
       }
+      #version-info {
+        display: none;
+      }
+    }
+
+    /* 右下角版本資訊 */
+    #version-info {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-family: monospace;
+      font-size: clamp(10px, 1.5vw, 14px);
+      color: rgba(255, 255, 255, 0.3);
+      z-index: 1000;
+      pointer-events: none;
+      user-select: none;
     }
   </style>
-  <script type="module" crossorigin src="/www/assets/index-BDQo-PyL.js"></script>
+  <script type="module" crossorigin src="/www/assets/index-DE1uX2Ye.js"></script>
   <link rel="modulepreload" crossorigin href="/www/assets/phaser-0RJB29YE.js">
 </head>
 
@@ -205,6 +221,9 @@
     <div class="icon">📱</div>
     <div class="text">請將裝置轉為橫向</div>
   </div>
+
+  <!-- 右下角版本資訊（由 JS 動態設定） -->
+  <div id="version-info"></div>
 
   <!-- 右上角控制列（預設隱藏，轉場後顯示） -->
   <div id="controls">
