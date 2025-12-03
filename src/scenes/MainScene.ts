@@ -55,6 +55,9 @@ export default class MainScene extends Phaser.Scene {
     // 遊戲世界容器（會隨鏡頭移動的內容）
     private worldContainer!: Phaser.GameObjects.Container;
 
+    // 角色容器（獨立於網格之上）
+    private characterContainer!: Phaser.GameObjects.Container;
+
     // UI 層（不隨鏡頭移動）
     private uiContainer!: Phaser.GameObjects.Container;
 
@@ -250,12 +253,15 @@ export default class MainScene extends Phaser.Scene {
         // 建立角色動畫
         this.createCharacterAnimations();
 
+        // 建立角色容器（會隨鏡頭移動，但獨立於 worldContainer 以便設定深度）
+        this.characterContainer = this.add.container(this.gameBounds.x, this.gameBounds.y);
+
         // 建立角色 Sprite
         this.character = this.add.sprite(this.characterX, this.characterY, 'char_idle_1');
         this.character.setScale(this.characterSize / this.character.height);
         this.character.setOrigin(0.5, 1); // 底部中央為錨點
         this.character.play('char_idle');
-        this.worldContainer.add(this.character);
+        this.characterContainer.add(this.character);
 
         // 建立怪物管理系統
         this.monsterManager = new MonsterManager(
@@ -286,6 +292,11 @@ export default class MainScene extends Phaser.Scene {
 
         // 建立技能範圍格子覆蓋層（放在 UI 層）
         this.createSkillGrid();
+
+        // 把角色容器加入 UI 層，深度高於網格（50）
+        this.characterContainer.setDepth(60);
+        this.characterContainer.setMask(geometryMask); // 套用遊戲區域遮罩
+        this.uiContainer.add(this.characterContainer);
 
         // 建立技能欄（加入 UI 容器）
         this.createSkillBar();
@@ -662,6 +673,9 @@ export default class MainScene extends Phaser.Scene {
             this.drawSectorEffect(targetAngle, range, halfAngle, skill.definition.color);
         }
 
+        // 繪製打擊區網格特效（展開+淡出動畫）
+        this.flashSkillAreaSector(this.characterX, this.characterY, range, targetAngle, halfAngle, skill.definition.flashColor || skill.definition.color);
+
         // 對命中的怪物造成傷害
         if (hitMonsters.length > 0) {
             // 取得命中怪物的位置（在造成傷害前）
@@ -674,8 +688,8 @@ export default class MainScene extends Phaser.Scene {
                 this.addExp(result.totalExp);
             }
 
-            // 命中回饋：格子閃爍
-            this.flashGridAtPositions(hitPositions, skill.definition.flashColor || skill.definition.color, 2);
+            // 命中回饋：白色十字高光
+            this.flashWhiteCrossAtPositions(hitPositions);
 
             // 舊版特效：十字星芒效果
             if (this.showLegacySkillEffects) {
@@ -828,6 +842,9 @@ export default class MainScene extends Phaser.Scene {
             this.drawCircleEffect(range, skill.definition.color);
         }
 
+        // 繪製打擊區網格特效（展開+淡出動畫）
+        this.flashSkillAreaCircle(this.characterX, this.characterY, range, skill.definition.flashColor || skill.definition.color);
+
         // 對命中的怪物造成傷害
         if (hitMonsters.length > 0) {
             // 取得命中怪物的位置（在造成傷害前）
@@ -840,8 +857,8 @@ export default class MainScene extends Phaser.Scene {
                 this.addExp(result.totalExp);
             }
 
-            // 命中回饋：格子閃爍
-            this.flashGridAtPositions(hitPositions, skill.definition.flashColor || skill.definition.color, 2);
+            // 命中回饋：白色十字高光
+            this.flashWhiteCrossAtPositions(hitPositions);
 
             // 舊版特效：十字星芒效果
             if (this.showLegacySkillEffects) {
@@ -1029,6 +1046,11 @@ export default class MainScene extends Phaser.Scene {
             if (this.showLegacySkillEffects) {
                 this.drawBeamEffect(targetAngle, range, beamWidth, skill.definition.color);
             }
+
+            // 繪製光束打擊區網格特效（展開+淡出動畫）
+            const endX = this.characterX + Math.cos(targetAngle) * range;
+            const endY = this.characterY + Math.sin(targetAngle) * range;
+            this.flashSkillAreaLine(this.characterX, this.characterY, endX, endY, beamWidth, skill.definition.flashColor || skill.definition.color);
         }
 
         // 更新角色面向（朝第一道光束方向）
@@ -1050,8 +1072,8 @@ export default class MainScene extends Phaser.Scene {
                 this.addExp(result.totalExp);
             }
 
-            // 命中回饋：格子閃爍
-            this.flashGridAtPositions(hitPositions, skill.definition.flashColor || skill.definition.color, 2);
+            // 命中回饋：白色十字高光
+            this.flashWhiteCrossAtPositions(hitPositions);
 
             // 舊版特效：十字星芒效果
             if (this.showLegacySkillEffects) {
@@ -1373,6 +1395,10 @@ export default class MainScene extends Phaser.Scene {
         if (this.showLegacySkillEffects) {
             this.drawShieldActivateEffect();
         }
+
+        // 繪製護盾打擊區網格特效（展開+淡出動畫）
+        const shieldRadius = this.gameBounds.height * 0.15;
+        this.flashSkillAreaCircle(this.characterX, this.characterY, shieldRadius, skill.definition.flashColor || skill.definition.color);
 
         console.log(`Architect activated: Shield ${shieldAmount}, Reflect damage ${this.shieldReflectDamage} (${reflectUnits} units)`);
     }
@@ -1983,6 +2009,12 @@ export default class MainScene extends Phaser.Scene {
             this.gameBounds.x - this.cameraOffsetX,
             this.gameBounds.y - this.cameraOffsetY
         );
+
+        // 同步移動角色容器
+        this.characterContainer.setPosition(
+            this.gameBounds.x - this.cameraOffsetX,
+            this.gameBounds.y - this.cameraOffsetY
+        );
     }
 
     private updateRevealMask(data: { x: number; y: number; radius: number }) {
@@ -2400,9 +2432,14 @@ export default class MainScene extends Phaser.Scene {
             // 更新護盾條顯示
             this.drawShieldBarFill();
 
-            // 護盾吸收傷害時的視覺效果（舊版，可用 SHIFT+BACKSPACE 切換）
-            if (shieldAbsorbed > 0 && this.showLegacySkillEffects) {
-                this.flashShieldEffect();
+            // 護盾吸收傷害時的視覺效果
+            if (shieldAbsorbed > 0) {
+                // 舊版特效
+                if (this.showLegacySkillEffects) {
+                    this.flashShieldEffect();
+                }
+                // 金色擴散光圈網格特效
+                this.flashShieldHitEffect();
             }
 
             // 反傷給攻擊者
@@ -2531,6 +2568,141 @@ export default class MainScene extends Phaser.Scene {
                 graphics.destroy();
             }
             timerEvent.remove();
+        });
+    }
+
+    // 護盾被擊中時的金色擴散光圈網格特效
+    private flashShieldHitEffect() {
+        const screen = this.worldToScreen(this.characterX, this.characterY);
+        const screenCenterX = screen.x;
+        const screenCenterY = screen.y;
+
+        const gap = MainScene.SKILL_GRID_GAP;
+        const cellTotal = this.skillGridCellSize + gap;
+
+        // 金色
+        const color = 0xffcc00;
+        const maxRadius = this.gameBounds.height * 0.2; // 擴散範圍
+
+        const duration = 400; // 總時長 400ms
+        const expandTime = 200; // 前 200ms 擴散
+        const startTime = this.time.now;
+
+        // 計算最大範圍內的所有格子
+        const cellsInArea: { col: number, row: number, dist: number }[] = [];
+
+        const minCol = Math.max(0, Math.floor((screenCenterX - maxRadius) / cellTotal));
+        const maxCol = Math.min(this.skillGridCols - 1, Math.ceil((screenCenterX + maxRadius) / cellTotal));
+        const minRow = Math.max(0, Math.floor((screenCenterY - maxRadius) / cellTotal));
+        const maxRow = Math.min(this.skillGridRows - 1, Math.ceil((screenCenterY + maxRadius) / cellTotal));
+
+        for (let row = minRow; row <= maxRow; row++) {
+            for (let col = minCol; col <= maxCol; col++) {
+                const cellCenterX = col * cellTotal + this.skillGridCellSize / 2;
+                const cellCenterY = row * cellTotal + this.skillGridCellSize / 2;
+
+                const dx = cellCenterX - screenCenterX;
+                const dy = cellCenterY - screenCenterY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist <= maxRadius) {
+                    cellsInArea.push({ col, row, dist });
+                }
+            }
+        }
+
+        if (cellsInArea.length === 0) return;
+
+        // 使用獨立的 Rectangle 物件
+        const flashCells: Phaser.GameObjects.Rectangle[] = [];
+        for (const { col, row } of cellsInArea) {
+            const x = col * cellTotal + this.skillGridCellSize / 2;
+            const y = row * cellTotal + this.skillGridCellSize / 2;
+            const cell = this.add.rectangle(x, y, this.skillGridCellSize, this.skillGridCellSize, color, 0);
+            cell.setVisible(false);
+            this.skillGridContainer.add(cell);
+            flashCells.push(cell);
+        }
+
+        const updateEffect = () => {
+            const elapsed = this.time.now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // 擴散進度：從中心向外擴散成環形
+            const expandProgress = Math.min(elapsed / expandTime, 1);
+            const currentOuterRadius = maxRadius * expandProgress;
+            const ringWidth = maxRadius * 0.3; // 光環寬度
+            const currentInnerRadius = Math.max(0, currentOuterRadius - ringWidth);
+
+            // 淡出進度
+            let fadeProgress = 0;
+            if (elapsed > expandTime) {
+                fadeProgress = (elapsed - expandTime) / (duration - expandTime);
+            }
+
+            let i = 0;
+            for (const { dist } of cellsInArea) {
+                const cell = flashCells[i++];
+                if (!cell) continue;
+
+                // 檢查是否在當前環形範圍內
+                if (dist >= currentInnerRadius && dist <= currentOuterRadius) {
+                    // 環形漸變：環的中心最亮
+                    const ringCenter = (currentInnerRadius + currentOuterRadius) / 2;
+                    const distFromRingCenter = Math.abs(dist - ringCenter);
+                    const ringHalfWidth = ringWidth / 2;
+                    const ringRatio = distFromRingCenter / ringHalfWidth;
+                    const baseAlpha = 0.9 * (1 - ringRatio * 0.5); // 環中心 90%，邊緣 45%
+
+                    // 淡出效果
+                    const currentAlpha = baseAlpha * (1 - fadeProgress);
+
+                    if (currentAlpha > 0.01) {
+                        // 高亮效果
+                        if (elapsed < expandTime && ringRatio < 0.3) {
+                            // 混合白色高光
+                            const r = ((color >> 16) & 0xff);
+                            const g = ((color >> 8) & 0xff);
+                            const b = (color & 0xff);
+                            const brightR = Math.min(255, r + Math.floor((255 - r) * 0.5));
+                            const brightG = Math.min(255, g + Math.floor((255 - g) * 0.5));
+                            const brightB = Math.min(255, b + Math.floor((255 - b) * 0.5));
+                            const brightColor = (brightR << 16) | (brightG << 8) | brightB;
+                            cell.setFillStyle(brightColor, currentAlpha);
+                        } else {
+                            cell.setFillStyle(color, currentAlpha);
+                        }
+                        cell.setVisible(true);
+                    } else {
+                        cell.setVisible(false);
+                    }
+                } else {
+                    cell.setVisible(false);
+                }
+            }
+
+            // 動畫結束時清理
+            if (progress >= 1) {
+                for (const cell of flashCells) {
+                    cell.destroy();
+                }
+            }
+        };
+
+        updateEffect();
+
+        const timerEvent = this.time.addEvent({
+            delay: 16,
+            callback: updateEffect,
+            callbackScope: this,
+            repeat: Math.ceil(duration / 16)
+        });
+
+        this.time.delayedCall(duration + 50, () => {
+            timerEvent.remove();
+            for (const cell of flashCells) {
+                if (cell.active) cell.destroy();
+            }
         });
     }
 
@@ -3533,7 +3705,7 @@ export default class MainScene extends Phaser.Scene {
         this.skillGridCols = Math.ceil((this.gameBounds.width + gap) / (this.skillGridCellSize + gap));
         this.skillGridRows = Math.ceil((this.gameBounds.height + gap) / (this.skillGridCellSize + gap));
 
-        // 建立格子容器（放在 UI 層，固定在螢幕上）
+        // 建立格子容器（固定在螢幕上）
         this.skillGridContainer = this.add.container(this.gameBounds.x, this.gameBounds.y);
         this.skillGridContainer.setDepth(50);
 
@@ -3837,6 +4009,591 @@ export default class MainScene extends Phaser.Scene {
     flashGridAtPositions(positions: { x: number, y: number }[], color: number, radius: number = 1) {
         positions.forEach(pos => {
             this.flashGridAt(pos.x, pos.y, color, radius);
+        });
+    }
+
+    // 在擊中位置顯示白色十字高光
+    flashWhiteCrossAt(worldX: number, worldY: number) {
+        const screen = this.worldToScreen(worldX, worldY);
+        const gap = MainScene.SKILL_GRID_GAP;
+        const cellTotal = this.skillGridCellSize + gap;
+
+        const centerCol = Math.floor(screen.x / cellTotal);
+        const centerRow = Math.floor(screen.y / cellTotal);
+
+        const crossLength = 3; // 十字臂長度（格子數）
+        const duration = 300; // 總時長 300ms
+        const startTime = this.time.now;
+
+        // 收集十字形狀的格子（中心 + 四個方向）
+        const crossCells: { col: number, row: number, dist: number }[] = [];
+
+        // 中心格子
+        if (centerCol >= 0 && centerCol < this.skillGridCols && centerRow >= 0 && centerRow < this.skillGridRows) {
+            crossCells.push({ col: centerCol, row: centerRow, dist: 0 });
+        }
+
+        // 四個方向
+        const directions = [
+            { dc: 1, dr: 0 },  // 右
+            { dc: -1, dr: 0 }, // 左
+            { dc: 0, dr: 1 },  // 下
+            { dc: 0, dr: -1 }  // 上
+        ];
+
+        for (const { dc, dr } of directions) {
+            for (let i = 1; i <= crossLength; i++) {
+                const col = centerCol + dc * i;
+                const row = centerRow + dr * i;
+                if (col >= 0 && col < this.skillGridCols && row >= 0 && row < this.skillGridRows) {
+                    crossCells.push({ col, row, dist: i });
+                }
+            }
+        }
+
+        if (crossCells.length === 0) return;
+
+        // 建立十字格子
+        const flashCells: Phaser.GameObjects.Rectangle[] = [];
+        for (const { col, row } of crossCells) {
+            const x = col * cellTotal + this.skillGridCellSize / 2;
+            const y = row * cellTotal + this.skillGridCellSize / 2;
+            const cell = this.add.rectangle(x, y, this.skillGridCellSize, this.skillGridCellSize, 0xffffff, 0);
+            cell.setVisible(false);
+            this.skillGridContainer.add(cell);
+            flashCells.push(cell);
+        }
+
+        const updateEffect = () => {
+            const elapsed = this.time.now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // 從中心往外淡出
+            const fadeProgress = progress;
+            const fadeDistance = crossLength * fadeProgress;
+
+            let i = 0;
+            for (const { dist } of crossCells) {
+                const cell = flashCells[i++];
+                if (!cell) continue;
+
+                if (dist >= fadeDistance) {
+                    // 距離越遠透明度越低
+                    const distRatio = dist / crossLength;
+                    const baseAlpha = 1 - distRatio * 0.5; // 中心 100%，邊緣 50%
+
+                    // 接近淡出邊緣時漸變透明
+                    let edgeFade = 1;
+                    if (fadeDistance > 0 && dist < fadeDistance + 1) {
+                        edgeFade = (dist - fadeDistance);
+                    }
+
+                    const currentAlpha = baseAlpha * Math.max(0, edgeFade);
+
+                    if (currentAlpha > 0.01) {
+                        cell.setFillStyle(0xffffff, currentAlpha);
+                        cell.setVisible(true);
+                    } else {
+                        cell.setVisible(false);
+                    }
+                } else {
+                    cell.setVisible(false);
+                }
+            }
+
+            // 動畫結束時清理
+            if (progress >= 1) {
+                for (const cell of flashCells) {
+                    cell.destroy();
+                }
+            }
+        };
+
+        updateEffect();
+
+        const timerEvent = this.time.addEvent({
+            delay: 16,
+            callback: updateEffect,
+            callbackScope: this,
+            repeat: Math.ceil(duration / 16)
+        });
+
+        this.time.delayedCall(duration + 50, () => {
+            timerEvent.remove();
+            for (const cell of flashCells) {
+                if (cell.active) cell.destroy();
+            }
+        });
+    }
+
+    // 批量顯示白色十字高光
+    flashWhiteCrossAtPositions(positions: { x: number, y: number }[]) {
+        positions.forEach(pos => {
+            this.flashWhiteCrossAt(pos.x, pos.y);
+        });
+    }
+
+    // 顯示技能打擊區持續特效（扇形）- 帶展開和淡出動畫
+    flashSkillAreaSector(centerX: number, centerY: number, radius: number, angle: number, halfAngle: number, color: number) {
+        const screen = this.worldToScreen(centerX, centerY);
+        const screenCenterX = screen.x;
+        const screenCenterY = screen.y;
+
+        const gap = MainScene.SKILL_GRID_GAP;
+        const cellTotal = this.skillGridCellSize + gap;
+
+        const duration = 500; // 總時長 500ms
+        const expandTime = 150; // 前 150ms 展開
+        const holdTime = 150; // 中間 150ms 高亮停留
+        const startTime = this.time.now;
+
+        // 收集所有在扇形範圍內的格子及其距離
+        const cellsInArea: { col: number, row: number, dist: number, angleDist: number }[] = [];
+
+        const minCol = Math.max(0, Math.floor((screenCenterX - radius) / cellTotal));
+        const maxCol = Math.min(this.skillGridCols - 1, Math.ceil((screenCenterX + radius) / cellTotal));
+        const minRow = Math.max(0, Math.floor((screenCenterY - radius) / cellTotal));
+        const maxRow = Math.min(this.skillGridRows - 1, Math.ceil((screenCenterY + radius) / cellTotal));
+
+        for (let row = minRow; row <= maxRow; row++) {
+            for (let col = minCol; col <= maxCol; col++) {
+                const cellCenterX = col * cellTotal + this.skillGridCellSize / 2;
+                const cellCenterY = row * cellTotal + this.skillGridCellSize / 2;
+
+                const dx = cellCenterX - screenCenterX;
+                const dy = cellCenterY - screenCenterY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist <= radius && dist > 0) {
+                    const cellAngle = Math.atan2(dy, dx);
+                    let angleDiff = Math.abs(cellAngle - angle);
+                    if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+
+                    if (angleDiff <= halfAngle) {
+                        cellsInArea.push({ col, row, dist, angleDist: angleDiff });
+                    }
+                }
+            }
+        }
+
+        if (cellsInArea.length === 0) return;
+
+        // 使用獨立的 Rectangle 物件來避免與預覽衝突
+        const flashCells: Phaser.GameObjects.Rectangle[] = [];
+        for (const { col, row } of cellsInArea) {
+            const x = col * cellTotal + this.skillGridCellSize / 2;
+            const y = row * cellTotal + this.skillGridCellSize / 2;
+            const cell = this.add.rectangle(x, y, this.skillGridCellSize, this.skillGridCellSize, color, 0);
+            cell.setVisible(false);
+            this.skillGridContainer.add(cell);
+            flashCells.push(cell);
+        }
+
+        const updateEffect = () => {
+            const elapsed = this.time.now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // 展開進度：從中心向外展開
+            const expandProgress = Math.min(elapsed / expandTime, 1);
+            const currentExpandRadius = radius * expandProgress;
+
+            // 淡出進度：展開+停留後開始從中心往外淡出
+            let fadeProgress = 0;
+            if (elapsed > expandTime + holdTime) {
+                fadeProgress = (elapsed - expandTime - holdTime) / (duration - expandTime - holdTime);
+            }
+            // 從中心往外淡出的半徑（內側先消失）
+            const fadeRadius = radius * fadeProgress;
+
+            let i = 0;
+            for (const { dist, angleDist } of cellsInArea) {
+                const cell = flashCells[i++];
+                if (!cell) continue;
+
+                // 檢查是否在當前展開範圍內，且尚未被淡出
+                if (dist <= currentExpandRadius && dist >= fadeRadius) {
+                    const distRatio = dist / radius;
+                    const angleRatio = angleDist / halfAngle; // 角度比例（0=中心線，1=邊緣）
+
+                    // 中心淡（30%），外圈亮（80%）
+                    const baseAlpha = 0.3 + distRatio * 0.5;
+
+                    // 接近淡出邊緣時漸變透明
+                    let edgeFade = 1;
+                    if (fadeRadius > 0) {
+                        const fadeEdgeWidth = radius * 0.15;
+                        if (dist < fadeRadius + fadeEdgeWidth) {
+                            edgeFade = (dist - fadeRadius) / fadeEdgeWidth;
+                        }
+                    }
+
+                    const currentAlpha = baseAlpha * edgeFade;
+
+                    if (currentAlpha > 0.01) {
+                        // 判斷是否需要高光白
+                        const radiusEdgeThreshold = 0.85; // 外圈邊緣
+                        const angleEdgeThreshold = 0.80; // 切線邊緣
+                        const isRadiusEdge = distRatio > radiusEdgeThreshold;
+                        const isAngleEdge = angleRatio > angleEdgeThreshold;
+
+                        if ((isRadiusEdge || isAngleEdge) && elapsed < expandTime + holdTime) {
+                            // 計算高光強度
+                            let edgeIntensity = 0;
+                            if (isRadiusEdge) {
+                                edgeIntensity = Math.max(edgeIntensity, (distRatio - radiusEdgeThreshold) / (1 - radiusEdgeThreshold));
+                            }
+                            if (isAngleEdge) {
+                                edgeIntensity = Math.max(edgeIntensity, (angleRatio - angleEdgeThreshold) / (1 - angleEdgeThreshold));
+                            }
+
+                            const r = ((color >> 16) & 0xff);
+                            const g = ((color >> 8) & 0xff);
+                            const b = (color & 0xff);
+                            const brightR = Math.min(255, r + Math.floor((255 - r) * edgeIntensity));
+                            const brightG = Math.min(255, g + Math.floor((255 - g) * edgeIntensity));
+                            const brightB = Math.min(255, b + Math.floor((255 - b) * edgeIntensity));
+                            const brightColor = (brightR << 16) | (brightG << 8) | brightB;
+                            cell.setFillStyle(brightColor, currentAlpha);
+                        } else {
+                            cell.setFillStyle(color, currentAlpha);
+                        }
+                        cell.setVisible(true);
+                    } else {
+                        cell.setVisible(false);
+                    }
+                } else {
+                    cell.setVisible(false);
+                }
+            }
+
+            // 動畫結束時清理
+            if (progress >= 1) {
+                for (const cell of flashCells) {
+                    cell.destroy();
+                }
+            }
+        };
+
+        updateEffect();
+
+        const timerEvent = this.time.addEvent({
+            delay: 16,
+            callback: updateEffect,
+            callbackScope: this,
+            repeat: Math.ceil(duration / 16)
+        });
+
+        this.time.delayedCall(duration + 50, () => {
+            timerEvent.remove();
+            for (const cell of flashCells) {
+                if (cell.active) cell.destroy();
+            }
+        });
+    }
+
+    // 顯示技能打擊區持續特效（圓形）- 帶展開和淡出動畫
+    flashSkillAreaCircle(centerX: number, centerY: number, radius: number, color: number) {
+        const screen = this.worldToScreen(centerX, centerY);
+        const screenCenterX = screen.x;
+        const screenCenterY = screen.y;
+
+        const gap = MainScene.SKILL_GRID_GAP;
+        const cellTotal = this.skillGridCellSize + gap;
+
+        const duration = 500;
+        const expandTime = 150;
+        const holdTime = 150;
+        const startTime = this.time.now;
+
+        const cellsInArea: { col: number, row: number, dist: number }[] = [];
+
+        const minCol = Math.max(0, Math.floor((screenCenterX - radius) / cellTotal));
+        const maxCol = Math.min(this.skillGridCols - 1, Math.ceil((screenCenterX + radius) / cellTotal));
+        const minRow = Math.max(0, Math.floor((screenCenterY - radius) / cellTotal));
+        const maxRow = Math.min(this.skillGridRows - 1, Math.ceil((screenCenterY + radius) / cellTotal));
+
+        for (let row = minRow; row <= maxRow; row++) {
+            for (let col = minCol; col <= maxCol; col++) {
+                const cellCenterX = col * cellTotal + this.skillGridCellSize / 2;
+                const cellCenterY = row * cellTotal + this.skillGridCellSize / 2;
+
+                const dx = cellCenterX - screenCenterX;
+                const dy = cellCenterY - screenCenterY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist <= radius) {
+                    cellsInArea.push({ col, row, dist });
+                }
+            }
+        }
+
+        if (cellsInArea.length === 0) return;
+
+        const flashCells: Phaser.GameObjects.Rectangle[] = [];
+        for (const { col, row } of cellsInArea) {
+            const x = col * cellTotal + this.skillGridCellSize / 2;
+            const y = row * cellTotal + this.skillGridCellSize / 2;
+            const cell = this.add.rectangle(x, y, this.skillGridCellSize, this.skillGridCellSize, color, 0);
+            cell.setVisible(false);
+            this.skillGridContainer.add(cell);
+            flashCells.push(cell);
+        }
+
+        const updateEffect = () => {
+            const elapsed = this.time.now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            const expandProgress = Math.min(elapsed / expandTime, 1);
+            const currentExpandRadius = radius * expandProgress;
+
+            // 從中心往外淡出
+            let fadeProgress = 0;
+            if (elapsed > expandTime + holdTime) {
+                fadeProgress = (elapsed - expandTime - holdTime) / (duration - expandTime - holdTime);
+            }
+            const fadeRadius = radius * fadeProgress;
+
+            let i = 0;
+            for (const { dist } of cellsInArea) {
+                const cell = flashCells[i++];
+                if (!cell) continue;
+
+                if (dist <= currentExpandRadius && dist >= fadeRadius) {
+                    const distRatio = dist / radius;
+                    // 中心淡（30%），外圈亮（80%）
+                    const baseAlpha = 0.3 + distRatio * 0.5;
+
+                    // 接近淡出邊緣時漸變透明
+                    let edgeFade = 1;
+                    if (fadeRadius > 0) {
+                        const fadeEdgeWidth = radius * 0.15;
+                        if (dist < fadeRadius + fadeEdgeWidth) {
+                            edgeFade = (dist - fadeRadius) / fadeEdgeWidth;
+                        }
+                    }
+
+                    const currentAlpha = baseAlpha * edgeFade;
+
+                    if (currentAlpha > 0.01) {
+                        // 邊緣高光白（最外圈 15% 範圍）
+                        const edgeThreshold = 0.85;
+                        if (distRatio > edgeThreshold && elapsed < expandTime + holdTime) {
+                            // 越接近邊緣越白
+                            const edgeRatio = (distRatio - edgeThreshold) / (1 - edgeThreshold);
+                            const r = ((color >> 16) & 0xff);
+                            const g = ((color >> 8) & 0xff);
+                            const b = (color & 0xff);
+                            const brightR = Math.min(255, r + Math.floor((255 - r) * edgeRatio));
+                            const brightG = Math.min(255, g + Math.floor((255 - g) * edgeRatio));
+                            const brightB = Math.min(255, b + Math.floor((255 - b) * edgeRatio));
+                            const brightColor = (brightR << 16) | (brightG << 8) | brightB;
+                            cell.setFillStyle(brightColor, currentAlpha);
+                        } else {
+                            cell.setFillStyle(color, currentAlpha);
+                        }
+                        cell.setVisible(true);
+                    } else {
+                        cell.setVisible(false);
+                    }
+                } else {
+                    cell.setVisible(false);
+                }
+            }
+
+            if (progress >= 1) {
+                for (const cell of flashCells) {
+                    cell.destroy();
+                }
+            }
+        };
+
+        updateEffect();
+
+        const timerEvent = this.time.addEvent({
+            delay: 16,
+            callback: updateEffect,
+            callbackScope: this,
+            repeat: Math.ceil(duration / 16)
+        });
+
+        this.time.delayedCall(duration + 50, () => {
+            timerEvent.remove();
+            for (const cell of flashCells) {
+                if (cell.active) cell.destroy();
+            }
+        });
+    }
+
+    // 顯示技能打擊區持續特效（光束/線性）- 帶展開、延遲、變細和淡出動畫
+    flashSkillAreaLine(startX: number, startY: number, endX: number, endY: number, width: number, color: number) {
+        const screenStart = this.worldToScreen(startX, startY);
+        const screenEnd = this.worldToScreen(endX, endY);
+
+        const gap = MainScene.SKILL_GRID_GAP;
+        const cellTotal = this.skillGridCellSize + gap;
+
+        const dx = screenEnd.x - screenStart.x;
+        const dy = screenEnd.y - screenStart.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        if (length === 0) return;
+
+        const dirX = dx / length;
+        const dirY = dy / length;
+        const normX = -dirY;
+        const normY = dirX;
+        const halfWidth = width / 2;
+
+        // 調整時間：更長的延遲和淡出
+        const duration = 800; // 總時長 800ms
+        const expandTime = 80; // 快速展開 80ms
+        const holdTime = 300; // 停留 300ms
+        const fadeTime = duration - expandTime - holdTime; // 淡出時間
+        const startTime = this.time.now;
+
+        const cellsInArea: { col: number, row: number, distAlong: number, distToLine: number }[] = [];
+
+        const corners = [
+            { x: screenStart.x + normX * halfWidth, y: screenStart.y + normY * halfWidth },
+            { x: screenStart.x - normX * halfWidth, y: screenStart.y - normY * halfWidth },
+            { x: screenEnd.x + normX * halfWidth, y: screenEnd.y + normY * halfWidth },
+            { x: screenEnd.x - normX * halfWidth, y: screenEnd.y - normY * halfWidth }
+        ];
+
+        const minX = Math.min(...corners.map(c => c.x));
+        const maxX = Math.max(...corners.map(c => c.x));
+        const minY = Math.min(...corners.map(c => c.y));
+        const maxY = Math.max(...corners.map(c => c.y));
+
+        const minCol = Math.max(0, Math.floor(minX / cellTotal));
+        const maxCol = Math.min(this.skillGridCols - 1, Math.ceil(maxX / cellTotal));
+        const minRow = Math.max(0, Math.floor(minY / cellTotal));
+        const maxRow = Math.min(this.skillGridRows - 1, Math.ceil(maxY / cellTotal));
+
+        for (let row = minRow; row <= maxRow; row++) {
+            for (let col = minCol; col <= maxCol; col++) {
+                const cellCenterX = col * cellTotal + this.skillGridCellSize / 2;
+                const cellCenterY = row * cellTotal + this.skillGridCellSize / 2;
+
+                const toCellX = cellCenterX - screenStart.x;
+                const toCellY = cellCenterY - screenStart.y;
+
+                const projLength = toCellX * dirX + toCellY * dirY;
+                if (projLength < 0 || projLength > length) continue;
+
+                const projX = screenStart.x + dirX * projLength;
+                const projY = screenStart.y + dirY * projLength;
+
+                const distToLine = Math.sqrt((cellCenterX - projX) ** 2 + (cellCenterY - projY) ** 2);
+
+                if (distToLine <= halfWidth) {
+                    cellsInArea.push({ col, row, distAlong: projLength, distToLine });
+                }
+            }
+        }
+
+        if (cellsInArea.length === 0) return;
+
+        const flashCells: Phaser.GameObjects.Rectangle[] = [];
+        for (const { col, row } of cellsInArea) {
+            const x = col * cellTotal + this.skillGridCellSize / 2;
+            const y = row * cellTotal + this.skillGridCellSize / 2;
+            const cell = this.add.rectangle(x, y, this.skillGridCellSize, this.skillGridCellSize, color, 0);
+            cell.setVisible(false);
+            this.skillGridContainer.add(cell);
+            flashCells.push(cell);
+        }
+
+        const updateEffect = () => {
+            const elapsed = this.time.now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            const expandProgress = Math.min(elapsed / expandTime, 1);
+            const currentLength = length * expandProgress;
+
+            // 從起點往終點淡出
+            let fadeProgress = 0;
+            if (elapsed > expandTime + holdTime) {
+                fadeProgress = (elapsed - expandTime - holdTime) / fadeTime;
+            }
+            const fadeLength = length * fadeProgress;
+
+            // 逐漸變細：寬度從 100% 縮減到 0%
+            const currentWidthRatio = 1 - fadeProgress;
+
+            let i = 0;
+            for (const { distAlong, distToLine } of cellsInArea) {
+                const cell = flashCells[i++];
+                if (!cell) continue;
+
+                // 計算當前有效寬度
+                const currentHalfWidth = halfWidth * currentWidthRatio;
+
+                // 檢查是否在當前展開範圍內、未被淡出、且在變細後的寬度內
+                if (distAlong <= currentLength && distAlong >= fadeLength && distToLine <= currentHalfWidth) {
+                    // 根據當前寬度計算比例（0=中心線，1=邊緣）
+                    const widthRatio = currentHalfWidth > 0 ? distToLine / currentHalfWidth : 1;
+
+                    // 中心亮（90%），邊緣淡（40%）
+                    const baseAlpha = 0.9 - widthRatio * 0.5;
+
+                    // 接近淡出邊緣時漸變透明
+                    let edgeFade = 1;
+                    if (fadeLength > 0) {
+                        const fadeEdgeWidth = length * 0.1;
+                        if (distAlong < fadeLength + fadeEdgeWidth) {
+                            edgeFade = (distAlong - fadeLength) / fadeEdgeWidth;
+                        }
+                    }
+
+                    const currentAlpha = baseAlpha * edgeFade;
+
+                    if (currentAlpha > 0.01) {
+                        // 中心高光白（中心 30% 範圍）
+                        const centerThreshold = 0.3;
+                        if (widthRatio < centerThreshold && elapsed < expandTime + holdTime) {
+                            // 越接近中心越白
+                            const centerIntensity = 1 - (widthRatio / centerThreshold);
+                            const r = ((color >> 16) & 0xff);
+                            const g = ((color >> 8) & 0xff);
+                            const b = (color & 0xff);
+                            const brightR = Math.min(255, r + Math.floor((255 - r) * centerIntensity * 0.8));
+                            const brightG = Math.min(255, g + Math.floor((255 - g) * centerIntensity * 0.8));
+                            const brightB = Math.min(255, b + Math.floor((255 - b) * centerIntensity * 0.8));
+                            const brightColor = (brightR << 16) | (brightG << 8) | brightB;
+                            cell.setFillStyle(brightColor, currentAlpha);
+                        } else {
+                            cell.setFillStyle(color, currentAlpha);
+                        }
+                        cell.setVisible(true);
+                    } else {
+                        cell.setVisible(false);
+                    }
+                } else {
+                    cell.setVisible(false);
+                }
+            }
+
+            if (progress >= 1) {
+                for (const cell of flashCells) {
+                    cell.destroy();
+                }
+            }
+        };
+
+        updateEffect();
+
+        const timerEvent = this.time.addEvent({
+            delay: 16,
+            callback: updateEffect,
+            callbackScope: this,
+            repeat: Math.ceil(duration / 16)
+        });
+
+        this.time.delayedCall(duration + 50, () => {
+            timerEvent.remove();
+            for (const cell of flashCells) {
+                if (cell.active) cell.destroy();
+            }
         });
     }
 }
