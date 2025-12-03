@@ -89,7 +89,7 @@ export const SKILL_LIBRARY: SkillDefinition[] = [
         name: '視網膜增強模組',
         description: '提升 30% 經驗取得，每級再 +30%',
         type: 'passive',
-        color: 0x99ff66, // 螢光綠
+        color: 0x992233, // 暗紅色
         maxLevel: 5
     },
     {
@@ -97,7 +97,7 @@ export const SKILL_LIBRARY: SkillDefinition[] = [
         name: 'AI賦能強化',
         description: '提升 25% 攻擊、5% 防禦，每級再疊加',
         type: 'passive',
-        color: 0xff6699, // 粉紅色
+        color: 0x6688aa, // 灰藍色
         maxLevel: 5
     }
 ];

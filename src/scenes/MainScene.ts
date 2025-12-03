@@ -3539,12 +3539,12 @@ export default class MainScene extends Phaser.Scene {
             const y = startY + row * (cellSize + gap);
 
             if (i < cdCellCount) {
-                // CD 進行中的格子：技能顏色（亮色）
+                // CD 進行中的格子：技能顏色（壓暗 40% 透明度）
                 const skillColor = this.getSkillColorForIndex(skillIndex);
-                graphics.fillStyle(skillColor, 0.9);
+                graphics.fillStyle(skillColor, 0.4);
             } else {
-                // 未到的格子：黑色 30% 透明度
-                graphics.fillStyle(0x000000, 0.3);
+                // 未到的格子：黑色 50% 透明度
+                graphics.fillStyle(0x000000, 0.5);
             }
             graphics.fillRect(x, y, cellSize, cellSize);
         }
@@ -4795,8 +4795,20 @@ export default class MainScene extends Phaser.Scene {
                     const distRatio = dist / radius;
                     const angleRatio = angleDist / halfAngle; // 角度比例（0=中心線，1=邊緣）
 
-                    // 中心淡（30%），外圈亮（80%）
-                    const baseAlpha = 0.3 + distRatio * 0.5;
+                    // 計算到邊緣的距離（0=中心，1=邊緣）
+                    const radiusEdgeness = distRatio; // 距離中心的比例
+                    const angleEdgeness = angleRatio; // 距離中心線的比例
+
+                    // 綜合邊緣值（取較大者，越接近邊緣值越高）
+                    const edgeness = Math.max(radiusEdgeness, angleEdgeness);
+
+                    // 使用平滑的 S 曲線（smoothstep）讓過渡更自然
+                    // 從 0.3 開始漸變到 1.0
+                    const t = Math.max(0, Math.min(1, (edgeness - 0.3) / 0.7));
+                    const smoothT = t * t * (3 - 2 * t); // smoothstep
+
+                    // 透明度：中心 15%，邊緣 75%
+                    const baseAlpha = 0.15 + smoothT * 0.60;
 
                     // 接近淡出邊緣時漸變透明
                     let edgeFade = 1;
@@ -4810,33 +4822,29 @@ export default class MainScene extends Phaser.Scene {
                     const currentAlpha = baseAlpha * edgeFade;
 
                     if (currentAlpha > 0.01) {
-                        // 判斷是否需要高光白
-                        const radiusEdgeThreshold = 0.85; // 外圈邊緣
-                        const angleEdgeThreshold = 0.80; // 切線邊緣
-                        const isRadiusEdge = distRatio > radiusEdgeThreshold;
-                        const isAngleEdge = angleRatio > angleEdgeThreshold;
+                        // 明度：使用同樣的平滑曲線，中心壓暗，邊緣保持原色
+                        // 明度倍率：中心 0.5，邊緣 1.0
+                        const brightnessMult = 0.5 + smoothT * 0.5;
 
-                        if ((isRadiusEdge || isAngleEdge) && elapsed < expandTime + holdTime) {
-                            // 計算高光強度
-                            let edgeIntensity = 0;
-                            if (isRadiusEdge) {
-                                edgeIntensity = Math.max(edgeIntensity, (distRatio - radiusEdgeThreshold) / (1 - radiusEdgeThreshold));
-                            }
-                            if (isAngleEdge) {
-                                edgeIntensity = Math.max(edgeIntensity, (angleRatio - angleEdgeThreshold) / (1 - angleEdgeThreshold));
-                            }
+                        const r = ((color >> 16) & 0xff);
+                        const g = ((color >> 8) & 0xff);
+                        const b = (color & 0xff);
 
-                            const r = ((color >> 16) & 0xff);
-                            const g = ((color >> 8) & 0xff);
-                            const b = (color & 0xff);
-                            const brightR = Math.min(255, r + Math.floor((255 - r) * edgeIntensity));
-                            const brightG = Math.min(255, g + Math.floor((255 - g) * edgeIntensity));
-                            const brightB = Math.min(255, b + Math.floor((255 - b) * edgeIntensity));
-                            const brightColor = (brightR << 16) | (brightG << 8) | brightB;
-                            cell.setFillStyle(brightColor, currentAlpha);
+                        // 邊緣高光（最外圈稍微提亮）
+                        let finalR = r, finalG = g, finalB = b;
+                        if (edgeness > 0.85 && elapsed < expandTime + holdTime) {
+                            const highlightIntensity = (edgeness - 0.85) / 0.15;
+                            finalR = Math.min(255, r + Math.floor((255 - r) * highlightIntensity * 0.3));
+                            finalG = Math.min(255, g + Math.floor((255 - g) * highlightIntensity * 0.3));
+                            finalB = Math.min(255, b + Math.floor((255 - b) * highlightIntensity * 0.3));
                         } else {
-                            cell.setFillStyle(color, currentAlpha);
+                            finalR = Math.floor(r * brightnessMult);
+                            finalG = Math.floor(g * brightnessMult);
+                            finalB = Math.floor(b * brightnessMult);
                         }
+
+                        const displayColor = (finalR << 16) | (finalG << 8) | finalB;
+                        cell.setFillStyle(displayColor, currentAlpha);
                         cell.setVisible(true);
                     } else {
                         cell.setVisible(false);
@@ -4940,8 +4948,14 @@ export default class MainScene extends Phaser.Scene {
 
                 if (dist <= currentExpandRadius && dist >= fadeRadius) {
                     const distRatio = dist / radius;
-                    // 中心淡（30%），外圈亮（80%）
-                    const baseAlpha = 0.3 + distRatio * 0.5;
+
+                    // 使用平滑的 S 曲線（smoothstep）讓過渡更自然
+                    // 從 0.3 開始漸變到 1.0
+                    const t = Math.max(0, Math.min(1, (distRatio - 0.3) / 0.7));
+                    const smoothT = t * t * (3 - 2 * t); // smoothstep
+
+                    // 透明度：中心 15%，邊緣 75%
+                    const baseAlpha = 0.15 + smoothT * 0.60;
 
                     // 接近淡出邊緣時漸變透明
                     let edgeFade = 1;
@@ -4955,22 +4969,29 @@ export default class MainScene extends Phaser.Scene {
                     const currentAlpha = baseAlpha * edgeFade;
 
                     if (currentAlpha > 0.01) {
-                        // 邊緣高光白（最外圈 15% 範圍）
-                        const edgeThreshold = 0.85;
-                        if (distRatio > edgeThreshold && elapsed < expandTime + holdTime) {
-                            // 越接近邊緣越白
-                            const edgeRatio = (distRatio - edgeThreshold) / (1 - edgeThreshold);
-                            const r = ((color >> 16) & 0xff);
-                            const g = ((color >> 8) & 0xff);
-                            const b = (color & 0xff);
-                            const brightR = Math.min(255, r + Math.floor((255 - r) * edgeRatio));
-                            const brightG = Math.min(255, g + Math.floor((255 - g) * edgeRatio));
-                            const brightB = Math.min(255, b + Math.floor((255 - b) * edgeRatio));
-                            const brightColor = (brightR << 16) | (brightG << 8) | brightB;
-                            cell.setFillStyle(brightColor, currentAlpha);
+                        // 明度：使用同樣的平滑曲線，中心壓暗，邊緣保持原色
+                        // 明度倍率：中心 0.5，邊緣 1.0
+                        const brightnessMult = 0.5 + smoothT * 0.5;
+
+                        const r = ((color >> 16) & 0xff);
+                        const g = ((color >> 8) & 0xff);
+                        const b = (color & 0xff);
+
+                        // 邊緣高光（最外圈稍微提亮）
+                        let finalR = r, finalG = g, finalB = b;
+                        if (distRatio > 0.85 && elapsed < expandTime + holdTime) {
+                            const highlightIntensity = (distRatio - 0.85) / 0.15;
+                            finalR = Math.min(255, r + Math.floor((255 - r) * highlightIntensity * 0.3));
+                            finalG = Math.min(255, g + Math.floor((255 - g) * highlightIntensity * 0.3));
+                            finalB = Math.min(255, b + Math.floor((255 - b) * highlightIntensity * 0.3));
                         } else {
-                            cell.setFillStyle(color, currentAlpha);
+                            finalR = Math.floor(r * brightnessMult);
+                            finalG = Math.floor(g * brightnessMult);
+                            finalB = Math.floor(b * brightnessMult);
                         }
+
+                        const displayColor = (finalR << 16) | (finalG << 8) | finalB;
+                        cell.setFillStyle(displayColor, currentAlpha);
                         cell.setVisible(true);
                     } else {
                         cell.setVisible(false);
@@ -5113,8 +5134,19 @@ export default class MainScene extends Phaser.Scene {
                     // 根據當前寬度計算比例（0=中心線，1=邊緣）
                     const widthRatio = currentHalfWidth > 0 ? distToLine / currentHalfWidth : 1;
 
-                    // 中心亮（90%），邊緣淡（40%）
-                    const baseAlpha = 0.9 - widthRatio * 0.5;
+                    // 簡單的光束效果：中心亮，向外漸暗
+                    // 使用 1 - widthRatio^2 曲線，讓中心區域更亮
+                    const centerFalloff = 1 - widthRatio * widthRatio;
+
+                    // 透明度：邊緣 20%，中心 70%
+                    let baseAlpha = 0.20 + centerFalloff * 0.50;
+
+                    // 頭尾漸淡（前 15% 和後 15% 幾近透明）
+                    const alongRatio = distAlong / length;
+                    const headFade = Math.min(1, alongRatio / 0.15); // 頭部 0~15% 漸入
+                    const tailFade = Math.min(1, (1 - alongRatio) / 0.15); // 尾部 85~100% 漸出
+                    const headTailFade = Math.min(headFade, tailFade);
+                    baseAlpha *= headTailFade * headTailFade; // 平方讓淡出更明顯
 
                     // 接近淡出邊緣時漸變透明
                     let edgeFade = 1;
@@ -5128,22 +5160,29 @@ export default class MainScene extends Phaser.Scene {
                     const currentAlpha = baseAlpha * edgeFade;
 
                     if (currentAlpha > 0.01) {
-                        // 中心高光白（中心 30% 範圍）
-                        const centerThreshold = 0.3;
-                        if (widthRatio < centerThreshold && elapsed < expandTime + holdTime) {
-                            // 越接近中心越白
-                            const centerIntensity = 1 - (widthRatio / centerThreshold);
-                            const r = ((color >> 16) & 0xff);
-                            const g = ((color >> 8) & 0xff);
-                            const b = (color & 0xff);
-                            const brightR = Math.min(255, r + Math.floor((255 - r) * centerIntensity * 0.8));
-                            const brightG = Math.min(255, g + Math.floor((255 - g) * centerIntensity * 0.8));
-                            const brightB = Math.min(255, b + Math.floor((255 - b) * centerIntensity * 0.8));
-                            const brightColor = (brightR << 16) | (brightG << 8) | brightB;
-                            cell.setFillStyle(brightColor, currentAlpha);
+                        // 明度：中心亮，邊緣暗
+                        // 明度倍率：邊緣 0.6，中心 1.0
+                        const brightnessMult = 0.6 + centerFalloff * 0.4;
+
+                        const r = ((color >> 16) & 0xff);
+                        const g = ((color >> 8) & 0xff);
+                        const b = (color & 0xff);
+
+                        // 中心高光（最中心 20% 範圍稍微提亮）
+                        let finalR, finalG, finalB;
+                        if (widthRatio < 0.2 && elapsed < expandTime + holdTime) {
+                            const highlightIntensity = 1 - (widthRatio / 0.2);
+                            finalR = Math.min(255, r + Math.floor((255 - r) * highlightIntensity * 0.3));
+                            finalG = Math.min(255, g + Math.floor((255 - g) * highlightIntensity * 0.3));
+                            finalB = Math.min(255, b + Math.floor((255 - b) * highlightIntensity * 0.3));
                         } else {
-                            cell.setFillStyle(color, currentAlpha);
+                            finalR = Math.floor(r * brightnessMult);
+                            finalG = Math.floor(g * brightnessMult);
+                            finalB = Math.floor(b * brightnessMult);
                         }
+
+                        const displayColor = (finalR << 16) | (finalG << 8) | finalB;
+                        cell.setFillStyle(displayColor, currentAlpha);
                         cell.setVisible(true);
                     } else {
                         cell.setVisible(false);
