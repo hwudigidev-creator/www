@@ -833,6 +833,39 @@ export default class MainScene extends Phaser.Scene {
         const holdTime = 300;
         const startTime = this.time.now;
 
+        // 分段數量
+        const segments = 15;
+
+        // 繪製漸淡線段的輔助函數
+        const drawFadedLine = (lineAngle: number, lineColor: number, lineWidth: number, baseAlpha: number, lengthMult: number = 1) => {
+            for (let i = 0; i < segments; i++) {
+                const t1 = i / segments;
+                const t2 = (i + 1) / segments;
+
+                // 頭尾漸淡（前 15% 和後 15% 幾近透明）
+                const midT = (t1 + t2) / 2;
+                const headFade = Math.min(1, midT / 0.15);
+                const tailFade = Math.min(1, (1 - midT) / 0.15);
+                const segmentFade = Math.min(headFade, tailFade);
+                const segmentAlpha = baseAlpha * segmentFade * segmentFade;
+
+                if (segmentAlpha > 0.01) {
+                    const r1 = radius * t1 * lengthMult;
+                    const r2 = radius * t2 * lengthMult;
+                    const x1 = originX + Math.cos(lineAngle) * r1;
+                    const y1 = originY + Math.sin(lineAngle) * r1;
+                    const x2 = originX + Math.cos(lineAngle) * r2;
+                    const y2 = originY + Math.sin(lineAngle) * r2;
+
+                    graphics.lineStyle(lineWidth, lineColor, segmentAlpha);
+                    graphics.beginPath();
+                    graphics.moveTo(x1, y1);
+                    graphics.lineTo(x2, y2);
+                    graphics.strokePath();
+                }
+            }
+        };
+
         const updateEffect = () => {
             const elapsed = this.time.now - startTime;
             const progress = Math.min(elapsed / duration, 1);
@@ -847,29 +880,13 @@ export default class MainScene extends Phaser.Scene {
             const alpha = 0.6 * (1 - fadeProgress);
 
             if (alpha > 0.01) {
-                // 兩條切線（從原點到弧線兩端）
-                graphics.lineStyle(3, color, alpha);
-                graphics.beginPath();
-                graphics.moveTo(originX, originY);
-                graphics.lineTo(originX + Math.cos(startAngle) * radius, originY + Math.sin(startAngle) * radius);
-                graphics.strokePath();
+                // 兩條切線（從原點到弧線兩端）- 頭尾漸淡
+                drawFadedLine(startAngle, color, 3, alpha);
+                drawFadedLine(endAngle, color, 3, alpha);
 
-                graphics.beginPath();
-                graphics.moveTo(originX, originY);
-                graphics.lineTo(originX + Math.cos(endAngle) * radius, originY + Math.sin(endAngle) * radius);
-                graphics.strokePath();
-
-                // 白色高光切線
-                graphics.lineStyle(1.5, 0xffffff, alpha * 0.5);
-                graphics.beginPath();
-                graphics.moveTo(originX, originY);
-                graphics.lineTo(originX + Math.cos(startAngle) * radius * 0.98, originY + Math.sin(startAngle) * radius * 0.98);
-                graphics.strokePath();
-
-                graphics.beginPath();
-                graphics.moveTo(originX, originY);
-                graphics.lineTo(originX + Math.cos(endAngle) * radius * 0.98, originY + Math.sin(endAngle) * radius * 0.98);
-                graphics.strokePath();
+                // 白色高光切線 - 頭尾漸淡
+                drawFadedLine(startAngle, 0xffffff, 1.5, alpha * 0.5, 0.98);
+                drawFadedLine(endAngle, 0xffffff, 1.5, alpha * 0.5, 0.98);
             }
 
             if (progress >= 1) {
@@ -954,12 +971,15 @@ export default class MainScene extends Phaser.Scene {
 
         const originX = this.characterX;
         const originY = this.characterY;
-        const endX = originX + Math.cos(angle) * length;
-        const endY = originY + Math.sin(angle) * length;
+        const cosA = Math.cos(angle);
+        const sinA = Math.sin(angle);
 
         const duration = 800; // 與光束網格特效同步
         const holdTime = 380;
         const startTime = this.time.now;
+
+        // 分段數量
+        const segments = 20;
 
         const updateEffect = () => {
             const elapsed = this.time.now - startTime;
@@ -972,15 +992,34 @@ export default class MainScene extends Phaser.Scene {
                 fadeProgress = (elapsed - holdTime) / (duration - holdTime);
             }
 
-            const alpha = 0.6 * (1 - fadeProgress * 0.5); // 淡出但不完全消失
+            const baseAlpha = 0.6 * (1 - fadeProgress * 0.5); // 淡出但不完全消失
 
-            if (alpha > 0.01) {
-                // 只保留中心白線
-                graphics.lineStyle(2, 0xffffff, alpha);
-                graphics.beginPath();
-                graphics.moveTo(originX, originY);
-                graphics.lineTo(endX, endY);
-                graphics.strokePath();
+            if (baseAlpha > 0.01) {
+                // 用多段線模擬頭尾漸淡
+                for (let i = 0; i < segments; i++) {
+                    const t1 = i / segments;
+                    const t2 = (i + 1) / segments;
+
+                    // 頭尾漸淡（前 15% 和後 15% 幾近透明）
+                    const midT = (t1 + t2) / 2;
+                    const headFade = Math.min(1, midT / 0.15);
+                    const tailFade = Math.min(1, (1 - midT) / 0.15);
+                    const segmentFade = Math.min(headFade, tailFade);
+                    const segmentAlpha = baseAlpha * segmentFade * segmentFade;
+
+                    if (segmentAlpha > 0.01) {
+                        const x1 = originX + cosA * length * t1;
+                        const y1 = originY + sinA * length * t1;
+                        const x2 = originX + cosA * length * t2;
+                        const y2 = originY + sinA * length * t2;
+
+                        graphics.lineStyle(2, 0xffffff, segmentAlpha);
+                        graphics.beginPath();
+                        graphics.moveTo(x1, y1);
+                        graphics.lineTo(x2, y2);
+                        graphics.strokePath();
+                    }
+                }
             }
 
             if (progress >= 1) {

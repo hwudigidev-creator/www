@@ -1,22 +1,9 @@
 // Service Worker for DIGI WAR PWA
 const CACHE_NAME = 'digi-war-v1';
 
-// 要快取的資源
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/vite.svg'
-];
-
 // 安裝 Service Worker
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Caching app shell');
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
+  console.log('[SW] Installing...');
   // 立即啟用新的 Service Worker
   self.skipWaiting();
 });
@@ -39,13 +26,17 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// 攔截網路請求 - Network First 策略（適合遊戲開發階段）
+// 攔截網路請求 - Network First 策略
 self.addEventListener('fetch', (event) => {
   // 跳過非 GET 請求
   if (event.request.method !== 'GET') return;
 
   // 跳過 chrome-extension 等非 http(s) 請求
   if (!event.request.url.startsWith('http')) return;
+
+  // 跳過跨域請求（避免 CORS 問題）
+  const url = new URL(event.request.url);
+  if (url.origin !== location.origin) return;
 
   event.respondWith(
     fetch(event.request)
