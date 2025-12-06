@@ -87,6 +87,7 @@ export default class MainScene extends Phaser.Scene {
     private skillManager: SkillManager = new SkillManager();
     private skillIconContainers: Phaser.GameObjects.Container[] = []; // 技能欄圖示容器
     private skillLevelTexts: Phaser.GameObjects.Text[] = []; // 技能等級文字
+    private skillIconSprites: (Phaser.GameObjects.Sprite | null)[] = []; // 技能圖示 Sprite
 
     // 技能資訊窗格
     private skillInfoPanel!: Phaser.GameObjects.Container;
@@ -4160,6 +4161,9 @@ export default class MainScene extends Phaser.Scene {
             const colorBg = this.add.rectangle(0, 0, iconPixelSize - 4, iconPixelSize - 4, 0x333333, 0);
             container.add(colorBg);
 
+            // 技能圖示 Sprite（預設隱藏，由 updateSkillBarDisplay 設定）
+            this.skillIconSprites.push(null); // 先放 null，之後由 updateSkillBarDisplay 建立
+
             // 等級文字
             const fontSize = Math.max(MainScene.MIN_FONT_SIZE_SMALL, Math.floor(iconPixelSize * 0.2));
             const levelText = this.add.text(0, iconPixelSize * 0.3, '', {
@@ -4204,6 +4208,9 @@ export default class MainScene extends Phaser.Scene {
             // 技能顏色指示
             const colorBg = this.add.rectangle(0, 0, iconPixelSize - 4, iconPixelSize - 4, 0x333333, 0);
             container.add(colorBg);
+
+            // 技能圖示 Sprite（預設隱藏，由 updateSkillBarDisplay 設定）
+            this.skillIconSprites.push(null); // 先放 null，之後由 updateSkillBarDisplay 建立
 
             // 等級文字
             const fontSize = Math.max(MainScene.MIN_FONT_SIZE_SMALL, Math.floor(iconPixelSize * 0.2));
@@ -4640,6 +4647,12 @@ export default class MainScene extends Phaser.Scene {
         const passiveSkills = this.skillManager.getPlayerPassiveSkills();
         const allSkills = [...activeSkills, ...passiveSkills];
 
+        // 計算圖示大小（與 createSkillBar 相同邏輯）
+        const cellSize = this.skillGridCellSize;
+        const gap = MainScene.SKILL_GRID_GAP;
+        const iconGridSize = 8;
+        const iconPixelSize = iconGridSize * (cellSize + gap) - gap;
+
         for (let i = 0; i < this.skillIconContainers.length; i++) {
             const container = this.skillIconContainers[i];
             const levelText = this.skillLevelTexts[i];
@@ -4648,14 +4661,60 @@ export default class MainScene extends Phaser.Scene {
             // 取得顏色背景（container 的第二個子元素）
             const colorBg = container.list[1] as Phaser.GameObjects.Rectangle;
 
+            // 處理技能圖示 Sprite
+            const existingSprite = this.skillIconSprites[i];
+
             if (skill) {
                 // 有技能，使用技能本身的顏色和等級
                 colorBg.setFillStyle(skill.definition.color, 0.5);
                 levelText.setText(SkillManager.formatLevel(skill.level, skill.definition.maxLevel));
+
+                // 如果有 iconPrefix，顯示對應等級的圖示
+                if (skill.definition.iconPrefix) {
+                    const iconKey = `skill_icon_${skill.definition.iconPrefix}${skill.level.toString().padStart(2, '0')}`;
+
+                    // 檢查紋理是否存在
+                    if (this.textures.exists(iconKey)) {
+                        if (existingSprite) {
+                            // 更新現有 Sprite 的紋理
+                            existingSprite.setTexture(iconKey);
+                            existingSprite.setVisible(true);
+                        } else {
+                            // 建立新的 Sprite
+                            const sprite = this.add.sprite(0, 0, iconKey);
+                            sprite.setOrigin(0.5, 0.5);
+                            // 縮放圖示以適應技能框（留一些邊距）
+                            const targetSize = iconPixelSize - 8;
+                            const scale = targetSize / Math.max(sprite.width, sprite.height);
+                            sprite.setScale(scale);
+                            // 插入到顏色背景之後、等級文字之前
+                            container.addAt(sprite, 2);
+                            this.skillIconSprites[i] = sprite;
+                        }
+                        // 隱藏顏色背景（因為有圖示）
+                        colorBg.setAlpha(0);
+                    } else {
+                        // 紋理不存在，隱藏 Sprite 並顯示顏色背景
+                        if (existingSprite) {
+                            existingSprite.setVisible(false);
+                        }
+                        colorBg.setAlpha(1);
+                    }
+                } else {
+                    // 沒有 iconPrefix，隱藏 Sprite 並顯示顏色背景
+                    if (existingSprite) {
+                        existingSprite.setVisible(false);
+                    }
+                    colorBg.setAlpha(1);
+                }
             } else {
                 // 無技能
                 colorBg.setFillStyle(0x333333, 0);
+                colorBg.setAlpha(1);
                 levelText.setText('');
+                if (existingSprite) {
+                    existingSprite.setVisible(false);
+                }
             }
         }
     }
@@ -4831,7 +4890,7 @@ export default class MainScene extends Phaser.Scene {
         this.skillCutInContainer.removeAll(true);
 
         // CUT IN 條的高度和位置（畫面上半中間）
-        const barHeight = this.gameBounds.height * 0.12;
+        const barHeight = this.gameBounds.height * 0.18; // 加高區塊
         const barY = this.gameBounds.y + this.gameBounds.height * 0.25;
         const fadeWidth = this.gameBounds.width * 0.15; // 兩側漸層區域寬度
         const solidWidth = this.gameBounds.width - fadeWidth * 2; // 中間實心區域
@@ -4931,11 +4990,11 @@ export default class MainScene extends Phaser.Scene {
         const titleText = `${skillDef.name} 提升到 ${levelDisplay}`;
         const title = this.add.text(
             this.gameBounds.x + this.gameBounds.width / 2,
-            barY - barHeight * 0.18,
+            barY - barHeight * 0.30,
             titleText,
             {
                 fontFamily: 'Microsoft JhengHei, PingFang TC, -apple-system, BlinkMacSystemFont, sans-serif',
-                fontSize: `${Math.max(MainScene.MIN_FONT_SIZE_LARGE, Math.floor(barHeight * 0.35))}px`,
+                fontSize: `${Math.max(MainScene.MIN_FONT_SIZE_LARGE, Math.floor(barHeight * 0.32))}px`,
                 color: '#ffffff',
                 fontStyle: 'bold'
             }
@@ -4944,18 +5003,39 @@ export default class MainScene extends Phaser.Scene {
         title.setOrigin(0.5, 0.5);
         this.skillCutInContainer.add(title);
 
-        // 副標題：自訂描述
+        // 角色對話（大字副標題）
+        let quoteText = '';
+        if (skillDef.levelUpQuotes && skillDef.levelUpQuotes[newLevel]) {
+            quoteText = skillDef.levelUpQuotes[newLevel];
+        }
+        if (quoteText) {
+            const quote = this.add.text(
+                this.gameBounds.x + this.gameBounds.width / 2,
+                barY + barHeight * 0.05,
+                quoteText,
+                {
+                    fontFamily: 'Microsoft JhengHei, PingFang TC, -apple-system, BlinkMacSystemFont, sans-serif',
+                    fontSize: `${Math.max(MainScene.MIN_FONT_SIZE_LARGE, Math.floor(barHeight * 0.28))}px`,
+                    color: '#ffffff'
+                }
+            );
+            quote.setResolution(2);
+            quote.setOrigin(0.5, 0.5);
+            this.skillCutInContainer.add(quote);
+        }
+
+        // 數值描述（小字）
         let descriptionText = skillDef.description;
         if (skillDef.levelUpMessages && skillDef.levelUpMessages[newLevel]) {
             descriptionText = skillDef.levelUpMessages[newLevel];
         }
         const description = this.add.text(
             this.gameBounds.x + this.gameBounds.width / 2,
-            barY + barHeight * 0.22,
+            barY + barHeight * 0.32,
             descriptionText,
             {
                 fontFamily: 'Microsoft JhengHei, PingFang TC, -apple-system, BlinkMacSystemFont, sans-serif',
-                fontSize: `${Math.max(MainScene.MIN_FONT_SIZE_MEDIUM, Math.floor(barHeight * 0.22))}px`,
+                fontSize: `${Math.max(MainScene.MIN_FONT_SIZE_MEDIUM, Math.floor(barHeight * 0.20))}px`,
                 color: Phaser.Display.Color.IntegerToColor(skillDef.color).rgba
             }
         );
@@ -4974,8 +5054,8 @@ export default class MainScene extends Phaser.Scene {
             duration: 250,
             ease: 'Power2.easeOut',
             onComplete: () => {
-                // 停留 1.5 秒後滑出
-                this.time.delayedCall(1500, () => {
+                // 停留 2 秒後滑出
+                this.time.delayedCall(2000, () => {
                     this.tweens.add({
                         targets: this.skillCutInContainer,
                         x: this.gameBounds.width,
@@ -5051,6 +5131,22 @@ export default class MainScene extends Phaser.Scene {
             const iconBg = this.add.rectangle(0, iconY, iconSize, iconSize, skillDef.color, 0.3);
             iconBg.setStrokeStyle(2, skillDef.color);
             optionContainer.add(iconBg);
+
+            // 如果有技能圖示，顯示對應等級的圖示
+            if (skillDef.iconPrefix) {
+                const iconKey = `skill_icon_${skillDef.iconPrefix}${nextLevel.toString().padStart(2, '0')}`;
+                if (this.textures.exists(iconKey)) {
+                    const iconSprite = this.add.sprite(0, iconY, iconKey);
+                    iconSprite.setOrigin(0.5, 0.5);
+                    // 縮放圖示以適應區域
+                    const targetSize = iconSize - 8;
+                    const scale = targetSize / Math.max(iconSprite.width, iconSprite.height);
+                    iconSprite.setScale(scale);
+                    optionContainer.add(iconSprite);
+                    // 隱藏顏色背景
+                    iconBg.setAlpha(0);
+                }
+            }
 
             // 技能名稱（固定位置）
             const nameY = cardHeight * 0.06;
@@ -5391,6 +5487,8 @@ export default class MainScene extends Phaser.Scene {
         this.skillIconGridGraphics.forEach(graphics => graphics.destroy());
         this.skillIconGridGraphics = [];
         this.skillIconGridData = [];
+        // 清除技能圖示 Sprite（已在 container 中被銷毀，只需重置陣列）
+        this.skillIconSprites = [];
 
         // 清除技能資訊面板
         if (this.skillInfoPanel) {

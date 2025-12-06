@@ -22,7 +22,9 @@ export interface SkillDefinition {
     flashColor?: number; // 發動時的閃光顏色
     cooldown?: number; // 冷卻時間（毫秒）
     maxLevel: number; // 最大等級，預設為 5
+    iconPrefix?: string; // 技能圖示前綴（如 'A' 對應 A00.png ~ A05.png）
     levelUpMessages?: string[]; // 每級升級時的自訂描述（索引 0 = Lv.0，索引 5 = Lv.5/MAX）
+    levelUpQuotes?: string[]; // 每級升級時的角色對話（CUT IN 大字副標題）
     maxExtraAbility?: MaxExtraAbility; // MAX 後的額外能力
 }
 
@@ -45,6 +47,7 @@ export const SKILL_LIBRARY: SkillDefinition[] = [
         flashColor: 0x66ccff, // 閃藍光
         cooldown: 1000, // 1 秒
         maxLevel: 5,
+        iconPrefix: 'A', // A00.png ~ A05.png
         levelUpMessages: [
             '60° 扇形、2 傷害',
             '70° 扇形、3 傷害',
@@ -52,6 +55,14 @@ export const SKILL_LIBRARY: SkillDefinition[] = [
             '90° 扇形、5 傷害',
             '100° 扇形、6 傷害',
             '110° 扇形、7 傷害，已達最大等級！'
+        ],
+        levelUpQuotes: [
+            '你練習了繪畫技法，動畫美術的能力提升了', // LV0
+            '你習得了分鏡設計，並獲得了動態腳本製作技術', // LV1
+            '你增進了手繪動畫和停格動畫的製作技術', // LV2
+            '你苦練了3D角色模型和3D場景的設計', // LV3
+            '你完全理解了動畫法則，提升了角色動畫的製作精度', // LV4
+            '你成為了動畫大師，即將解鎖驚人的能力', // LV5/MAX
         ],
         maxExtraAbility: {
             name: '穿透',
@@ -91,14 +102,15 @@ export const SKILL_LIBRARY: SkillDefinition[] = [
     },
     {
         id: 'active_vfx',
-        name: '超級導演',
-        subtitle: '視效師',
+        name: '疾光狙擊',
+        subtitle: '超級導演',
         description: '朝隨機敵人發射 10 單位貫穿光束，每級增加 1 道',
         type: 'active',
         color: 0x66ff66, // 綠色
         flashColor: 0x88ff88, // 閃綠光
         cooldown: 2500, // 2.5 秒
         maxLevel: 5,
+        iconPrefix: 'B', // B00.png ~ B05.png
         levelUpMessages: [
             '1 道光束、1 傷害',
             '2 道光束、2 傷害',
@@ -394,11 +406,10 @@ export class SkillManager {
 
         const options: SkillDefinition[] = [];
 
-        // 第一次選擇：只顯示攻擊技能
+        // 第一次選擇：固定顯示前 3 個攻擊技能（不隨機）
         if (!this.hasAnyActiveSkill()) {
-            const shuffledActive = this.shuffleArray([...upgradeableActive]);
-            for (let i = 0; i < Math.min(3, shuffledActive.length); i++) {
-                options.push(shuffledActive[i]);
+            for (let i = 0; i < Math.min(3, upgradeableActive.length); i++) {
+                options.push(upgradeableActive[i]);
             }
             return options;
         }
