@@ -6,7 +6,8 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nfeat: 建立動態官方首頁專案架構\n\n- 前端：React + Vite，包含首頁、關於、產品、聯絡頁面\n- 後端：Google Apps Script API 程式碼\n- 部署：GitHub Actions 自動部署到 GitHub Pages\n- 文件：README 及 Google Sheets 設定指南\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git push)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nfix: 修正 vite base 路徑為 /WWW/\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix: 修正 vite base 路徑為 /WWW/\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix: 修正 base 路徑為小寫 /www/\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")"
     ]
   }
 }
