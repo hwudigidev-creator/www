@@ -34,7 +34,10 @@ function Contact() {
   return (
     <div className="contact">
       <section className="section">
-        <h2 className="section-title">聯絡我們</h2>
+        <div className="section-header">
+          <h2 className="section-title">聯絡我們</h2>
+          <p className="section-subtitle">有任何問題或建議嗎？歡迎與我們聯繫</p>
+        </div>
         <form className="contact-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="name">姓名</label>
@@ -75,13 +78,9 @@ function Contact() {
             {submitting ? '發送中...' : '發送訊息'}
           </button>
           {result && (
-            <p style={{
-              marginTop: '1rem',
-              textAlign: 'center',
-              color: result.success ? '#059669' : '#dc2626'
-            }}>
+            <div className={`form-message ${result.success ? 'success' : 'error'}`}>
               {result.message}
-            </p>
+            </div>
           )}
         </form>
       </section>

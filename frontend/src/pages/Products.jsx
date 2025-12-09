@@ -13,7 +13,10 @@ function Products() {
   return (
     <div className="products">
       <section className="section">
-        <h2 className="section-title">產品服務</h2>
+        <div className="section-header">
+          <h2 className="section-title">產品服務</h2>
+          <p className="section-subtitle">探索我們精心設計的產品與服務</p>
+        </div>
         <div className="products-grid">
           {products?.map((product) => (
             <div key={product.id} className="product-card">

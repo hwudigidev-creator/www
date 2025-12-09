@@ -11,7 +11,8 @@ function Header() {
     <header className="header">
       <div className="header-container">
         <Link to="/" className="logo">
-          品牌名稱
+          <div className="logo-icon"></div>
+          <span>品牌名稱</span>
         </Link>
         <nav className="nav">
           <Link to="/" className={isActive('/')}>

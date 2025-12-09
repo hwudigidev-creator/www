@@ -15,8 +15,8 @@ function About() {
           <div className="about-text">
             <h2>{data?.title || '關於我們'}</h2>
             <p>{data?.content}</p>
-            <p><strong>我們的使命：</strong>{data?.mission}</p>
-            <p><strong>我們的願景：</strong>{data?.vision}</p>
+            <p><strong>我們的使命</strong><br />{data?.mission}</p>
+            <p><strong>我們的願景</strong><br />{data?.vision}</p>
           </div>
           <div className="about-image">
             公司形象圖片
