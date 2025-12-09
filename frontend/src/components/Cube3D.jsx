@@ -28,15 +28,15 @@ function Cube3D({ features }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // 方塊旋轉角度
-  const cubeRotateX = scrollProgress * 360
-  const cubeRotateY = scrollProgress * 720
+  // 方塊效果
   const cubeScale = 1 - scrollProgress * 0.5
-  const cubeOpacity = 1 - scrollProgress
+  const cubeOpacity = 1 - scrollProgress * 1.5
+  const cubeRotateX = -25 + scrollProgress * 360
+  const cubeRotateY = 45 + scrollProgress * 720
 
-  // 卡片展開
-  const cardsOpacity = scrollProgress
-  const cardsScale = 0.8 + scrollProgress * 0.2
+  // 卡片展開 - 預設看不到
+  const cardsOpacity = Math.max(0, (scrollProgress - 0.4) * 2.5)
+  const cardsScale = 0.8 + Math.min(1, scrollProgress) * 0.2
 
   return (
     <div className="cube-section" ref={containerRef}>
@@ -44,9 +44,9 @@ function Cube3D({ features }) {
       <div
         className="cube-container"
         style={{
-          opacity: cubeOpacity,
+          opacity: Math.max(0, cubeOpacity),
           transform: `scale(${cubeScale})`,
-          pointerEvents: scrollProgress > 0.5 ? 'none' : 'auto'
+          pointerEvents: scrollProgress > 0.3 ? 'none' : 'auto'
         }}
       >
         <div
@@ -56,33 +56,34 @@ function Cube3D({ features }) {
           }}
         >
           <div className="cube-face cube-front">
-            <span>AI</span>
+            <span>?</span>
           </div>
           <div className="cube-face cube-back">
-            <span>VFX</span>
+            <span>?</span>
           </div>
           <div className="cube-face cube-right">
-            <span>Game</span>
+            <span>?</span>
           </div>
           <div className="cube-face cube-left">
-            <span>Anim</span>
+            <span>?</span>
           </div>
           <div className="cube-face cube-top">
-            <span>XR</span>
+            <span>?</span>
           </div>
           <div className="cube-face cube-bottom">
-            <span>Flow</span>
+            <span>?</span>
           </div>
         </div>
       </div>
 
-      {/* 展開的字卡 */}
+      {/* 展開的字卡 - 預設隱藏 */}
       <div
         className="expanded-cards"
         style={{
           opacity: cardsOpacity,
           transform: `scale(${cardsScale})`,
-          pointerEvents: scrollProgress < 0.5 ? 'none' : 'auto'
+          pointerEvents: scrollProgress < 0.4 ? 'none' : 'auto',
+          visibility: scrollProgress < 0.3 ? 'hidden' : 'visible'
         }}
       >
         <div className="cards-grid">
@@ -92,10 +93,10 @@ function Cube3D({ features }) {
               className="feature-card-3d"
               style={{
                 transitionDelay: `${index * 0.1}s`,
-                transform: scrollProgress > 0.3
+                transform: scrollProgress > 0.5
                   ? 'translateY(0) rotateX(0)'
                   : 'translateY(50px) rotateX(-15deg)',
-                opacity: scrollProgress > 0.3 ? 1 : 0
+                opacity: scrollProgress > 0.5 ? 1 : 0
               }}
             >
               <div className="card-icon">{feature.icon}</div>
