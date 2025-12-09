@@ -318,30 +318,36 @@ body {
 
 /* ==================== 3D Cube Section ==================== */
 .cube-section {
-  min-height: 150vh;
+  min-height: 200vh;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
   padding: 40px 24px;
   perspective: 1500px;
 }
 
 .cube-container {
   position: sticky;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding-bottom: calc(100vh / 3 - var(--cube-size, 200px) / 2);
+  padding-left: calc((100% - var(--cube-size, 200px)) / 3);
   transition: opacity 0.3s ease;
   z-index: 10;
-  height: 50vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  pointer-events: none;
+}
+
+.cube-wrapper {
+  --cube-size: min(30vh, 250px);
+  position: relative;
+  transform-style: preserve-3d;
 }
 
 .cube {
-  --cube-size: min(45vh, 350px);
   width: var(--cube-size);
   height: var(--cube-size);
   position: relative;
@@ -403,15 +409,34 @@ body {
 }
 
 .expanded-cards {
+  position: absolute;
+  bottom: calc(100vh / 3 - 150px);
+  left: 0;
+  right: 0;
   width: 100%;
   max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
+  perspective: 1000px;
+}
+
+@media (max-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .feature-card-3d {
@@ -419,8 +444,9 @@ body {
   padding: 32px;
   border-radius: var(--md-radius-lg);
   border: 1px solid var(--md-outline-variant);
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: center top;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+  will-change: transform, opacity;
 }
 
 .feature-card-3d:hover {
