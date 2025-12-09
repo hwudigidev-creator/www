@@ -286,7 +286,148 @@ body {
   line-height: 1.6;
 }
 
-/* ==================== Features Grid ==================== */
+/* ==================== 3D Cube Section ==================== */
+.cube-section {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  perspective: 1200px;
+}
+
+.cube-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.cube {
+  width: 150px;
+  height: 150px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: cubeFloat 6s ease-in-out infinite;
+}
+
+@keyframes cubeFloat {
+  0%, 100% { transform: rotateX(0deg) rotateY(0deg) translateY(0); }
+  25% { transform: rotateX(5deg) rotateY(90deg) translateY(-10px); }
+  50% { transform: rotateX(0deg) rotateY(180deg) translateY(0); }
+  75% { transform: rotateX(-5deg) rotateY(270deg) translateY(-10px); }
+}
+
+.cube-face {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--md-on-surface);
+  border: 2px solid var(--md-outline-variant);
+  border-radius: var(--md-radius-md);
+  backface-visibility: visible;
+}
+
+.cube-front {
+  background: linear-gradient(135deg, rgba(168, 199, 250, 0.15), rgba(168, 199, 250, 0.05));
+  transform: translateZ(75px);
+}
+
+.cube-back {
+  background: linear-gradient(135deg, rgba(109, 213, 140, 0.15), rgba(109, 213, 140, 0.05));
+  transform: rotateY(180deg) translateZ(75px);
+}
+
+.cube-right {
+  background: linear-gradient(135deg, rgba(127, 207, 255, 0.15), rgba(127, 207, 255, 0.05));
+  transform: rotateY(90deg) translateZ(75px);
+}
+
+.cube-left {
+  background: linear-gradient(135deg, rgba(252, 189, 0, 0.15), rgba(252, 189, 0, 0.05));
+  transform: rotateY(-90deg) translateZ(75px);
+}
+
+.cube-top {
+  background: linear-gradient(135deg, rgba(242, 184, 181, 0.15), rgba(242, 184, 181, 0.05));
+  transform: rotateX(90deg) translateZ(75px);
+}
+
+.cube-bottom {
+  background: linear-gradient(135deg, rgba(168, 199, 250, 0.15), rgba(127, 207, 255, 0.05));
+  transform: rotateX(-90deg) translateZ(75px);
+}
+
+.cube-face span {
+  background: linear-gradient(135deg, var(--md-primary), var(--md-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.expanded-cards {
+  width: 100%;
+  max-width: 1200px;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.feature-card-3d {
+  background-color: var(--md-surface-container);
+  padding: 32px;
+  border-radius: var(--md-radius-lg);
+  border: 1px solid var(--md-outline-variant);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center top;
+}
+
+.feature-card-3d:hover {
+  background-color: var(--md-surface-container-high);
+  border-color: var(--md-outline);
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.feature-card-3d .card-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--md-primary-container), var(--md-secondary-container));
+  border-radius: var(--md-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.feature-card-3d h3 {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--md-on-surface);
+  margin-bottom: 12px;
+}
+
+.feature-card-3d p {
+  font-size: 14px;
+  color: var(--md-on-surface-variant);
+  line-height: 1.7;
+}
+
+/* ==================== Features Grid (Fallback) ==================== */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

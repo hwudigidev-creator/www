@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useFetch } from '../hooks/useFetch'
 import { getHomeData } from '../services/api'
 import Loading from '../components/Loading'
+import Cube3D from '../components/Cube3D'
 
 function Home() {
   const { data, loading, error } = useFetch(getHomeData)
@@ -37,21 +38,13 @@ function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* 3D Cube + Features Section */}
       <section className="section">
         <div className="section-header">
           <h2 className="section-title">專業領域</h2>
           <p className="section-subtitle">結合 AI 技術與創意設計，培養全方位數位設計人才</p>
         </div>
-        <div className="features-grid">
-          {features?.map((feature, index) => (
-            <div key={index} className="feature-card">
-              <div className="feature-icon">{feature.icon}</div>
-              <h3>{feature.title}</h3>
-              <p>{feature.description}</p>
-            </div>
-          ))}
-        </div>
+        <Cube3D features={features} />
       </section>
     </div>
   )
