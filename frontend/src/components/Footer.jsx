@@ -51,6 +51,7 @@ function Footer() {
             <a href="https://www.hwu.edu.tw/" target="_blank" rel="noopener noreferrer">學校官網</a>
           </div>
           <p>&copy; {currentYear} 醒吾科技大學 數位設計系. All rights reserved.</p>
+          <p className="powered-by">Powered by 數位設計：張紀威</p>
         </div>
       </div>
     </footer>
