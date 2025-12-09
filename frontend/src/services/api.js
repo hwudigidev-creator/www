@@ -32,31 +32,95 @@ function getMockData(action) {
   const mockData = {
     getHomeData: {
       hero: {
-        title: '歡迎來到我們的官方網站',
-        subtitle: '我們致力於提供最優質的產品與服務，讓您的生活更加美好。',
-        buttonText: '了解更多',
-        buttonLink: '/about'
+        title: '醒吾科技大學',
+        subtitle: '培養數位時代的創意設計人才。結合 AI 輔助設計、動畫、遊戲、互動多媒體與影視特效，打造全方位的數位設計專業能力。',
+        buttonText: '探索課程',
+        buttonLink: '/products'
       },
       features: [
-        { icon: '🚀', title: '快速服務', description: '我們提供迅速且高效的服務體驗' },
-        { icon: '💎', title: '優質產品', description: '嚴選最高品質的產品給您' },
-        { icon: '🤝', title: '專業團隊', description: '經驗豐富的專業團隊為您服務' },
-        { icon: '💬', title: '客戶支援', description: '24/7 全天候客戶服務支援' }
+        {
+          icon: '🤖',
+          title: 'AI 輔助設計',
+          description: '學習運用 AI 工具加速創作流程，掌握 AIGC 生成式 AI 技術，提升設計效率與創意表現。'
+        },
+        {
+          icon: '🎬',
+          title: '動畫設計',
+          description: '從 2D 動畫到 3D 動畫，學習角色設計、動態捕捉、動畫製作全流程技術。'
+        },
+        {
+          icon: '🎮',
+          title: '遊戲開發',
+          description: '遊戲企劃、關卡設計、Unity/Unreal 引擎開發，打造沉浸式遊戲體驗。'
+        },
+        {
+          icon: '✨',
+          title: '影視特效',
+          description: 'VFX 視覺特效、合成技術、動態圖像設計，創造震撼視覺效果。'
+        },
+        {
+          icon: '🖥️',
+          title: '互動多媒體',
+          description: 'AR/VR 擴增實境、互動裝置、數位展演，探索新媒體藝術可能性。'
+        },
+        {
+          icon: '🔄',
+          title: 'AI 工作流',
+          description: '建立高效的 AI 創作工作流程，整合多種 AI 工具實現自動化設計流程。'
+        }
       ]
     },
     getProducts: {
       products: [
-        { id: 1, name: '產品 A', description: '這是產品 A 的描述文字', price: 1200, image: '' },
-        { id: 2, name: '產品 B', description: '這是產品 B 的描述文字', price: 2400, image: '' },
-        { id: 3, name: '產品 C', description: '這是產品 C 的描述文字', price: 3600, image: '' },
-        { id: 4, name: '產品 D', description: '這是產品 D 的描述文字', price: 4800, image: '' }
+        {
+          id: 1,
+          name: 'AI 創意設計實務',
+          description: '學習 Midjourney、Stable Diffusion、ChatGPT 等 AI 工具在設計領域的應用。',
+          price: null,
+          image: ''
+        },
+        {
+          id: 2,
+          name: '3D 動畫與角色設計',
+          description: '使用 Maya、Blender 進行 3D 建模、骨架綁定、動畫製作。',
+          price: null,
+          image: ''
+        },
+        {
+          id: 3,
+          name: '遊戲設計與開發',
+          description: 'Unity、Unreal Engine 遊戲引擎實戰，從企劃到上架完整流程。',
+          price: null,
+          image: ''
+        },
+        {
+          id: 4,
+          name: '影視後製與特效',
+          description: 'After Effects、Nuke 視覺特效合成，電影級後製技術。',
+          price: null,
+          image: ''
+        },
+        {
+          id: 5,
+          name: 'AR/VR 互動體驗設計',
+          description: '擴增實境與虛擬實境應用開發，創造沉浸式互動體驗。',
+          price: null,
+          image: ''
+        },
+        {
+          id: 6,
+          name: 'UI/UX 介面設計',
+          description: '使用者體驗研究、介面設計、原型製作與可用性測試。',
+          price: null,
+          image: ''
+        }
       ]
     },
     getAbout: {
-      title: '關於我們',
-      content: '我們是一家致力於創新與品質的公司。自創立以來，我們始終堅持以客戶為中心的理念，不斷提升產品品質與服務水準。',
-      mission: '我們的使命是透過創新科技與優質服務，為客戶創造更大的價值。',
-      vision: '成為業界最受信賴的合作夥伴，引領產業發展趨勢。'
+      title: '關於數位設計系',
+      content: '醒吾科技大學數位設計系成立於數位內容產業蓬勃發展之際，致力於培養具備創意思維與技術能力的數位設計人才。我們結合最新的 AI 技術與傳統設計美學，讓學生在動畫、遊戲、互動多媒體、影視特效等領域具備專業競爭力。',
+      mission: '培養具備 AI 時代競爭力的數位設計專業人才，結合創意思維與技術實作，使學生能夠在快速變遷的數位產業中持續成長。',
+      vision: '成為台灣數位設計教育的領航者，培育能夠引領產業創新的設計人才，為數位內容產業注入創意動能。'
     },
     submitContact: {
       success: true,

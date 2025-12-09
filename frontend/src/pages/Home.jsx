@@ -18,17 +18,17 @@ function Home() {
         <div className="hero-content">
           <div className="hero-badge">
             <span>✨</span>
-            <span>全新上線</span>
+            <span>AI 時代的設計教育</span>
           </div>
           <h1>
-            {hero?.title || '歡迎來到'}
+            {hero?.title || '醒吾科技大學'}
             <br />
-            <span>我們的官方網站</span>
+            <span>數位設計系</span>
           </h1>
-          <p>{hero?.subtitle || '我們致力於提供最優質的產品與服務，讓您的生活更加美好。探索我們的解決方案，開啟嶄新的可能。'}</p>
+          <p>{hero?.subtitle || '培養數位時代的創意設計人才'}</p>
           <div className="hero-actions">
             <Link to={hero?.buttonLink || '/products'} className="btn btn-primary">
-              {hero?.buttonText || '探索產品'}
+              {hero?.buttonText || '探索課程'}
             </Link>
             <Link to="/about" className="btn btn-secondary">
               了解更多
@@ -40,8 +40,8 @@ function Home() {
       {/* Features Section */}
       <section className="section">
         <div className="section-header">
-          <h2 className="section-title">為什麼選擇我們</h2>
-          <p className="section-subtitle">我們提供全方位的解決方案，滿足您的各種需求</p>
+          <h2 className="section-title">專業領域</h2>
+          <p className="section-subtitle">結合 AI 技術與創意設計，培養全方位數位設計人才</p>
         </div>
         <div className="features-grid">
           {features?.map((feature, index) => (

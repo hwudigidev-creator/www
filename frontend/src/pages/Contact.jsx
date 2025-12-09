@@ -36,7 +36,7 @@ function Contact() {
       <section className="section">
         <div className="section-header">
           <h2 className="section-title">聯絡我們</h2>
-          <p className="section-subtitle">有任何問題或建議嗎？歡迎與我們聯繫</p>
+          <p className="section-subtitle">對數位設計系有任何問題嗎？歡迎與我們聯繫</p>
         </div>
         <form className="contact-form" onSubmit={handleSubmit}>
           <div className="form-group">
@@ -71,7 +71,7 @@ function Contact() {
               value={formData.message}
               onChange={handleChange}
               required
-              placeholder="請輸入您想要告訴我們的訊息"
+              placeholder="請輸入您想詢問的問題或建議"
             />
           </div>
           <button type="submit" className="submit-btn" disabled={submitting}>

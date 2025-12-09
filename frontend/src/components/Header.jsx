@@ -12,7 +12,7 @@ function Header() {
       <div className="header-container">
         <Link to="/" className="logo">
           <div className="logo-icon"></div>
-          <span>品牌名稱</span>
+          <span>數位設計系</span>
         </Link>
         <nav className="nav">
           <Link to="/" className={isActive('/')}>
@@ -22,7 +22,7 @@ function Header() {
             關於我們
           </Link>
           <Link to="/products" className={isActive('/products')}>
-            產品服務
+            課程特色
           </Link>
           <Link to="/contact" className={isActive('/contact')}>
             聯絡我們
