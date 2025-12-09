@@ -17,22 +17,13 @@ function Home() {
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
-          <div className="hero-badge">
-            <span>✨</span>
-            <span>AI 時代的設計教育</span>
-          </div>
           <h1>
-            {hero?.title || '醒吾科技大學'}
-            <br />
-            <span>數位設計系</span>
+            <span className="gradient-text">AI 時代的設計教育</span>
           </h1>
           <p>{hero?.subtitle || '培養數位時代的創意設計人才'}</p>
           <div className="hero-actions">
-            <Link to={hero?.buttonLink || '/products'} className="btn btn-primary">
+            <Link to={hero?.buttonLink || '/products'} className="btn btn-outline-gradient">
               {hero?.buttonText || '探索課程'}
-            </Link>
-            <Link to="/about" className="btn btn-secondary">
-              了解更多
             </Link>
           </div>
         </div>

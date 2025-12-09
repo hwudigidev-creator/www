@@ -6,6 +6,11 @@
 }
 
 :root {
+  /* 主色系 - 藍紫漸層 */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  --gradient-primary-reverse: linear-gradient(315deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  --gradient-glow: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #667eea);
+
   /* CodeWiki 深色模式色彩系統 */
   --md-primary: #a8c7fa;
   --md-on-primary: #062e6f;
@@ -224,31 +229,18 @@ body {
   margin: 0 auto;
 }
 
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background-color: var(--md-surface-container-high);
-  color: var(--md-primary);
-  padding: 8px 16px;
-  border-radius: var(--md-radius-full);
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 28px;
-  border: 1px solid var(--md-outline-variant);
-}
-
 .hero h1 {
-  font-size: 60px;
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -2px;
-  margin-bottom: 20px;
+  font-size: 56px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -1px;
+  margin-bottom: 24px;
   color: var(--md-on-surface);
 }
 
-.hero h1 span {
-  background: linear-gradient(90deg, #a8c7fa, #7fcfff, #6dd58c);
+/* 藍紫漸層文字 */
+.gradient-text {
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -305,6 +297,54 @@ body {
 .btn-secondary:hover {
   background-color: var(--md-surface-container);
   border-color: var(--md-outline);
+}
+
+/* 藍紫漸層流動邊框按鈕 */
+.btn-outline-gradient {
+  position: relative;
+  background: transparent;
+  color: var(--md-on-surface);
+  border: none;
+  padding: 14px 32px;
+  font-size: 16px;
+  z-index: 1;
+}
+
+.btn-outline-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--md-radius-full);
+  padding: 2px;
+  background: var(--gradient-glow);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: borderRotate 3s linear infinite;
+}
+
+.btn-outline-gradient::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--md-surface);
+  border-radius: calc(var(--md-radius-full) - 2px);
+  z-index: -1;
+}
+
+.btn-outline-gradient:hover::before {
+  animation: borderRotate 1.5s linear infinite;
+  filter: brightness(1.3);
+}
+
+.btn-outline-gradient:hover::after {
+  background: var(--md-surface-container);
+}
+
+@keyframes borderRotate {
+  from { background: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #667eea); }
+  to { background: conic-gradient(from 360deg, #667eea, #764ba2, #f093fb, #667eea); }
 }
 
 /* ==================== Section ==================== */
