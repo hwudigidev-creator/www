@@ -46,7 +46,9 @@ function Cube3D({ features }) {
   const easedCharacter = easeOutCubicChar(characterEnterProgress)
 
   // 方塊往左移動的偏移量（隨角色圖滑入而移動）
-  const cubeOffsetX = easedCharacter * -150 // 往左移 150px
+  // 手機版不位移，桌面版往左移 150px
+  const isMobileView = typeof window !== 'undefined' && window.innerWidth <= 768
+  const cubeOffsetX = isMobileView ? 0 : easedCharacter * -150
 
   // 卡片內容顯示進度 (0.6 ~ 1.0)
   const contentProgress = Math.max(0, Math.min(1, (scrollProgress - 0.6) / 0.4))
@@ -343,7 +345,8 @@ function Cube3D({ features }) {
         className="character-image"
         style={{
           opacity: easedCharacter,
-          transform: `translateX(${(1 - easedCharacter) * 35}%)`,
+          // 手機版從畫面外起始（50%），桌面版維持 35%
+          transform: `translateX(${(1 - easedCharacter) * (window.innerWidth <= 768 ? 50 : 35)}%)`,
         }}
       >
         <img

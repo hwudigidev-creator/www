@@ -913,8 +913,9 @@ body {
 
   /* 手機版角色圖 */
   .character-image {
-    right: -5%;
+    right: -25%; /* 停留位置往右移，少露一半 */
     bottom: 10%;
+    z-index: 0; /* 在卡片之後 */
   }
 
   .character-image img {
