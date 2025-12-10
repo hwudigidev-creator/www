@@ -20,7 +20,7 @@
   --gradient-glow: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #667eea);
 
   /* 標準化毛玻璃效果 - 調整這裡影響全站 */
-  --glass-opacity: 0.2;
+  --glass-opacity: 0.1;
   --glass-blur: 16px;
   --glass-bg: rgba(19, 19, 20, var(--glass-opacity));
   --glass-bg-hover: rgba(30, 31, 32, calc(var(--glass-opacity) + 0.1));
@@ -100,7 +100,7 @@ body {
 
 /* Footer 滾動空間 - 為固定區塊創造滾動空間 */
 .footer-spacer {
-  height: 100vh;
+  height: 250vh; /* 增加滾動空間讓動畫完整播放 */
   position: relative;
   z-index: 5;
   pointer-events: none;
@@ -121,8 +121,10 @@ body {
 .header {
   padding: 0 24px;
   height: 80px;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
@@ -525,12 +527,12 @@ body {
   pointer-events: none;
 }
 
-/* 方塊定位 - 井字構圖左下焦點 (PC) */
+/* 方塊定位 - 畫面正中央偏上 */
 .cube-wrapper {
-  --cube-size: min(25vh, 200px);
+  --cube-size: min(30vh, 220px);
   position: absolute;
-  left: 33.33%;
-  top: 66.66%;
+  left: 50%;
+  top: 45%;
   transform: translate(-50%, -50%);
   transform-style: preserve-3d;
   transition: opacity 0.4s ease;
@@ -576,35 +578,172 @@ body {
     0 0 60px rgba(245, 184, 0, 0.3);
 }
 
-/* 初始位置由 JS 控制 */
-
-.expanded-cards {
-  position: absolute;
-  bottom: 15vh;
-  left: 0;
-  right: 0;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
+/* 方塊各面 3D 定位 */
+.cube-front {
+  transform: translateZ(calc(var(--cube-size) / 2));
 }
 
+.cube-back {
+  transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.cube-right {
+  transform: rotateY(90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.cube-left {
+  transform: rotateY(-90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.cube-top {
+  transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.cube-bottom {
+  transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+/* 分解中的面容器 */
+.exploding-faces {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transform-style: preserve-3d;
+}
+
+/* 從面變成卡片（正方形 300x300） */
+.face-to-card {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  left: -110px;
+  top: -110px;
+  background: rgba(19, 19, 20, 0.9);
+  border: 2px solid #f5b800;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 20px rgba(245, 184, 0, 0.3),
+    0 0 40px rgba(245, 184, 0, 0.2);
+  transform-origin: center center;
+}
+
+.face-question {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  font-weight: 700;
+  color: #f5b800;
+  text-shadow:
+    0 0 20px rgba(245, 184, 0, 0.8),
+    0 0 40px rgba(245, 184, 0, 0.5);
+}
+
+.face-content {
+  position: absolute;
+  inset: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.face-content .card-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.face-content h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--md-on-surface);
+  margin-bottom: 8px;
+}
+
+.face-content p {
+  font-size: 12px;
+  color: var(--md-on-surface-variant);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 展開的卡片區域 */
+.expanded-cards {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 900px;
+  padding: 0 24px;
+  transition: opacity 0.3s ease;
+}
+
+/* PC: 3x2 grid */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  perspective: 1000px;
+  grid-template-rows: repeat(2, auto);
+  gap: 20px;
 }
 
-@media (max-width: 1024px) {
+/* Tablet: 2x3 grid */
+@media (max-width: 900px) {
+  .expanded-cards {
+    max-width: 600px;
+  }
   .cards-grid {
     grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, auto);
+    gap: 16px;
   }
 }
 
+/* Mobile: 橫向滾動，一次一張，隱藏滾動條 */
 @media (max-width: 640px) {
+  .expanded-cards {
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    max-width: 100%;
+    padding: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    /* 隱藏滾動條 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+
+  .expanded-cards::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Opera */
+  }
+
   .cards-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    padding: 20px 24px;
+    width: max-content;
+  }
+
+  .cards-grid .feature-card-3d {
+    flex: 0 0 calc(100vw - 80px);
+    max-width: 300px;
+    scroll-snap-align: center;
   }
 }
 
@@ -894,7 +1033,7 @@ body {
 
 /* ==================== Footer ==================== */
 .footer {
-  background: rgba(19, 19, 20, 0.8);
+  background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border-top: 1px solid var(--md-outline-variant);
