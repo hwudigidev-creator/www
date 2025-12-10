@@ -1313,6 +1313,30 @@ body {
   color: var(--md-error);
 }
 
+/* ==================== Version Info ==================== */
+.version-info {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  color: var(--md-on-surface-variant);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--md-radius-sm);
+  z-index: 9999;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.version-info:hover {
+  opacity: 1;
+}
+
 /* ==================== Footer ==================== */
 .footer {
   background: var(--glass-bg);

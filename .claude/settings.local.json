@@ -16,7 +16,10 @@
       "Bash(git merge:*)",
       "Bash(git push:*)",
       "Bash(git branch:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(dir \"B:\\〔WEB〕\\WWW_DD\")",
+      "Bash(dir \"B:\\〔WEB〕\\WWW_DD\\frontend\")",
+      "Bash(git tag:*)"
     ]
   }
 }
