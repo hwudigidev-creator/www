@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 function Header() {
@@ -16,6 +16,29 @@ function Header() {
   const closeNav = () => {
     setIsExpanded(false)
   }
+
+  // 點擊或捲動任何地方收起導覽
+  useEffect(() => {
+    if (!isExpanded) return
+
+    const handleClose = () => {
+      setIsExpanded(false)
+    }
+
+    // 延遲添加監聽，避免立即觸發
+    const timer = setTimeout(() => {
+      document.addEventListener('click', handleClose)
+      window.addEventListener('scroll', handleClose, { passive: true })
+      window.addEventListener('touchmove', handleClose, { passive: true })
+    }, 10)
+
+    return () => {
+      clearTimeout(timer)
+      document.removeEventListener('click', handleClose)
+      window.removeEventListener('scroll', handleClose)
+      window.removeEventListener('touchmove', handleClose)
+    }
+  }, [isExpanded])
 
   return (
     <header className={`header ${isExpanded ? 'expanded' : ''}`}>

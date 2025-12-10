@@ -55,6 +55,14 @@ function Home() {
             </button>
           </div>
         </div>
+        {/* 向下滾動指示器 */}
+        <div className="scroll-indicator" style={{ opacity: 1 - scrollProgress }}>
+          <div className="scroll-icons">
+            <span className="scroll-icon">▼</span>
+            <span className="scroll-icon">▼</span>
+            <span className="scroll-icon">▼</span>
+          </div>
+        </div>
       </section>
 
       {/* 3D Cube Section - 固定在底部 */}
