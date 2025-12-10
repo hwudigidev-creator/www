@@ -13,6 +13,37 @@
   box-sizing: border-box;
 }
 
+/* 自訂捲軸樣式 - 全站 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(19, 19, 20, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #7b8fed 0%, #8a5cb5 100%);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox 捲軸樣式 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #764ba2 rgba(19, 19, 20, 0.3);
+}
+
 :root {
   /* 主色系 - 藍紫漸層 */
   --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
