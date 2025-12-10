@@ -1,4 +1,12 @@
 /* Google CodeWiki 深色模式風格 */
+
+/* 定義可動畫的漸層角度 */
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -62,9 +70,9 @@
   --md-elevation-2: 0 2px 6px 2px rgba(0,0,0,0.15), 0 1px 2px 0 rgba(0,0,0,0.3);
   --md-elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px 0 rgba(0,0,0,0.3);
 
-  /* 字體 */
-  --md-font-family: 'Google Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-  --md-font-mono: 'Google Sans Mono', 'Roboto Mono', monospace;
+  /* 字體 - 使用 Google 開源字型 Noto Sans TC */
+  --md-font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --md-font-mono: 'Roboto Mono', 'Consolas', monospace;
 }
 
 body {
@@ -90,12 +98,23 @@ body {
   position: relative;
 }
 
-/* Footer 滾動空間 - 讓 footer 可以滾上來蓋住 */
+/* Footer 滾動空間 - 為固定區塊創造滾動空間 */
 .footer-spacer {
   height: 100vh;
   position: relative;
   z-index: 5;
   pointer-events: none;
+}
+
+/* 固定在底部的最後區塊 */
+.fixed-bottom-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: auto;
 }
 
 /* ==================== Header ==================== */
@@ -250,6 +269,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 2; /* 高於固定的 cube-section */
 }
 
 .hero::before {
@@ -272,16 +292,27 @@ body {
   66% { transform: translate(-2%, 2%) scale(0.98); }
 }
 
+/* Hero 滾動毛玻璃遮罩 */
+.hero-blur-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(19, 19, 20, 0.3);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+}
+
 .hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 800px;
   margin: 0 auto;
 }
 
 .hero h1 {
   font-size: 56px;
-  font-weight: 500;
+  font-weight: 700;
   line-height: 1.2;
   letter-spacing: -1px;
   margin-bottom: 24px;
@@ -388,7 +419,7 @@ body {
   inset: 0;
   border-radius: var(--md-radius-full);
   padding: 2px;
-  background: var(--gradient-glow);
+  background: conic-gradient(from var(--gradient-angle), #667eea, #764ba2, #f093fb, #667eea);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -425,8 +456,8 @@ body {
 }
 
 @keyframes borderRotate {
-  from { background: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #667eea); }
-  to { background: conic-gradient(from 360deg, #667eea, #764ba2, #f093fb, #667eea); }
+  from { --gradient-angle: 0deg; }
+  to { --gradient-angle: 360deg; }
 }
 
 /* ==================== Section ==================== */
@@ -468,11 +499,14 @@ body {
 .cube-section {
   min-height: 100vh;
   height: 100vh;
-  position: sticky;
-  top: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding: 0;
   perspective: 1500px;
   z-index: 1;
+  background: var(--md-surface);
 }
 
 .cube-container {
@@ -860,7 +894,7 @@ body {
 
 /* ==================== Footer ==================== */
 .footer {
-  background: var(--glass-bg);
+  background: rgba(19, 19, 20, 0.8);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border-top: 1px solid var(--md-outline-variant);

@@ -2,9 +2,24 @@ import { useFetch } from '../hooks/useFetch'
 import { getHomeData } from '../services/api'
 import Loading from '../components/Loading'
 import Cube3D from '../components/Cube3D'
+import { useEffect, useState } from 'react'
 
 function Home() {
   const { data, loading, error } = useFetch(getHomeData)
+  const [scrollProgress, setScrollProgress] = useState(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const windowHeight = window.innerHeight
+      // 計算滾動進度 (0 到 1)，在第一個畫面高度內完成
+      const progress = Math.min(1, scrollY / (windowHeight * 0.8))
+      setScrollProgress(progress)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const scrollToFeatures = (e) => {
     e.preventDefault()
@@ -18,8 +33,17 @@ function Home() {
 
   return (
     <div className="home">
-      {/* Hero Section */}
+      {/* Hero Section - sticky 讓滾動時可見毛玻璃效果 */}
       <section className="hero">
+        {/* 滾動時漸進毛玻璃效果 */}
+        <div
+          className="hero-blur-overlay"
+          style={{
+            opacity: scrollProgress,
+            backdropFilter: `blur(${scrollProgress * 20}px)`,
+            WebkitBackdropFilter: `blur(${scrollProgress * 20}px)`
+          }}
+        />
         <div className="hero-content">
           <h1>
             <span className="gradient-text">AI 時代的設計教育</span>
@@ -33,17 +57,11 @@ function Home() {
         </div>
       </section>
 
-      {/* 3D Cube + Features Section */}
-      <section id="features" className="section">
-        <div className="section-header">
-          <h2 className="section-title">專業領域</h2>
-          <p className="section-subtitle">結合 AI 技術與創意設計，培養全方位數位設計人才</p>
-        </div>
-        <Cube3D features={features} />
-      </section>
+      {/* 3D Cube Section - 固定在底部 */}
+      <Cube3D features={features} />
 
-      {/* Footer 滾動空間 */}
-      <div className="footer-spacer"></div>
+      {/* Footer 滾動空間 - 為 fixed cube-section 創造滾動空間 */}
+      <div id="features" className="footer-spacer"></div>
     </div>
   )
 }
