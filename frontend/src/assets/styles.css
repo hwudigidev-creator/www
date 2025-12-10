@@ -11,6 +11,12 @@
   --gradient-primary-reverse: linear-gradient(315deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   --gradient-glow: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #667eea);
 
+  /* 標準化毛玻璃效果 - 調整這裡影響全站 */
+  --glass-opacity: 0.2;
+  --glass-blur: 16px;
+  --glass-bg: rgba(19, 19, 20, var(--glass-opacity));
+  --glass-bg-hover: rgba(30, 31, 32, calc(var(--glass-opacity) + 0.1));
+
   /* CodeWiki 深色模式色彩系統 */
   --md-primary: #a8c7fa;
   --md-on-primary: #062e6f;
@@ -79,6 +85,19 @@ body {
   flex: 1;
 }
 
+/* 首頁容器 */
+.home {
+  position: relative;
+}
+
+/* Footer 滾動空間 - 讓 footer 可以滾上來蓋住 */
+.footer-spacer {
+  height: 100vh;
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
+}
+
 /* ==================== Header ==================== */
 .header {
   padding: 0 24px;
@@ -98,14 +117,14 @@ body {
   right: 0;
   height: 120px;
   background: linear-gradient(180deg,
-    rgba(19, 19, 20, 0.95) 0%,
-    rgba(19, 19, 20, 0.85) 30%,
-    rgba(19, 19, 20, 0.6) 60%,
-    rgba(19, 19, 20, 0.2) 85%,
+    rgba(19, 19, 20, calc(var(--glass-opacity) + 0.3)) 0%,
+    rgba(19, 19, 20, calc(var(--glass-opacity) + 0.2)) 30%,
+    rgba(19, 19, 20, var(--glass-opacity)) 60%,
+    rgba(19, 19, 20, calc(var(--glass-opacity) - 0.1)) 85%,
     rgba(19, 19, 20, 0) 100%
   );
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   mask-image: linear-gradient(180deg, black 0%, black 40%, transparent 100%);
   -webkit-mask-image: linear-gradient(180deg, black 0%, black 40%, transparent 100%);
   pointer-events: none;
@@ -222,10 +241,15 @@ body {
 /* ==================== Hero ==================== */
 .hero {
   background: var(--md-surface-dim);
-  padding: 100px 24px;
+  min-height: 100vh;
+  height: 100vh;
+  padding: 24px;
   text-align: center;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hero::before {
@@ -325,7 +349,7 @@ body {
   border-color: var(--md-outline);
 }
 
-/* 藍紫漸層流動邊框按鈕 */
+/* 藍紫漸層流動邊框按鈕 - 毛玻璃風格 */
 .btn-outline-gradient {
   position: relative;
   background: transparent;
@@ -334,6 +358,28 @@ body {
   padding: 14px 32px;
   font-size: 16px;
   z-index: 1;
+  /* 外圍發光效果 */
+  box-shadow:
+    0 0 15px rgba(102, 126, 234, 0.4),
+    0 0 30px rgba(118, 75, 162, 0.3),
+    0 0 45px rgba(240, 147, 251, 0.2);
+  border-radius: var(--md-radius-full);
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(102, 126, 234, 0.4),
+      0 0 30px rgba(118, 75, 162, 0.3),
+      0 0 45px rgba(240, 147, 251, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(102, 126, 234, 0.6),
+      0 0 40px rgba(118, 75, 162, 0.4),
+      0 0 60px rgba(240, 147, 251, 0.3);
+  }
 }
 
 .btn-outline-gradient::before {
@@ -347,25 +393,35 @@ body {
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: borderRotate 3s linear infinite;
+  animation: borderRotate 4s linear infinite;
 }
 
 .btn-outline-gradient::after {
   content: '';
   position: absolute;
   inset: 2px;
-  background: var(--md-surface);
+  /* 使用標準化毛玻璃效果 */
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border-radius: calc(var(--md-radius-full) - 2px);
   z-index: -1;
 }
 
+.btn-outline-gradient:hover {
+  box-shadow:
+    0 0 25px rgba(102, 126, 234, 0.6),
+    0 0 50px rgba(118, 75, 162, 0.5),
+    0 0 75px rgba(240, 147, 251, 0.4);
+}
+
 .btn-outline-gradient:hover::before {
-  animation: borderRotate 1.5s linear infinite;
+  animation: borderRotate 2s linear infinite;
   filter: brightness(1.3);
 }
 
 .btn-outline-gradient:hover::after {
-  background: var(--md-surface-container);
+  background: var(--glass-bg-hover);
 }
 
 @keyframes borderRotate {
@@ -375,9 +431,16 @@ body {
 
 /* ==================== Section ==================== */
 .section {
-  padding: 80px 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+  min-height: 100vh;
+  height: 100vh;
+  padding: 24px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 100px; /* 避開導覽列 */
+  position: relative;
+  background: var(--md-surface);
 }
 
 .section-header {
@@ -403,32 +466,38 @@ body {
 
 /* ==================== 3D Cube Section ==================== */
 .cube-section {
-  min-height: 200vh;
-  position: relative;
-  padding: 40px 24px;
+  min-height: 100vh;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  padding: 0;
   perspective: 1500px;
+  z-index: 1;
 }
 
 .cube-container {
-  position: sticky;
+  position: absolute;
   top: 0;
-  height: 100vh;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  height: 100%;
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding-bottom: calc(100vh / 3 - var(--cube-size, 200px) / 2);
-  padding-left: calc((100% - var(--cube-size, 200px)) / 3);
+  align-items: center;
+  justify-content: center;
   transition: opacity 0.3s ease;
   z-index: 10;
   pointer-events: none;
 }
 
+/* 方塊定位 - 井字構圖左下焦點 (PC) */
 .cube-wrapper {
-  --cube-size: min(30vh, 250px);
-  position: relative;
+  --cube-size: min(25vh, 200px);
+  position: absolute;
+  left: 33.33%;
+  top: 66.66%;
+  transform: translate(-50%, -50%);
   transform-style: preserve-3d;
   transition: opacity 0.4s ease;
 }
@@ -451,9 +520,9 @@ body {
   justify-content: center;
   padding: 20%;
   background: rgba(19, 19, 20, 0.85);
-  border: 3px solid;
+  border: 2px solid;
   border-color: #f5b800;
-  border-radius: var(--md-radius-lg);
+  border-radius: 0; /* 無圓角，緊密拼接 */
   backface-visibility: visible;
   box-shadow:
     0 0 20px rgba(245, 184, 0, 0.3),
@@ -791,9 +860,13 @@ body {
 
 /* ==================== Footer ==================== */
 .footer {
-  background-color: var(--md-surface-container);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border-top: 1px solid var(--md-outline-variant);
   padding: 48px 24px 32px;
+  position: relative;
+  z-index: 10;
 }
 
 .footer-content {
@@ -938,13 +1011,12 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradientFlow 3s ease-in-out infinite;
+  animation: gradientFlow 3s linear infinite;
   font-weight: 500;
 }
 
 @keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0% { background-position: 200% 50%; }
   100% { background-position: 0% 50%; }
 }
 
@@ -1077,16 +1149,17 @@ body {
   }
 
   .hero {
-    padding: 60px 16px;
+    min-height: 100vh;
+    padding: 16px;
   }
 
   .hero h1 {
-    font-size: 36px;
-    letter-spacing: -1px;
+    font-size: 32px;
+    letter-spacing: -0.5px;
   }
 
   .hero p {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .hero-actions {
@@ -1096,10 +1169,26 @@ body {
 
   .section {
     padding: 48px 16px;
+    padding-top: 80px;
   }
 
   .section-title {
-    font-size: 28px;
+    font-size: clamp(24px, 6vw, 28px); /* 字尺寸適應畫面 */
+  }
+
+  .section-subtitle {
+    font-size: clamp(14px, 4vw, 16px);
+  }
+
+  /* 方塊定位 - 手機版置中 */
+  .cube-wrapper {
+    --cube-size: min(40vw, 150px);
+    left: 50%;
+    top: 50%;
+  }
+
+  .cube-face span {
+    font-size: calc(var(--cube-size) * 0.4);
   }
 
   .about-content {
