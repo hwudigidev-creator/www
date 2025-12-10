@@ -11,7 +11,11 @@
       "Bash(git commit:*)",
       "WebFetch(domain:codewiki.google)",
       "WebSearch",
-      "WebFetch(domain:news.ycombinator.com)"
+      "WebFetch(domain:news.ycombinator.com)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git push:*)",
+      "Bash(git branch:*)"
     ]
   }
 }
