@@ -626,10 +626,10 @@ body {
   position: absolute;
   right: 0;
   top: 0;
-  z-index: 5;
+  z-index: 0; /* 在字卡後面 */
   pointer-events: none;
   will-change: transform, opacity;
-  transform-origin: right top;
+  transform-origin: right center;
 }
 
 .character-image img {
@@ -637,6 +637,38 @@ body {
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 0 30px rgba(102, 126, 234, 0.3));
+  transform-origin: right top;
+}
+
+/* 進場完成後：呼吸漂浮動畫，維持進場最終狀態 */
+.character-image.entered {
+  animation: characterFloat 6s ease-in-out infinite;
+}
+
+.character-image.entered img {
+  /* 維持進場結束時的 scale(1.2) = 0.7 + 0.5 */
+  transform: scale(1.2);
+  animation: characterBreathe 5s ease-in-out infinite;
+}
+
+@keyframes characterFloat {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(0) translateY(-10px);
+  }
+}
+
+@keyframes characterBreathe {
+  0%, 100% {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 30px rgba(102, 126, 234, 0.3));
+  }
+  50% {
+    transform: scale(1.214);
+    filter: drop-shadow(0 0 37px rgba(102, 126, 234, 0.44));
+  }
 }
 
 .cube-container {
@@ -915,11 +947,25 @@ body {
   .character-image {
     right: -25%; /* 停留位置往右移，少露一半 */
     bottom: 10%;
-    z-index: 0; /* 在卡片之後 */
+    z-index: 0; /* 在字卡後面 */
   }
 
   .character-image img {
     max-height: 60vh;
+  }
+
+  /* 手機版漂浮動畫幅度稍小，維持進場最終狀態 */
+  .character-image.entered {
+    animation: characterFloatMobile 6s ease-in-out infinite;
+  }
+
+  .character-image.entered img {
+    transform: scale(1.2);
+  }
+
+  @keyframes characterFloatMobile {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    50% { transform: translateX(0) translateY(-7px); }
   }
 }
 
@@ -1249,14 +1295,150 @@ body {
   font-size: 14px;
 }
 
-/* ==================== Contact Form ==================== */
-.contact-form {
+/* ==================== Contact Page ==================== */
+.contact {
+  background: var(--md-surface);
+  position: relative;
+}
+
+/* 第一區塊：標題區 - FIXED 不動 */
+.contact-hero {
+  position: fixed;
+  top: 80px; /* header 高度 */
+  left: 0;
+  right: 0;
+  padding: 32px 24px;
+  text-align: center;
+  background: var(--md-surface);
+  z-index: 4; /* 高於表單區 */
+}
+
+.contact-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.contact-hero h1 {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+
+.contact-hero p {
+  font-size: 16px;
+  color: var(--md-on-surface-variant);
   max-width: 560px;
   margin: 0 auto;
-  background-color: var(--md-surface-container);
-  padding: 40px;
-  border-radius: var(--md-radius-lg);
-  border: 1px solid var(--md-outline-variant);
+  line-height: 1.6;
+}
+
+/* 第二區塊：表單區 - FIXED 滿版，內部捲動 */
+.contact-form-section {
+  position: fixed;
+  top: 200px; /* header + 標題區高度 */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  background: var(--md-surface);
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+}
+
+/* 表單捲動容器 - 有上下漸層遮蔽 */
+.contact-form-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  position: relative;
+}
+
+/* 上下漸層遮蔽 - 同 CUBE 字卡 */
+.contact-form-wrapper::before,
+.contact-form-wrapper::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 80px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.contact-form-wrapper::before {
+  top: 0;
+  background: linear-gradient(to bottom,
+    var(--md-surface) 0%,
+    rgba(19, 19, 20, 0.9) 40%,
+    transparent 100%
+  );
+}
+
+.contact-form-wrapper::after {
+  bottom: 0;
+  background: linear-gradient(to top,
+    var(--md-surface) 0%,
+    rgba(19, 19, 20, 0.9) 40%,
+    transparent 100%
+  );
+}
+
+/* 表單內容捲動區 */
+.contact-form-scroll {
+  height: 100%;
+  overflow-y: auto;
+  padding: 60px 0;
+  /* 隱藏捲軸 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.contact-form-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* 第三區塊：Footer 滾動空間 */
+.contact-footer-spacer {
+  height: 200vh;
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.contact-form {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  /* 毛玻璃背景 */
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  padding: 48px 64px;
+  border-radius: 0; /* 無圓角 */
+  /* 發光邊框 */
+  border: 2px solid rgba(102, 126, 234, 0.5);
+  box-shadow:
+    0 0 20px rgba(102, 126, 234, 0.3),
+    0 0 40px rgba(118, 75, 162, 0.2),
+    0 0 60px rgba(240, 147, 251, 0.1),
+    inset 0 0 30px rgba(102, 126, 234, 0.05);
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* 欄位並列 */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.form-row .form-group {
+  margin-bottom: 0;
 }
 
 .form-group {
@@ -1274,21 +1456,23 @@ body {
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 16px;
+  padding: 16px 20px;
   font-family: var(--md-font-family);
   font-size: 16px;
   color: var(--md-on-surface);
-  background-color: var(--md-surface-container-low);
-  border: 1px solid var(--md-outline-variant);
-  border-radius: var(--md-radius-sm);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  background: rgba(19, 19, 20, 0.6);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 0; /* 無圓角 */
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--md-primary);
-  box-shadow: 0 0 0 2px rgba(168, 199, 250, 0.2);
+  border-color: rgba(102, 126, 234, 0.8);
+  box-shadow:
+    0 0 10px rgba(102, 126, 234, 0.4),
+    0 0 20px rgba(118, 75, 162, 0.2);
 }
 
 .form-group input::placeholder,
@@ -1301,36 +1485,45 @@ body {
   resize: vertical;
 }
 
+/* 送出按鈕 - 發光漸層風格 */
 .submit-btn {
   width: 100%;
-  padding: 14px 24px;
-  background-color: var(--md-primary);
-  color: var(--md-on-primary);
-  border: none;
-  border-radius: var(--md-radius-full);
+  padding: 16px 24px;
+  background: transparent;
+  color: var(--md-on-surface);
+  border: 2px solid rgba(102, 126, 234, 0.6);
+  border-radius: 0;
   font-family: var(--md-font-family);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow:
+    0 0 15px rgba(102, 126, 234, 0.4),
+    0 0 30px rgba(118, 75, 162, 0.3);
 }
 
 .submit-btn:hover {
-  filter: brightness(1.1);
-  box-shadow: var(--md-elevation-2);
+  border-color: rgba(102, 126, 234, 0.9);
+  box-shadow:
+    0 0 25px rgba(102, 126, 234, 0.6),
+    0 0 50px rgba(118, 75, 162, 0.5),
+    0 0 75px rgba(240, 147, 251, 0.4);
+  background: rgba(102, 126, 234, 0.1);
 }
 
 .submit-btn:disabled {
-  background-color: var(--md-outline-variant);
+  border-color: var(--md-outline-variant);
   color: var(--md-outline);
   cursor: not-allowed;
-  filter: none;
+  box-shadow: none;
 }
 
 .form-message {
   margin-top: 16px;
   padding: 12px 16px;
-  border-radius: var(--md-radius-sm);
+  border-radius: 0; /* 無圓角 */
   font-size: 14px;
   text-align: center;
 }
@@ -1343,6 +1536,270 @@ body {
 .form-message.error {
   background-color: var(--md-error-container);
   color: var(--md-error);
+}
+
+/* 下拉選單樣式 */
+.form-group select {
+  width: 100%;
+  padding: 16px 20px;
+  font-family: var(--md-font-family);
+  font-size: 16px;
+  color: var(--md-on-surface);
+  background: rgba(19, 19, 20, 0.6);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 0; /* 無圓角 */
+  transition: border-color 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 20px;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: rgba(102, 126, 234, 0.8);
+  box-shadow:
+    0 0 10px rgba(102, 126, 234, 0.4),
+    0 0 20px rgba(118, 75, 162, 0.2);
+}
+
+/* Autocomplete 下拉選單 */
+.autocomplete-wrapper {
+  position: relative;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  background: rgba(19, 19, 20, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-top: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  z-index: 100;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.autocomplete-dropdown li {
+  padding: 12px 20px;
+  cursor: pointer;
+  color: var(--md-on-surface);
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.autocomplete-dropdown li:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-dropdown li:hover {
+  background: rgba(102, 126, 234, 0.15);
+}
+
+.autocomplete-dropdown li.selected {
+  background: rgba(102, 126, 234, 0.25);
+  color: var(--md-primary);
+}
+
+/* 必填欄位標示 */
+.required {
+  color: var(--md-error);
+  margin-left: 2px;
+}
+
+/* 錯誤狀態 */
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+  border-color: var(--md-error);
+}
+
+.form-group input.error:focus,
+.form-group select.error:focus,
+.form-group textarea.error:focus {
+  box-shadow: 0 0 0 2px rgba(242, 184, 181, 0.3);
+}
+
+.error-message {
+  display: block;
+  color: var(--md-error);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* 職涯選擇器 - 左右箭頭切換 */
+/* 職業選擇器 + 留言並排 */
+.career-message-row {
+  grid-template-columns: auto 1fr; /* 選擇器最小寬度，留言佔滿 */
+  align-items: stretch;
+}
+
+.career-group {
+  width: fit-content;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.message-group textarea {
+  flex: 1;
+  min-height: 100px;
+}
+
+.career-selector {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(19, 19, 20, 0.6);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 0; /* 無圓角 */
+  transition: all 0.3s ease;
+  flex: 1; /* 填滿高度與留言一致 */
+}
+
+.career-selector-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.career-selector:hover {
+  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+}
+
+.arrow-btn {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(102, 126, 234, 0.5);
+  border-radius: 0; /* 無圓角 */
+  color: var(--md-primary);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.arrow-btn:hover {
+  background: rgba(102, 126, 234, 0.15);
+  border-color: rgba(102, 126, 234, 0.8);
+  box-shadow: 0 0 15px rgba(102, 126, 234, 0.4);
+  transform: scale(1.1);
+}
+
+.arrow-btn:active {
+  transform: scale(0.95);
+}
+
+.career-display {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.career-icon {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.career-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--md-on-surface);
+}
+
+.career-description {
+  font-size: 13px;
+  color: var(--md-on-surface-variant);
+}
+
+/* 指示點 */
+.career-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 0; /* 在 career-selector 內，用 gap 控制間距 */
+}
+
+.career-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--md-outline-variant);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.career-dots .dot:hover {
+  background: var(--md-outline);
+}
+
+.career-dots .dot.active {
+  background: var(--md-primary);
+  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(102, 126, 234, 0.6);
+}
+
+/* 手機版職涯選擇器 */
+@media (max-width: 768px) {
+  .career-message-row {
+    grid-template-columns: 1fr; /* 手機版垂直排列 */
+  }
+
+  .career-group {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .career-selector {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .arrow-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .career-icon {
+    font-size: 28px;
+  }
+
+  .career-label {
+    font-size: 16px;
+  }
+
+  .career-description {
+    font-size: 12px;
+  }
 }
 
 /* ==================== Version Info ==================== */
@@ -1759,8 +2216,56 @@ body {
     gap: 32px;
   }
 
+  .contact-hero {
+    top: 64px; /* 手機版 header 高度 */
+    padding: 20px 16px;
+  }
+
+  .contact-hero h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .contact-hero p {
+    font-size: 14px;
+  }
+
+  .contact-form-section {
+    top: 150px; /* 手機版 header + 標題區高度 */
+    padding: 0 16px;
+  }
+
+  .contact-form-wrapper::before,
+  .contact-form-wrapper::after {
+    height: 60px;
+  }
+
+  .contact-form-scroll {
+    padding: 40px 0;
+  }
+
   .contact-form {
-    padding: 24px;
+    padding: 24px 16px;
+  }
+
+  .contact-footer-spacer {
+    height: 150vh;
+  }
+
+  /* 手機版欄位改為一直排 */
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .form-row .form-group {
+    margin-bottom: 24px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 14px 16px;
   }
 
   .footer-main {

@@ -340,20 +340,26 @@ function Cube3D({ features }) {
         </div>
       )}
 
-      {/* 角色圖 - 從右側滑入 */}
+      {/* 角色圖 - 從右側滑入，進場完成後加漂浮動畫 */}
       <div
-        className="character-image"
+        className={`character-image ${characterEnterProgress >= 1 ? 'entered' : ''}`}
         style={{
           opacity: easedCharacter,
           // 手機版從畫面外起始（50%），桌面版維持 35%
-          transform: `translateX(${(1 - easedCharacter) * (window.innerWidth <= 768 ? 50 : 35)}%)`,
+          // 進場完成後不設定 transform，讓 CSS 動畫接管
+          transform: characterEnterProgress < 1
+            ? `translateX(${(1 - easedCharacter) * (window.innerWidth <= 768 ? 50 : 35)}%)`
+            : undefined,
         }}
       >
         <img
           src="/www/images/NeroS.webp"
           alt="Nero"
           style={{
-            transform: `scale(${0.7 + easedCharacter * 0.5})`,
+            // 進場完成後不設定 transform，讓 CSS 動畫接管
+            transform: characterEnterProgress < 1
+              ? `scale(${0.7 + easedCharacter * 0.5})`
+              : undefined,
             transformOrigin: 'right top',
           }}
         />

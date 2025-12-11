@@ -1,5 +1,7 @@
 # 動態官方首頁
 
+> **版本：v0.1.0a**
+
 使用 React + Google Apps Script + Google Sheets 打造的動態官方網站。
 
 ## 技術架構
@@ -21,14 +23,26 @@
 ## 專案結構
 
 ```
-WWW_DD/
-├── frontend/                # React Vite 前端
+www/
+├── frontend/                 # React Vite 前端
 │   ├── src/
-│   │   ├── components/      # React 元件
-│   │   ├── pages/           # 頁面元件
-│   │   ├── services/        # API 請求服務
-│   │   ├── hooks/           # 自訂 Hooks
-│   │   ├── assets/          # 靜態資源
+│   │   ├── components/       # React 元件
+│   │   │   ├── Cube3D.jsx    # 3D 方塊 UI 元件
+│   │   │   ├── Header.jsx    # 頁首導覽
+│   │   │   ├── Footer.jsx    # 頁尾
+│   │   │   ├── Loading.jsx   # 載入動畫
+│   │   │   └── VersionInfo.jsx # 版本資訊顯示
+│   │   ├── pages/            # 頁面元件
+│   │   │   ├── Home.jsx      # 首頁
+│   │   │   ├── About.jsx     # 關於我們
+│   │   │   ├── Products.jsx  # 產品頁
+│   │   │   └── Contact.jsx   # 聯絡我們
+│   │   ├── services/         # API 請求服務
+│   │   │   └── api.js
+│   │   ├── hooks/            # 自訂 Hooks
+│   │   │   └── useFetch.js
+│   │   ├── assets/           # 靜態資源
+│   │   │   └── styles.css
 │   │   ├── App.jsx
 │   │   └── main.jsx
 │   ├── public/
@@ -37,9 +51,9 @@ WWW_DD/
 │   └── package.json
 │
 ├── backend/                  # Google Apps Script 後端
-│   ├── Code.gs              # 主程式碼
-│   ├── API.gs               # API 處理函數
-│   └── appsscript.json      # GAS 設定檔
+│   ├── Code.gs               # 主程式碼 (含所有 API 函數)
+│   ├── appsscript.json       # GAS 設定檔
+│   └── SHEETS_SETUP.md       # Google Sheets 設定指南
 │
 └── README.md
 ```
@@ -126,7 +140,7 @@ npm run deploy
 
 ```javascript
 export default defineConfig({
-  base: '/<repo-name>/',  // 替換為你的倉庫名稱
+  base: '/www/',  // 目前設定為 /www/
   // ...其他設定
 })
 ```
