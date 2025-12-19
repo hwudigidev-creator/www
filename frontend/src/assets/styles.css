@@ -1285,16 +1285,16 @@ body {
   position: relative;
 }
 
-/* 第一區塊：標題區 - FIXED 不動 */
+/* 第一區塊：標題區 - FIXED 在背後，表單滾完後露出 */
 .contact-hero {
   position: fixed;
-  top: 80px; /* header 高度 */
+  top: 80px; /* 緊貼導覽列下方 */
   left: 0;
   right: 0;
   padding: 32px 24px;
   text-align: center;
   background: var(--md-surface);
-  z-index: 4; /* 高於表單區 */
+  z-index: 0; /* 在表單區後面 */
 }
 
 .contact-hero-content {
@@ -1318,75 +1318,40 @@ body {
   line-height: 1.6;
 }
 
-/* 第二區塊：表單區 - FIXED 滿版，內部捲動 */
+/* 第二區塊：表單區 - FIXED 在底部（同首頁 cube-section） */
 .contact-form-section {
   position: fixed;
-  top: 200px; /* header + 標題區高度 */
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  z-index: 2;
-  background: var(--md-surface);
+  height: 100vh;
+  background: transparent; /* 透明背景，讓標題區露出 */
   display: flex;
   justify-content: center;
-  padding: 0 24px;
+  align-items: flex-start;
+  padding: 24px;
+  padding-top: 80px; /* 只避開 header */
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none; /* 讓點擊穿透到表單 */
 }
 
-/* 表單捲動容器 - 有上下漸層遮蔽 */
+/* 表單容器 - 由外層滾動控制位置 */
 .contact-form-wrapper {
   width: 100%;
   max-width: 1200px;
-  height: 100%;
-  position: relative;
+  pointer-events: auto; /* 讓表單可點擊 */
 }
 
-/* 上下漸層遮蔽 - 同 CUBE 字卡 */
-.contact-form-wrapper::before,
-.contact-form-wrapper::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 80px;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.contact-form-wrapper::before {
-  top: 0;
-  background: linear-gradient(to bottom,
-    var(--md-surface) 0%,
-    rgba(19, 19, 20, 0.9) 40%,
-    transparent 100%
-  );
-}
-
-.contact-form-wrapper::after {
-  bottom: 0;
-  background: linear-gradient(to top,
-    var(--md-surface) 0%,
-    rgba(19, 19, 20, 0.9) 40%,
-    transparent 100%
-  );
-}
-
-/* 表單內容捲動區 */
+/* 表單內容區 */
 .contact-form-scroll {
-  height: 100%;
-  overflow-y: auto;
-  padding: 60px 0;
-  /* 隱藏捲軸 */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  padding: 20px 0;
+  padding-top: 160px; /* 讓標題區先露出來 */
 }
 
-.contact-form-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-/* 第三區塊：Footer 滾動空間 */
+/* Contact 頁面滾動空間 - 讓 Footer 可以上浮 */
 .contact-footer-spacer {
-  height: 200vh;
+  height: 250vh;
   position: relative;
   z-index: 5;
   pointer-events: none;
@@ -2220,7 +2185,7 @@ body {
   }
 
   .contact-hero {
-    top: 64px; /* 手機版 header 高度 */
+    top: 64px; /* 手機版導覽列高度 */
     padding: 20px 16px;
   }
 
@@ -2234,13 +2199,8 @@ body {
   }
 
   .contact-form-section {
-    top: 150px; /* 手機版 header + 標題區高度 */
-    padding: 0 16px;
-  }
-
-  .contact-form-wrapper::before,
-  .contact-form-wrapper::after {
-    height: 60px;
+    height: calc(100vh - 140px); /* 手機版扣除 header + 標題區 */
+    padding: 16px;
   }
 
   .contact-form-scroll {
@@ -2252,7 +2212,7 @@ body {
   }
 
   .contact-footer-spacer {
-    height: 150vh;
+    height: 200vh;
   }
 
   /* 手機版欄位改為一直排 */

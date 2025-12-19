@@ -18,9 +18,10 @@ function Contact() {
   const [result, setResult] = useState(null)
   const [schoolInput, setSchoolInput] = useState('')
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false)
+  const [formOffset, setFormOffset] = useState(0)
   const schoolInputRef = useRef(null)
   const dropdownRef = useRef(null)
-  const formScrollRef = useRef(null)
+  const formRef = useRef(null)
 
   const { careerTypes } = contactOptions
   // 使用 hslist.json 的學校清單，排除第一項（請輸入或選擇學校）
@@ -31,54 +32,35 @@ function Contact() {
     school.label.toLowerCase().includes(schoolInput.toLowerCase())
   )
 
-  // 表單內捲動邏輯 - 捲完才讓頁面捲動（同 CUBE 字卡）
+  // 用外層頁面滾動控制表單位置（同首頁卡片）
   useEffect(() => {
-    const container = formScrollRef.current
-    if (!container) return
-
-    const isAtTop = () => container.scrollTop <= 5
-    const isAtBottom = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container
-      return scrollTop + clientHeight >= scrollHeight - 5
-    }
-
-    // 檢查頁面是否已滾動（Footer 已上浮）
-    const isPageScrolled = () => window.scrollY > 10
-
-    const handleWheel = (e) => {
-      // 往上捲且頁面已滾動（Footer 可見）- 優先讓頁面滾動收回 Footer
-      if (e.deltaY < 0 && isPageScrolled()) {
-        return // 不攔截，讓頁面滾動收回 Footer
-      }
-      // 往上捲且已在頂部 - 讓頁面滾動
-      if (e.deltaY < 0 && isAtTop()) {
-        return
-      }
-      // 往下捲且已在底部 - 讓頁面滾動（Footer 出現）
-      if (e.deltaY > 0 && isAtBottom()) {
-        return
-      }
-      // 其他情況攔截，讓表單內部捲動
-      e.preventDefault()
-      e.stopPropagation()
-      container.scrollTop += e.deltaY
-    }
-
-    // 更新 overscroll 行為
     const handleScroll = () => {
-      if (isAtTop() || isAtBottom()) {
-        container.style.overscrollBehaviorY = 'auto'
-      } else {
-        container.style.overscrollBehaviorY = 'contain'
-      }
+      const scrollY = window.scrollY
+      const windowHeight = window.innerHeight
+
+      // 可視區域高度（扣除 header + 標題區）
+      const isMobile = window.innerWidth <= 768
+      const visibleHeight = windowHeight - (isMobile ? 140 : 180)
+
+      // 表單實際高度
+      const formHeight = formRef.current?.scrollHeight || 800
+
+      // 表單可以移動的最大距離
+      const maxOffset = Math.max(0, formHeight - visibleHeight + 100)
+
+      // 根據頁面滾動計算表單移動量（限制在 0 到 maxOffset 之間）
+      const offset = Math.min(scrollY, maxOffset)
+      setFormOffset(offset)
     }
 
-    window.addEventListener('wheel', handleWheel, { passive: false })
-    container.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', handleScroll, { passive: true })
+    // 延遲執行一次，確保表單已渲染
+    setTimeout(handleScroll, 100)
 
     return () => {
-      window.removeEventListener('wheel', handleWheel)
-      container.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
     }
   }, [])
 
@@ -222,14 +204,19 @@ function Contact() {
       <section className="contact-hero">
         <div className="contact-hero-content">
           <h1 className="gradient-text">聯絡我們</h1>
-          <p>對數位設計系有興趣或任何想了解的嗎？歡迎與我們聯繫</p>
+          <p>對數位設計系或AI工作流有興趣，或任何想了解的？</p>
         </div>
       </section>
 
-      {/* 第二區塊：表單區 - FIXED 滿版，內部捲動 */}
+      {/* 第二區塊：表單區 - FIXED 在底部，由外層滾動控制 */}
       <section className="contact-form-section">
-        <div className="contact-form-wrapper">
-          <div className="contact-form-scroll" ref={formScrollRef}>
+        <div
+          className="contact-form-wrapper"
+          style={{
+            transform: `translateY(${-formOffset}px)`,
+          }}
+        >
+          <div className="contact-form-scroll" ref={formRef}>
             <form className="contact-form" onSubmit={handleSubmit}>
               {/* 校名 + 科別 並列 */}
               <div className="form-row">
@@ -400,7 +387,7 @@ function Contact() {
         </div>
       </section>
 
-      {/* 第三區塊：Footer 滾動空間 */}
+      {/* Footer 滾動空間 - 讓 Footer 可以上浮 */}
       <div className="contact-footer-spacer"></div>
     </div>
   )
