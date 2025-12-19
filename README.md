@@ -1,10 +1,16 @@
 # 動態官方首頁
 
-> **版本：v0.2.0a**
+> **版本：v0.2.1a**
 
 使用 React + Google Apps Script + Google Sheets 打造的動態官方網站。
 
 ## 更新日誌
+
+### v0.2.1a
+- **聯絡表單 Google Sheets 串接**
+  - 新增獨立的 Google Apps Script 處理表單提交
+  - 表單資料自動寫入 Google Sheets
+  - 支援科別自動完成（與學校欄位相同介面）
 
 ### v0.2.0a
 - **聯絡頁面重構**
@@ -72,6 +78,9 @@ www/
 │   ├── Code.gs               # 主程式碼 (含所有 API 函數)
 │   ├── appsscript.json       # GAS 設定檔
 │   └── SHEETS_SETUP.md       # Google Sheets 設定指南
+│
+├── google-apps-script/       # 獨立的 Apps Script
+│   └── contact-form.gs       # 聯絡表單專用腳本
 │
 └── README.md
 ```
@@ -165,6 +174,8 @@ export default defineConfig({
 
 ## API 端點
 
+### 主要 API (VITE_API_URL)
+
 | 方法 | 端點 | 說明 |
 |------|------|------|
 | GET  | `?action=getHomeData` | 取得首頁資料 |
@@ -172,16 +183,39 @@ export default defineConfig({
 | GET  | `?action=getAbout` | 取得關於我們資料 |
 | POST | `?action=submitContact` | 提交聯絡表單 |
 
+### 聯絡表單 API (VITE_CONTACT_API_URL)
+
+獨立的 Google Apps Script，專門處理聯絡表單並寫入 Google Sheets。
+
+| 方法 | 說明 |
+|------|------|
+| GET  | 測試 API 是否運作 |
+| POST | 提交表單資料到 Google Sheets |
+
+**設定步驟**：
+1. 建立新的 Google Sheets 試算表
+2. 開啟 擴充功能 > Apps Script
+3. 複製 `google-apps-script/contact-form.gs` 內容
+4. 修改 `SHEET_ID` 為你的試算表 ID（從 URL 取得）
+5. 部署 > 新增部署 > 網頁應用程式
+6. 執行身份：我、存取權：所有人
+7. 複製部署 URL 設定到 `VITE_CONTACT_API_URL`
+
 ## 環境變數
 
 前端需設定以下環境變數 (建立 `.env` 檔案)：
 
 ```env
+# 主要 API（首頁、產品、關於等資料）
 VITE_API_URL=你的Google Apps Script部署URL
+
+# 聯絡表單專用 API（寫入 Google Sheets）
+VITE_CONTACT_API_URL=你的聯絡表單Apps Script部署URL
 ```
 
 生產環境部署時，需在 GitHub Actions 中設定 Secrets：
 - `VITE_API_URL`: Google Apps Script Web App URL
+- `VITE_CONTACT_API_URL`: 聯絡表單 Google Apps Script Web App URL
 
 ## 開發注意事項
 

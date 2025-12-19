@@ -1,4 +1,5 @@
 const API_URL = import.meta.env.VITE_API_URL || ''
+const CONTACT_API_URL = import.meta.env.VITE_CONTACT_API_URL || ''
 
 async function fetchAPI(action, options = {}) {
   const url = API_URL ? `${API_URL}?action=${action}` : ''
@@ -144,6 +145,29 @@ export async function getAbout() {
 }
 
 export async function submitContact(data) {
+  // 優先使用獨立的聯絡表單 API (Google Apps Script)
+  if (CONTACT_API_URL) {
+    try {
+      const response = await fetch(CONTACT_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain', // Google Apps Script 需要 text/plain 避免 CORS preflight
+        },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+      return result
+    } catch (error) {
+      console.error('Contact API Error:', error)
+      return {
+        success: false,
+        message: '發送失敗，請稍後再試。'
+      }
+    }
+  }
+
+  // 回退到原本的 API
   if (!API_URL) {
     return getMockData('submitContact')
   }
