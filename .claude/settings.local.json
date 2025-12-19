@@ -21,7 +21,12 @@
       "Bash(dir \"B:\\〔WEB〕\\WWW_DD\\frontend\")",
       "Bash(git tag:*)",
       "Bash(dir)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(git -C \"B:/〔WEB〕/WWW_DD\" status)",
+      "Bash(git -C \"B:/〔WEB〕/WWW_DD\" diff README.md frontend/.env.example frontend/src/services/api.js)",
+      "Bash(git -C \"B:/〔WEB〕/WWW_DD\" add README.md frontend/.env.example frontend/src/services/api.js google-apps-script/)",
+      "Bash(git -C \"B:/〔WEB〕/WWW_DD\" commit -m \"$\\(cat <<''EOF''\nfeat: 新增聯絡表單 Google Sheets 串接\n\n- 新增獨立的 Google Apps Script 處理表單提交\n- 表單資料自動寫入 Google Sheets\n- 更新 api.js 支援獨立的聯絡表單 API\n- 更新文件說明設定步驟\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git -C \"B:/〔WEB〕/WWW_DD\" push origin main)"
     ]
   }
 }
