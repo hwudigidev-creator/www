@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { submitContact } from '../services/api'
 import contactOptions from '../data/contactOptions.json'
 import hslist from '../data/hslist.json'
+import departmentList from '../data/departments.json'
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -18,9 +19,13 @@ function Contact() {
   const [result, setResult] = useState(null)
   const [schoolInput, setSchoolInput] = useState('')
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false)
+  const [deptInput, setDeptInput] = useState('')
+  const [showDeptDropdown, setShowDeptDropdown] = useState(false)
   const [formOffset, setFormOffset] = useState(0)
   const schoolInputRef = useRef(null)
   const dropdownRef = useRef(null)
+  const deptInputRef = useRef(null)
+  const deptDropdownRef = useRef(null)
   const formRef = useRef(null)
 
   const { careerTypes } = contactOptions
@@ -30,6 +35,11 @@ function Contact() {
   // 過濾符合的學校選項
   const filteredSchools = schools.filter(school =>
     school.label.toLowerCase().includes(schoolInput.toLowerCase())
+  )
+
+  // 過濾符合的科別選項
+  const filteredDepts = departmentList.filter(dept =>
+    dept.label.toLowerCase().includes(deptInput.toLowerCase())
   )
 
   // 用外層頁面滾動控制表單位置（同首頁卡片）
@@ -70,6 +80,10 @@ function Contact() {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target) &&
           schoolInputRef.current && !schoolInputRef.current.contains(e.target)) {
         setShowSchoolDropdown(false)
+      }
+      if (deptDropdownRef.current && !deptDropdownRef.current.contains(e.target) &&
+          deptInputRef.current && !deptInputRef.current.contains(e.target)) {
+        setShowDeptDropdown(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -114,6 +128,32 @@ function Contact() {
     }
   }
 
+  // 選擇科別
+  const handleDeptSelect = (dept) => {
+    setFormData(prev => ({ ...prev, department: dept.value }))
+    setDeptInput(dept.label)
+    setShowDeptDropdown(false)
+    if (errors.department) {
+      setErrors(prev => ({ ...prev, department: '' }))
+    }
+  }
+
+  // 科別輸入變更
+  const handleDeptInputChange = (e) => {
+    const value = e.target.value
+    setDeptInput(value)
+    setShowDeptDropdown(true)
+    const exactMatch = departmentList.find(d => d.label === value)
+    if (exactMatch) {
+      setFormData(prev => ({ ...prev, department: exactMatch.value }))
+    } else {
+      setFormData(prev => ({ ...prev, department: value }))
+    }
+    if (errors.department) {
+      setErrors(prev => ({ ...prev, department: '' }))
+    }
+  }
+
   // 驗證表單
   const validateForm = () => {
     const newErrors = {}
@@ -121,8 +161,8 @@ function Contact() {
     if (!schoolInput.trim()) {
       newErrors.school = '請輸入或選擇學校'
     }
-    if (!formData.department.trim()) {
-      newErrors.department = '請輸入科別'
+    if (!deptInput.trim()) {
+      newErrors.department = '請輸入或選擇科別'
     }
     if (!formData.name.trim()) {
       newErrors.name = '請輸入姓名'
@@ -188,6 +228,7 @@ function Contact() {
         message: ''
       })
       setSchoolInput('')
+      setDeptInput('')
       setErrors({})
     } catch (error) {
       setResult({ success: false, message: '發送失敗，請稍後再試。' })
@@ -253,18 +294,36 @@ function Contact() {
                   {errors.school && <span className="error-message">{errors.school}</span>}
                 </div>
 
-                {/* 科別 */}
+                {/* 科別 - 可搜尋輸入 */}
                 <div className="form-group">
                   <label htmlFor="department">科別 <span className="required">*</span></label>
-                  <input
-                    type="text"
-                    id="department"
-                    name="department"
-                    value={formData.department}
-                    onChange={handleChange}
-                    placeholder="請輸入您的科別"
-                    className={errors.department ? 'error' : ''}
-                  />
+                  <div className="autocomplete-wrapper">
+                    <input
+                      ref={deptInputRef}
+                      type="text"
+                      id="department"
+                      name="department"
+                      value={deptInput}
+                      onChange={handleDeptInputChange}
+                      onFocus={() => setShowDeptDropdown(true)}
+                      placeholder="輸入或選擇科別"
+                      className={errors.department ? 'error' : ''}
+                      autoComplete="off"
+                    />
+                    {showDeptDropdown && filteredDepts.length > 0 && (
+                      <ul className="autocomplete-dropdown" ref={deptDropdownRef}>
+                        {filteredDepts.map(dept => (
+                          <li
+                            key={dept.value}
+                            onClick={() => handleDeptSelect(dept)}
+                            className={formData.department === dept.value ? 'selected' : ''}
+                          >
+                            {dept.label}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                   {errors.department && <span className="error-message">{errors.department}</span>}
                 </div>
               </div>
