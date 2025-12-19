@@ -131,7 +131,7 @@ body {
 
 /* Footer 滾動空間 - 為固定區塊創造滾動空間 */
 .footer-spacer {
-  height: 300vh; /* 增加滾動空間讓卡片有更多時間瀏覽 */
+  height: 500vh; /* 增加滾動空間讓卡片有更多時間瀏覽 */
   position: relative;
   z-index: 5;
   pointer-events: none;
@@ -818,26 +818,13 @@ body {
   );
 }
 
-/* 垂直捲動卡片容器 */
+/* 卡片容器 - 不再有內部滾動，由外層頁面滾動控制 */
 .cards-scroll-container {
   width: calc(100% + 200px); /* 擴大寬度容納光暈 */
   margin-left: -100px; /* 置中 */
   height: 100%;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  /* 隱藏滾動條 */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  pointer-events: auto;
-  overscroll-behavior-y: contain;
-  /* 平滑滾動一格 */
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
-}
-
-.cards-scroll-container::-webkit-scrollbar {
-  display: none;
+  overflow: hidden; /* 隱藏超出範圍的卡片 */
+  pointer-events: none; /* 不攔截滾動事件 */
 }
 
 .cards-scroll-track {
@@ -861,12 +848,11 @@ body {
   justify-content: center;
   text-align: center;
   padding: 24px;
-  scroll-snap-align: center;
-  scroll-snap-stop: always; /* 確保每次只移動一格 */
   transition: transform 0.3s ease, box-shadow 0.3s ease, z-index 0s;
   position: relative;
   user-select: none; /* 禁止選取 */
   -webkit-user-select: none;
+  pointer-events: auto; /* 允許卡片本身可互動 */
 }
 
 .scroll-card .card-icon {
@@ -910,10 +896,8 @@ body {
   .cards-scroll-container {
     width: 100%;
     margin-left: 0;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    overscroll-behavior-y: auto; /* 允許穿透到頁面滾動 */
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden; /* 隱藏超出範圍的卡片 */
+    pointer-events: none; /* 不攔截滾動事件 */
   }
 
   .cards-scroll-track {

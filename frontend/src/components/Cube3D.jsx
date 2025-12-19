@@ -1,9 +1,8 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 function Cube3D({ features }) {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [focusedCardIndex, setFocusedCardIndex] = useState(0)
-  const scrollContainerRef = useRef(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -66,106 +65,33 @@ function Cube3D({ features }) {
   // 判斷動畫是否完成（可以切換到捲動模式）- 提早完成讓 Footer 更快出現
   const isAnimationComplete = explodeProgress >= 0.85
 
-  // 垂直捲動 - 全頁面捲動控制卡片
+  // 垂直捲動 - 用外層頁面滾動統一控制卡片聚焦
   useEffect(() => {
-    const container = scrollContainerRef.current
-    if (!container || !isAnimationComplete) return
+    if (!isAnimationComplete) return
 
-    let isScrolling = false
-    // 根據螢幕寬度決定卡片尺寸
-    const isMobile = window.innerWidth <= 768
-    const cardHeight = isMobile ? (220 + 24) : (280 + 32) // 卡片高度 + gap
     const totalCards = 6
+    const windowHeight = window.innerHeight
 
-    const checkScrollPosition = () => {
-      const { scrollTop } = container
-      // 計算當前聚焦的卡片索引
-      const index = Math.round(scrollTop / cardHeight)
+    // 動畫完成時的頁面滾動位置（約 windowHeight * 2.5）
+    const cardSectionStart = windowHeight * 2.5
+    // 每張卡片切換所需的滾動距離（約半個畫面高度，讓用戶有足夠時間瀏覽）
+    const scrollPerCard = windowHeight * 0.5
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+
+      // 計算在卡片區域內的相對位置
+      const relativeScroll = scrollY - cardSectionStart
+      // 根據滾動位置計算聚焦的卡片索引
+      const index = Math.round(relativeScroll / scrollPerCard)
       setFocusedCardIndex(Math.min(Math.max(0, index), totalCards - 1))
     }
 
-    const isAtTop = () => container.scrollTop <= 5
-    const isAtBottom = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container
-      return scrollTop + clientHeight >= scrollHeight - 5
-    }
-
-    // 檢查頁面是否已滾動超過卡片動畫區域（進入 footer-spacer 或 footer）
-    const isPageBeyondCardSection = () => {
-      const scrollY = window.scrollY
-      const windowHeight = window.innerHeight
-      // 動畫完成時頁面大約在 windowHeight * 2.5 位置
-      // 如果滾動超過這個位置，表示已經離開卡片區域
-      const cardSectionEnd = windowHeight * 2.5
-      return scrollY > cardSectionEnd
-    }
-
-    const handleWheel = (e) => {
-      // 檢查頁面是否已超出卡片區域（進入 footer 區域）
-      const beyondCardSection = isPageBeyondCardSection()
-
-      // 往上捲且頁面已超出卡片區域 - 讓頁面先往上滾（收起 Footer）
-      if (e.deltaY < 0 && beyondCardSection) {
-        return // 不阻止，讓頁面滾動收起 Footer
-      }
-
-      // 往上捲且卡片已在頂部 - 讓頁面往上滾
-      if (e.deltaY < 0 && isAtTop()) {
-        return // 不阻止，讓頁面滾動
-      }
-
-      // 往下捲且已在底部 - 讓頁面往下滾（Footer 出現）
-      if (e.deltaY > 0 && isAtBottom()) {
-        return // 不阻止，讓頁面滾動
-      }
-
-      // 防止連續滾動，讓 snap 有時間完成
-      if (isScrolling) {
-        e.preventDefault()
-        return
-      }
-
-      // 攔截滾動並控制卡片
-      e.preventDefault()
-      e.stopPropagation()
-
-      isScrolling = true
-      const direction = e.deltaY > 0 ? 1 : -1
-      container.scrollTop += direction * cardHeight
-
-      // 延遲重置，讓動畫完成
-      setTimeout(() => {
-        isScrolling = false
-        checkScrollPosition()
-      }, 400)
-    }
-
-    // 手機版：不攔截觸控，讓 CSS scroll-snap 處理卡片切換
-    // 只監聽 container 的 scroll 事件來更新 focusedCardIndex
-    // 並監聽邊界狀態來控制 overscroll 行為
-
-    // 監聽 container 滾動到邊界時，讓頁面可以滾動
-    const handleContainerScroll = () => {
-      checkScrollPosition()
-
-      // 更新 overscroll 行為
-      if (isAtTop() || isAtBottom()) {
-        container.style.overscrollBehaviorY = 'auto'
-      } else {
-        container.style.overscrollBehaviorY = 'contain'
-      }
-    }
-
-    // 監聽事件
-    window.addEventListener('wheel', handleWheel, { passive: false })
-    container.addEventListener('scroll', handleContainerScroll, { passive: true })
-
-    // 初始檢查
-    checkScrollPosition()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // 初始檢查
 
     return () => {
-      window.removeEventListener('wheel', handleWheel)
-      container.removeEventListener('scroll', handleContainerScroll)
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [isAnimationComplete])
 
@@ -316,14 +242,18 @@ function Cube3D({ features }) {
 
   return (
     <div className="cube-section">
-      {/* 動畫完成後：可捲動的卡片列表（放在最外層） */}
+      {/* 動畫完成後：卡片列表（由外層頁面滾動控制） */}
       {isAnimationComplete && (
         <div className="cards-scroll-wrapper">
-          <div
-            className="cards-scroll-container"
-            ref={scrollContainerRef}
-          >
-            <div className="cards-scroll-track">
+          <div className="cards-scroll-container">
+            <div
+              className="cards-scroll-track"
+              style={{
+                // 根據 focusedCardIndex 移動軌道，讓聚焦的卡片對齊中央
+                transform: `translateY(${-focusedCardIndex * (window.innerWidth <= 768 ? (220 + 24) : (280 + 32))}px)`,
+                transition: 'transform 0.4s ease-out',
+              }}
+            >
               {safeFeatures.map((feature, index) => (
                 <div
                   key={index}
