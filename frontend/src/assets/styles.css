@@ -708,7 +708,8 @@ body {
   transition: transform 0.1s ease-out;
 }
 
-.cube-face {
+/* 首頁專用方塊面樣式 */
+.home-face {
   position: absolute;
   width: var(--cube-size);
   height: var(--cube-size);
@@ -730,7 +731,7 @@ body {
   will-change: transform, opacity;
 }
 
-.cube-face span {
+.home-face span {
   font-size: calc(var(--cube-size) * 0.6);
   font-weight: 700;
   font-family: 'Press Start 2P', 'VT323', 'Courier New', monospace;
@@ -742,28 +743,28 @@ body {
   filter: drop-shadow(0 0 5px rgba(245, 184, 0, 0.3));
 }
 
-/* 方塊各面 3D 定位 */
-.cube-front {
+/* 首頁方塊各面 3D 定位 */
+.home-front {
   transform: translateZ(calc(var(--cube-size) / 2));
 }
 
-.cube-back {
+.home-back {
   transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2));
 }
 
-.cube-right {
+.home-right {
   transform: rotateY(90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
-.cube-left {
+.home-left {
   transform: rotateY(-90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
-.cube-top {
+.home-top {
   transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
-.cube-bottom {
+.home-bottom {
   transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
@@ -1296,8 +1297,8 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 550px;
-  height: 750px;
+  width: 700px;
+  height: 900px;
   border-radius: 16px;
   overflow: hidden;
   z-index: 0;
@@ -1319,8 +1320,8 @@ body {
 /* 清晰的底層圖片 - 中心顯示，邊緣淡化（與外層相反） */
 .showcase-image-clear {
   z-index: 1;
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
   object-fit: cover;
   filter: contrast(1.05) saturate(1.1);
   transform: translate(-50%, -50%);
@@ -1388,8 +1389,8 @@ body {
 /* 發光背景 */
 .wireframe-glow {
   position: absolute;
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
   background: radial-gradient(
     circle,
     rgba(102, 126, 234, 0.35) 0%,
@@ -1408,8 +1409,8 @@ body {
 /* 線框方塊 - 不自動旋轉，由 JS 控制 */
 .wireframe-cube {
   position: relative;
-  width: 180px;
-  height: 180px;
+  width: 240px;
+  height: 240px;
   transform-style: preserve-3d;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1417,12 +1418,12 @@ body {
 /* 6 個濾鏡面 - backdrop-filter 看後面的圖 */
 .cube-face {
   position: absolute;
-  width: 180px;
-  height: 180px;
+  width: 240px;
+  height: 240px;
   left: 50%;
   top: 50%;
-  margin-left: -90px;
-  margin-top: -90px;
+  margin-left: -120px;
+  margin-top: -120px;
   background: rgba(255, 255, 255, 0.02);
   border: 3px solid #f5b800;
   overflow: hidden;
@@ -1458,12 +1459,12 @@ body {
   pointer-events: none;
 }
 
-.cube-face.front  { transform: translate3d(0, 0, 90px); }
-.cube-face.back   { transform: translate3d(0, 0, -90px) rotateY(180deg); }
-.cube-face.left   { transform: translate3d(-90px, 0, 0) rotateY(-90deg); }
-.cube-face.right  { transform: translate3d(90px, 0, 0) rotateY(90deg); }
-.cube-face.top    { transform: translate3d(0, -90px, 0) rotateX(90deg); }
-.cube-face.bottom { transform: translate3d(0, 90px, 0) rotateX(-90deg); }
+.cube-face.front  { transform: translate3d(0, 0, 120px); }
+.cube-face.back   { transform: translate3d(0, 0, -120px) rotateY(180deg); }
+.cube-face.left   { transform: translate3d(-120px, 0, 0) rotateY(-90deg); }
+.cube-face.right  { transform: translate3d(120px, 0, 0) rotateY(90deg); }
+.cube-face.top    { transform: translate3d(0, -120px, 0) rotateX(90deg); }
+.cube-face.bottom { transform: translate3d(0, 120px, 0) rotateX(-90deg); }
 
 /* 12 條邊 */
 .cube-edge {
@@ -1483,23 +1484,23 @@ body {
   100% { background-position: 0 0; opacity: 0.6; }
 }
 
-/* 前面 4 條邊 (z=90) */
-.cube-edge.e1 { width: 180px; height: 2px; margin-left: -90px; transform: translate3d(0, -90px, 90px); }
-.cube-edge.e2 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(90px, 0, 90px); }
-.cube-edge.e3 { width: 180px; height: 2px; margin-left: -90px; transform: translate3d(0, 90px, 90px); }
-.cube-edge.e4 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(-90px, 0, 90px); }
+/* 前面 4 條邊 (z=100) - 紫色框比金色小一號 */
+.cube-edge.e1 { width: 200px; height: 2px; margin-left: -100px; transform: translate3d(0, -100px, 100px); }
+.cube-edge.e2 { width: 2px; height: 200px; margin-top: -100px; transform: translate3d(100px, 0, 100px); }
+.cube-edge.e3 { width: 200px; height: 2px; margin-left: -100px; transform: translate3d(0, 100px, 100px); }
+.cube-edge.e4 { width: 2px; height: 200px; margin-top: -100px; transform: translate3d(-100px, 0, 100px); }
 
-/* 後面 4 條邊 (z=-90) */
-.cube-edge.e5 { width: 180px; height: 2px; margin-left: -90px; transform: translate3d(0, -90px, -90px); }
-.cube-edge.e6 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(90px, 0, -90px); }
-.cube-edge.e7 { width: 180px; height: 2px; margin-left: -90px; transform: translate3d(0, 90px, -90px); }
-.cube-edge.e8 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(-90px, 0, -90px); }
+/* 後面 4 條邊 (z=-100) */
+.cube-edge.e5 { width: 200px; height: 2px; margin-left: -100px; transform: translate3d(0, -100px, -100px); }
+.cube-edge.e6 { width: 2px; height: 200px; margin-top: -100px; transform: translate3d(100px, 0, -100px); }
+.cube-edge.e7 { width: 200px; height: 2px; margin-left: -100px; transform: translate3d(0, 100px, -100px); }
+.cube-edge.e8 { width: 2px; height: 200px; margin-top: -100px; transform: translate3d(-100px, 0, -100px); }
 
 /* 連接前後的 4 條邊 */
-.cube-edge.e9 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(-90px, -90px, 0) rotateX(90deg); }
-.cube-edge.e10 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(90px, -90px, 0) rotateX(90deg); }
-.cube-edge.e11 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(90px, 90px, 0) rotateX(90deg); }
-.cube-edge.e12 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(-90px, 90px, 0) rotateX(90deg); }
+.cube-edge.e9 { width: 2px; height: 200px; margin-top: -100px; transform: translate3d(-100px, -100px, 0) rotateX(90deg); }
+.cube-edge.e10 { width: 2px; height: 200px; margin-top: -100px; transform: translate3d(100px, -100px, 0) rotateX(90deg); }
+.cube-edge.e11 { width: 2px; height: 200px; margin-top: -100px; transform: translate3d(100px, 100px, 0) rotateX(90deg); }
+.cube-edge.e12 { width: 2px; height: 200px; margin-top: -100px; transform: translate3d(-100px, 100px, 0) rotateX(90deg); }
 
 /* ==================== Product Display ==================== */
 .product-display {
@@ -2688,7 +2689,7 @@ body {
     top: 50%;
   }
 
-  .cube-face span {
+  .home-face span {
     font-size: calc(var(--cube-size) * 0.4);
   }
 
@@ -2734,50 +2735,56 @@ body {
   }
 
   .cube-showcase {
-    height: 320px;
-  }
-
-  .showcase-image-container {
-    width: 280px;
     height: 380px;
   }
 
+  .showcase-image-container {
+    width: 340px;
+    height: 450px;
+  }
+
+  .showcase-image-clear {
+    width: 260px;
+    height: 260px;
+  }
+
   .wireframe-cube {
-    width: 120px;
-    height: 120px;
+    width: 160px;
+    height: 160px;
   }
 
   .wireframe-glow {
-    width: 180px;
-    height: 180px;
+    width: 240px;
+    height: 240px;
   }
 
   .cube-face {
-    width: 120px;
-    height: 120px;
-    margin-left: -60px;
-    margin-top: -60px;
+    width: 160px;
+    height: 160px;
+    margin-left: -80px;
+    margin-top: -80px;
   }
 
-  .cube-face.front  { transform: translate3d(0, 0, 60px); }
-  .cube-face.back   { transform: translate3d(0, 0, -60px) rotateY(180deg); }
-  .cube-face.left   { transform: translate3d(-60px, 0, 0) rotateY(-90deg); }
-  .cube-face.right  { transform: translate3d(60px, 0, 0) rotateY(90deg); }
-  .cube-face.top    { transform: translate3d(0, -60px, 0) rotateX(90deg); }
-  .cube-face.bottom { transform: translate3d(0, 60px, 0) rotateX(-90deg); }
+  .cube-face.front  { transform: translate3d(0, 0, 80px); }
+  .cube-face.back   { transform: translate3d(0, 0, -80px) rotateY(180deg); }
+  .cube-face.left   { transform: translate3d(-80px, 0, 0) rotateY(-90deg); }
+  .cube-face.right  { transform: translate3d(80px, 0, 0) rotateY(90deg); }
+  .cube-face.top    { transform: translate3d(0, -80px, 0) rotateX(90deg); }
+  .cube-face.bottom { transform: translate3d(0, 80px, 0) rotateX(-90deg); }
 
-  .cube-edge.e1 { width: 120px; margin-left: -60px; transform: translate3d(0, -60px, 60px); }
-  .cube-edge.e2 { height: 120px; margin-top: -60px; transform: translate3d(60px, 0, 60px); }
-  .cube-edge.e3 { width: 120px; margin-left: -60px; transform: translate3d(0, 60px, 60px); }
-  .cube-edge.e4 { height: 120px; margin-top: -60px; transform: translate3d(-60px, 0, 60px); }
-  .cube-edge.e5 { width: 120px; margin-left: -60px; transform: translate3d(0, -60px, -60px); }
-  .cube-edge.e6 { height: 120px; margin-top: -60px; transform: translate3d(60px, 0, -60px); }
-  .cube-edge.e7 { width: 120px; margin-left: -60px; transform: translate3d(0, 60px, -60px); }
-  .cube-edge.e8 { height: 120px; margin-top: -60px; transform: translate3d(-60px, 0, -60px); }
-  .cube-edge.e9 { height: 120px; margin-top: -60px; transform: translate3d(-60px, -60px, 0) rotateX(90deg); }
-  .cube-edge.e10 { height: 120px; margin-top: -60px; transform: translate3d(60px, -60px, 0) rotateX(90deg); }
-  .cube-edge.e11 { height: 120px; margin-top: -60px; transform: translate3d(60px, 60px, 0) rotateX(90deg); }
-  .cube-edge.e12 { height: 120px; margin-top: -60px; transform: translate3d(-60px, 60px, 0) rotateX(90deg); }
+  /* 紫色框比金色小一號 (金色80px，紫色65px) */
+  .cube-edge.e1 { width: 130px; margin-left: -65px; transform: translate3d(0, -65px, 65px); }
+  .cube-edge.e2 { height: 130px; margin-top: -65px; transform: translate3d(65px, 0, 65px); }
+  .cube-edge.e3 { width: 130px; margin-left: -65px; transform: translate3d(0, 65px, 65px); }
+  .cube-edge.e4 { height: 130px; margin-top: -65px; transform: translate3d(-65px, 0, 65px); }
+  .cube-edge.e5 { width: 130px; margin-left: -65px; transform: translate3d(0, -65px, -65px); }
+  .cube-edge.e6 { height: 130px; margin-top: -65px; transform: translate3d(65px, 0, -65px); }
+  .cube-edge.e7 { width: 130px; margin-left: -65px; transform: translate3d(0, 65px, -65px); }
+  .cube-edge.e8 { height: 130px; margin-top: -65px; transform: translate3d(-65px, 0, -65px); }
+  .cube-edge.e9 { height: 130px; margin-top: -65px; transform: translate3d(-65px, -65px, 0) rotateX(90deg); }
+  .cube-edge.e10 { height: 130px; margin-top: -65px; transform: translate3d(65px, -65px, 0) rotateX(90deg); }
+  .cube-edge.e11 { height: 130px; margin-top: -65px; transform: translate3d(65px, 65px, 0) rotateX(90deg); }
+  .cube-edge.e12 { height: 130px; margin-top: -65px; transform: translate3d(-65px, 65px, 0) rotateX(90deg); }
 
   .product-card-large {
     padding: 24px 20px;

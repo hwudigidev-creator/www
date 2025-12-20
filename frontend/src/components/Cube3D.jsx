@@ -312,12 +312,12 @@ function Cube3D({ features }) {
               {/* 只在未分解時顯示方塊面 */}
               {explodeProgress < 0.1 && (
                 <>
-                  <div className="cube-face cube-front"><span>?</span></div>
-                  <div className="cube-face cube-back"><span>?</span></div>
-                  <div className="cube-face cube-right"><span>?</span></div>
-                  <div className="cube-face cube-left"><span>?</span></div>
-                  <div className="cube-face cube-top"><span>?</span></div>
-                  <div className="cube-face cube-bottom"><span>?</span></div>
+                  <div className="home-face home-front"><span>?</span></div>
+                  <div className="home-face home-back"><span>?</span></div>
+                  <div className="home-face home-right"><span>?</span></div>
+                  <div className="home-face home-left"><span>?</span></div>
+                  <div className="home-face home-top"><span>?</span></div>
+                  <div className="home-face home-bottom"><span>?</span></div>
                 </>
               )}
             </div>
