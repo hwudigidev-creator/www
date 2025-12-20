@@ -16,25 +16,25 @@
       "value": "animation",
       "label": "動畫大師",
       "description": "2/3D 動畫製作",
-      "icon": "🎬"
+      "icon": "fa-solid fa-film"
     },
     {
       "value": "game",
       "label": "遊戲先知",
       "description": "遊戲企劃/互動/程式設計",
-      "icon": "🎮"
+      "icon": "fa-solid fa-gamepad"
     },
     {
       "value": "director",
       "label": "超級導演",
       "description": "影視/特效合成",
-      "icon": "🎥"
+      "icon": "fa-solid fa-video"
     },
     {
       "value": "leader",
       "label": "靈魂領導",
       "description": "AI賦能/架構規劃/團隊協作",
-      "icon": "🧠"
+      "icon": "fa-solid fa-brain"
     }
   ]
 }

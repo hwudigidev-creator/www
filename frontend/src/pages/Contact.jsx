@@ -394,7 +394,7 @@ function Contact() {
                         ◀
                       </button>
                       <div className="career-display">
-                        <span className="career-icon">{currentCareer.icon}</span>
+                        <i className={`career-icon ${currentCareer.icon}`}></i>
                         <span className="career-label">{currentCareer.label}</span>
                         <span className="career-description">{currentCareer.description}</span>
                       </div>

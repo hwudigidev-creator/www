@@ -28,7 +28,7 @@ function Cube3D({ features }) {
   // 確保有 6 個 features
   const safeFeatures = features?.slice(0, 6) || []
   while (safeFeatures.length < 6) {
-    safeFeatures.push({ icon: '?', title: '即將推出', description: '敬請期待' })
+    safeFeatures.push({ icon: 'fa-solid fa-question', title: '即將推出', description: '敬請期待' })
   }
 
   // 方塊旋轉 (0 ~ 0.3 進度)
@@ -260,7 +260,7 @@ function Cube3D({ features }) {
                   className={`scroll-card ${index === focusedCardIndex ? 'focused' : ''}`}
                   style={getCompletedCardStyle(index)}
                 >
-                  <div className="card-icon">{feature.icon}</div>
+                  <i className={`card-icon ${feature.icon}`}></i>
                   <h3>{feature.title}</h3>
                   <p>{feature.description}</p>
                 </div>
@@ -345,7 +345,7 @@ function Cube3D({ features }) {
                         </div>
                       )}
                       <div className="face-content" style={{ opacity: cardContentOpacity }}>
-                        <div className="card-icon">{feature.icon}</div>
+                        <i className={`card-icon ${feature.icon}`}></i>
                         <h3>{feature.title}</h3>
                         <p>{feature.description}</p>
                       </div>

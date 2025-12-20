@@ -40,32 +40,32 @@ function getMockData(action) {
       },
       features: [
         {
-          icon: '🤖',
+          icon: 'fa-solid fa-robot',
           title: 'AI 輔助設計',
           description: '學習運用 AI 工具加速創作流程，掌握 AIGC 生成式 AI 技術，提升設計效率與創意表現。'
         },
         {
-          icon: '🎬',
+          icon: 'fa-solid fa-film',
           title: '動畫設計',
           description: '從 2D 動畫到 3D 動畫，學習角色設計、動態捕捉、動畫製作全流程技術。'
         },
         {
-          icon: '🎮',
+          icon: 'fa-solid fa-gamepad',
           title: '遊戲開發',
           description: '遊戲企劃、關卡設計、Unity/Unreal 引擎開發，打造沉浸式遊戲體驗。'
         },
         {
-          icon: '✨',
+          icon: 'fa-solid fa-wand-magic-sparkles',
           title: '影視特效',
           description: 'VFX 視覺特效、合成技術、動態圖像設計，創造震撼視覺效果。'
         },
         {
-          icon: '🖥️',
+          icon: 'fa-solid fa-vr-cardboard',
           title: '互動多媒體',
           description: 'AR/VR 擴增實境、互動裝置、數位展演，探索新媒體藝術可能性。'
         },
         {
-          icon: '🔄',
+          icon: 'fa-solid fa-arrows-spin',
           title: 'AI 工作流',
           description: '建立高效的 AI 創作工作流程，整合多種 AI 工具實現自動化設計流程。'
         }
