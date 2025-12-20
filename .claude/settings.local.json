@@ -37,7 +37,8 @@
       "Bash(git -C \"B:/〔WEB〕/WWW_DD\" add frontend/src/pages/Contact.jsx frontend/src/services/api.js google-apps-script/contact-form.gs)",
       "Bash(git -C \"B:/〔WEB〕/WWW_DD\" commit -m \"$\\(cat <<''EOF''\nfix: 修正聯絡表單中文編碼問題\n\n- 前端加入 UTF-8 charset 確保中文正確傳送\n- 修正送出學校/科別名稱而非代碼\n- 更新 Apps Script SHEET_ID 為正確值\n- 新增 createHeaders 函數建立標頭\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git -C \"B:/〔WEB〕/WWW_DD\" add frontend/src/assets/styles.css frontend/src/pages/Products.jsx frontend/package.json)",
-      "Bash(git -C:*)"
+      "Bash(git -C:*)",
+      "Bash(cat:*)"
     ]
   }
 }
