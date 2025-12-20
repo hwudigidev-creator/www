@@ -192,14 +192,57 @@ export default defineConfig({
 | GET  | 測試 API 是否運作 |
 | POST | 提交表單資料到 Google Sheets |
 
-**設定步驟**：
-1. 建立新的 Google Sheets 試算表
-2. 開啟 擴充功能 > Apps Script
-3. 複製 `google-apps-script/contact-form.gs` 內容
-4. 修改 `SHEET_ID` 為你的試算表 ID（從 URL 取得）
-5. 部署 > 新增部署 > 網頁應用程式
-6. 執行身份：我、存取權：所有人
-7. 複製部署 URL 設定到 `VITE_CONTACT_API_URL`
+#### 設定步驟
+
+**步驟 1：建立 Google Sheets**
+1. 前往 [Google Sheets](https://sheets.google.com/) 建立新試算表
+2. 將第一個工作表命名為「聯絡表單」
+3. 在第一列加入欄位標題：`時間戳記`、`校名`、`科別`、`姓名`、`手機`、`Email`、`職業興趣`、`留言`
+4. 從 URL 複製試算表 ID（位於 `/d/` 和 `/edit` 之間）
+   ```
+   https://docs.google.com/spreadsheets/d/【這裡是SHEET_ID】/edit
+   ```
+
+**步驟 2：建立 Apps Script**
+1. 在試算表中，點選「擴充功能」>「Apps Script」
+2. 刪除預設程式碼，貼上 `google-apps-script/contact-form.gs` 的內容
+3. **重要**：修改 `SHEET_ID` 為你的試算表 ID
+   ```javascript
+   const SHEET_ID = '你的試算表ID';  // 從步驟 1 取得
+   ```
+
+**步驟 3：部署 Web App**
+1. 點選「部署」>「新增部署」
+2. 類型選擇「網頁應用程式」
+3. 設定：
+   - 說明：聯絡表單 API
+   - 執行身份：**我**
+   - 存取權：**所有人**
+4. 點選「部署」
+5. 複製「網頁應用程式」URL
+
+**步驟 4：設定環境變數**
+- 本機開發：將 URL 設定到 `frontend/.env` 的 `VITE_CONTACT_API_URL`
+- 生產環境：在 GitHub Settings > Secrets 新增 `VITE_CONTACT_API_URL`
+
+#### 更新部署
+
+修改 Apps Script 程式碼後，需要重新部署：
+1. 點選「部署」>「管理部署」
+2. 選擇現有部署，點選「編輯」(鉛筆圖示)
+3. 版本選擇「新版本」
+4. 點選「部署」
+
+> **注意**：URL 不會改變，但必須建立新版本才會套用程式碼變更。
+
+#### 疑難排解
+
+| 問題 | 原因 | 解決方式 |
+|------|------|----------|
+| `Document is missing` | SHEET_ID 設定錯誤 | 確認 SHEET_ID 與試算表 URL 相符 |
+| `找不到網頁` | 部署設定錯誤 | 確認存取權為「所有人」 |
+| `發送失敗` | CORS 或網路問題 | 檢查瀏覽器 Console 錯誤訊息 |
+| 資料未寫入 | 工作表名稱錯誤 | 確認工作表名稱為「聯絡表單」 |
 
 ## 環境變數
 
