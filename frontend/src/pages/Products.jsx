@@ -16,7 +16,8 @@ const productImages = [
 function Products() {
   const { data, loading, error } = useFetch(getProducts)
   const [activeIndex, setActiveIndex] = useState(0)
-  const [cubeRotation, setCubeRotation] = useState(0)
+  const [cubeRotation, setCubeRotation] = useState(45)
+  const [cubePitch, setCubePitch] = useState(-30)
   const prevIndexRef = useRef(0)
 
   // 根據滾動位置切換當前卡片
@@ -39,11 +40,12 @@ function Products() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [data])
 
-  // 切換卡片時觸發方塊旋轉
+  // 切換卡片時觸發方塊旋轉 + 俯仰變化
   useEffect(() => {
     if (activeIndex !== prevIndexRef.current) {
       const direction = activeIndex > prevIndexRef.current ? 1 : -1
       setCubeRotation(prev => prev + (90 * direction))
+      setCubePitch(prev => prev - (10 * direction))
       prevIndexRef.current = activeIndex
     }
   }, [activeIndex])
@@ -76,7 +78,7 @@ function Products() {
             <div className="wireframe-glow"></div>
             <div
               className="wireframe-cube"
-              style={{ transform: `rotateX(-15deg) rotateY(${cubeRotation}deg)` }}
+              style={{ transform: `rotateX(${cubePitch}deg) rotateY(${cubeRotation}deg)` }}
             >
               {/* 6 個半透明濾鏡面 */}
               <div className="cube-face front"></div>

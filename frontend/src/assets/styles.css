@@ -1325,31 +1325,38 @@ body {
   position: absolute;
   width: 180px;
   height: 180px;
+  left: 50%;
+  top: 50%;
+  margin-left: -90px;
+  margin-top: -90px;
   background: linear-gradient(
     135deg,
-    rgba(102, 126, 234, 0.15) 0%,
-    rgba(240, 147, 251, 0.1) 50%,
-    rgba(102, 126, 234, 0.15) 100%
+    rgba(102, 126, 234, 0.08) 0%,
+    rgba(240, 147, 251, 0.05) 50%,
+    rgba(102, 126, 234, 0.08) 100%
   );
-  backdrop-filter: blur(8px) saturate(1.4) contrast(1.1);
-  -webkit-backdrop-filter: blur(8px) saturate(1.4) contrast(1.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px) saturate(1.2) contrast(1.05);
+  -webkit-backdrop-filter: blur(4px) saturate(1.2) contrast(1.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.cube-face.front  { transform: translateZ(90px); }
-.cube-face.back   { transform: translateZ(-90px) rotateY(180deg); }
-.cube-face.left   { transform: translateX(-90px) rotateY(-90deg); }
-.cube-face.right  { transform: translateX(90px) rotateY(90deg); }
-.cube-face.top    { transform: translateY(-90px) rotateX(90deg); }
-.cube-face.bottom { transform: translateY(90px) rotateX(-90deg); }
+.cube-face.front  { transform: translate3d(0, 0, 90px); }
+.cube-face.back   { transform: translate3d(0, 0, -90px) rotateY(180deg); }
+.cube-face.left   { transform: translate3d(-90px, 0, 0) rotateY(-90deg); }
+.cube-face.right  { transform: translate3d(90px, 0, 0) rotateY(90deg); }
+.cube-face.top    { transform: translate3d(0, -90px, 0) rotateX(90deg); }
+.cube-face.bottom { transform: translate3d(0, 90px, 0) rotateX(-90deg); }
 
 /* 12 條邊 */
 .cube-edge {
   position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -1px;
+  margin-top: -1px;
   background: linear-gradient(90deg, #667eea, #f093fb, #667eea);
   background-size: 200% 100%;
   animation: edgeGlow 3s linear infinite;
-  transform-origin: 0 0;
 }
 
 @keyframes edgeGlow {
@@ -1358,23 +1365,23 @@ body {
   100% { background-position: 0 0; opacity: 0.6; }
 }
 
-/* 前面 4 條邊 */
-.cube-edge.e1 { width: 180px; height: 2px; transform: translate3d(-90px, -90px, 90px); }
-.cube-edge.e2 { width: 2px; height: 180px; transform: translate3d(90px, -90px, 90px); }
-.cube-edge.e3 { width: 180px; height: 2px; transform: translate3d(-90px, 90px, 90px); }
-.cube-edge.e4 { width: 2px; height: 180px; transform: translate3d(-90px, -90px, 90px); }
+/* 前面 4 條邊 (z=90) */
+.cube-edge.e1 { width: 180px; height: 2px; margin-left: -90px; transform: translate3d(0, -90px, 90px); }
+.cube-edge.e2 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(90px, 0, 90px); }
+.cube-edge.e3 { width: 180px; height: 2px; margin-left: -90px; transform: translate3d(0, 90px, 90px); }
+.cube-edge.e4 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(-90px, 0, 90px); }
 
-/* 後面 4 條邊 */
-.cube-edge.e5 { width: 180px; height: 2px; transform: translate3d(-90px, -90px, -90px); }
-.cube-edge.e6 { width: 2px; height: 180px; transform: translate3d(90px, -90px, -90px); }
-.cube-edge.e7 { width: 180px; height: 2px; transform: translate3d(-90px, 90px, -90px); }
-.cube-edge.e8 { width: 2px; height: 180px; transform: translate3d(-90px, -90px, -90px); }
+/* 後面 4 條邊 (z=-90) */
+.cube-edge.e5 { width: 180px; height: 2px; margin-left: -90px; transform: translate3d(0, -90px, -90px); }
+.cube-edge.e6 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(90px, 0, -90px); }
+.cube-edge.e7 { width: 180px; height: 2px; margin-left: -90px; transform: translate3d(0, 90px, -90px); }
+.cube-edge.e8 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(-90px, 0, -90px); }
 
 /* 連接前後的 4 條邊 */
-.cube-edge.e9 { width: 2px; height: 180px; transform: translate3d(-90px, -90px, -90px) rotateX(90deg); }
-.cube-edge.e10 { width: 2px; height: 180px; transform: translate3d(90px, -90px, -90px) rotateX(90deg); }
-.cube-edge.e11 { width: 2px; height: 180px; transform: translate3d(90px, 90px, -90px) rotateX(90deg); }
-.cube-edge.e12 { width: 2px; height: 180px; transform: translate3d(-90px, 90px, -90px) rotateX(90deg); }
+.cube-edge.e9 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(-90px, -90px, 0) rotateX(90deg); }
+.cube-edge.e10 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(90px, -90px, 0) rotateX(90deg); }
+.cube-edge.e11 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(90px, 90px, 0) rotateX(90deg); }
+.cube-edge.e12 { width: 2px; height: 180px; margin-top: -90px; transform: translate3d(-90px, 90px, 0) rotateX(90deg); }
 
 /* ==================== Product Display ==================== */
 .product-display {
@@ -2629,27 +2636,29 @@ body {
   .cube-face {
     width: 120px;
     height: 120px;
+    margin-left: -60px;
+    margin-top: -60px;
   }
 
-  .cube-face.front  { transform: translateZ(60px); }
-  .cube-face.back   { transform: translateZ(-60px) rotateY(180deg); }
-  .cube-face.left   { transform: translateX(-60px) rotateY(-90deg); }
-  .cube-face.right  { transform: translateX(60px) rotateY(90deg); }
-  .cube-face.top    { transform: translateY(-60px) rotateX(90deg); }
-  .cube-face.bottom { transform: translateY(60px) rotateX(-90deg); }
+  .cube-face.front  { transform: translate3d(0, 0, 60px); }
+  .cube-face.back   { transform: translate3d(0, 0, -60px) rotateY(180deg); }
+  .cube-face.left   { transform: translate3d(-60px, 0, 0) rotateY(-90deg); }
+  .cube-face.right  { transform: translate3d(60px, 0, 0) rotateY(90deg); }
+  .cube-face.top    { transform: translate3d(0, -60px, 0) rotateX(90deg); }
+  .cube-face.bottom { transform: translate3d(0, 60px, 0) rotateX(-90deg); }
 
-  .cube-edge.e1 { width: 120px; transform: translate3d(-60px, -60px, 60px); }
-  .cube-edge.e2 { height: 120px; transform: translate3d(60px, -60px, 60px); }
-  .cube-edge.e3 { width: 120px; transform: translate3d(-60px, 60px, 60px); }
-  .cube-edge.e4 { height: 120px; transform: translate3d(-60px, -60px, 60px); }
-  .cube-edge.e5 { width: 120px; transform: translate3d(-60px, -60px, -60px); }
-  .cube-edge.e6 { height: 120px; transform: translate3d(60px, -60px, -60px); }
-  .cube-edge.e7 { width: 120px; transform: translate3d(-60px, 60px, -60px); }
-  .cube-edge.e8 { height: 120px; transform: translate3d(-60px, -60px, -60px); }
-  .cube-edge.e9 { height: 120px; transform: translate3d(-60px, -60px, -60px) rotateX(90deg); }
-  .cube-edge.e10 { height: 120px; transform: translate3d(60px, -60px, -60px) rotateX(90deg); }
-  .cube-edge.e11 { height: 120px; transform: translate3d(60px, 60px, -60px) rotateX(90deg); }
-  .cube-edge.e12 { height: 120px; transform: translate3d(-60px, 60px, -60px) rotateX(90deg); }
+  .cube-edge.e1 { width: 120px; margin-left: -60px; transform: translate3d(0, -60px, 60px); }
+  .cube-edge.e2 { height: 120px; margin-top: -60px; transform: translate3d(60px, 0, 60px); }
+  .cube-edge.e3 { width: 120px; margin-left: -60px; transform: translate3d(0, 60px, 60px); }
+  .cube-edge.e4 { height: 120px; margin-top: -60px; transform: translate3d(-60px, 0, 60px); }
+  .cube-edge.e5 { width: 120px; margin-left: -60px; transform: translate3d(0, -60px, -60px); }
+  .cube-edge.e6 { height: 120px; margin-top: -60px; transform: translate3d(60px, 0, -60px); }
+  .cube-edge.e7 { width: 120px; margin-left: -60px; transform: translate3d(0, 60px, -60px); }
+  .cube-edge.e8 { height: 120px; margin-top: -60px; transform: translate3d(-60px, 0, -60px); }
+  .cube-edge.e9 { height: 120px; margin-top: -60px; transform: translate3d(-60px, -60px, 0) rotateX(90deg); }
+  .cube-edge.e10 { height: 120px; margin-top: -60px; transform: translate3d(60px, -60px, 0) rotateX(90deg); }
+  .cube-edge.e11 { height: 120px; margin-top: -60px; transform: translate3d(60px, 60px, 0) rotateX(90deg); }
+  .cube-edge.e12 { height: 120px; margin-top: -60px; transform: translate3d(-60px, 60px, 0) rotateX(90deg); }
 
   .product-card-large {
     padding: 24px 20px;
