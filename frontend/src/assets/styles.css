@@ -1316,15 +1316,21 @@ body {
   animation: imageFadeIn 0.5s ease-out;
 }
 
-/* 清晰的底層圖片 */
+/* 清晰的底層圖片 - 中心顯示，邊緣淡化（與外層相反） */
 .showcase-image-clear {
   z-index: 1;
-  filter: contrast(1.1) saturate(1.1);
-  transform: translate(-50%, -50%) scale(1.05);
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  filter: contrast(1.05) saturate(1.1);
+  transform: translate(-50%, -50%);
   animation: imageFadeIn 0.4s ease-out;
+  /* 中心顯示，向外淡化消失 - 跟方塊差不多大 */
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, black 0%, black 60%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, black 0%, black 60%, transparent 100%);
 }
 
-/* 外層圖片容器 */
+/* 外層圖片容器 - 中心透明讓 P01 顯示 */
 .showcase-image-blur-wrapper {
   position: absolute;
   width: 100%;
@@ -1333,9 +1339,9 @@ body {
   left: 0;
   overflow: hidden;
   z-index: 2;
-  /* 中心透明，邊緣顯示，外緣淡化消失 */
-  -webkit-mask-image: radial-gradient(ellipse 45% 32% at 50% 50%, transparent 55%, black 70%, transparent 95%);
-  mask-image: radial-gradient(ellipse 45% 32% at 50% 50%, transparent 55%, black 70%, transparent 95%);
+  /* 中心透明（方塊大小），向外漸層顯示 P00，最外緣淡化 - 比方塊大許多 */
+  -webkit-mask-image: radial-gradient(ellipse 45% 32% at 50% 50%, transparent 50%, black 70%, transparent 95%);
+  mask-image: radial-gradient(ellipse 45% 32% at 50% 50%, transparent 50%, black 70%, transparent 95%);
 }
 
 /* 外層圖片 - 自動循環滾動 */
@@ -1408,7 +1414,7 @@ body {
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 6 個濾鏡面 - 清晰 + 放大 + 色彩分離效果 */
+/* 6 個濾鏡面 - backdrop-filter 看後面的圖 */
 .cube-face {
   position: absolute;
   width: 180px;
@@ -1417,12 +1423,16 @@ body {
   top: 50%;
   margin-left: -90px;
   margin-top: -90px;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  border: 3px solid #f5b800;
   overflow: hidden;
-  /* 抵消外部模糊，讓內部清晰 + 放大 */
-  backdrop-filter: blur(0px) contrast(1.1);
-  -webkit-backdrop-filter: blur(0px) contrast(1.1);
+  /* backdrop-filter 讓面變成濾鏡窗口 */
+  backdrop-filter: contrast(1.15) saturate(1.2) brightness(1.1);
+  -webkit-backdrop-filter: contrast(1.15) saturate(1.2) brightness(1.1);
+  box-shadow:
+    0 0 20px rgba(245, 184, 0, 0.4),
+    0 0 40px rgba(245, 184, 0, 0.2),
+    inset 0 0 15px rgba(245, 184, 0, 0.1);
   transform-style: preserve-3d;
 }
 

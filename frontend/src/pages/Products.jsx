@@ -84,9 +84,9 @@ function Products() {
       <section className="products-fixed-section">
         {/* 左側：方塊與圖片區 */}
         <div className="cube-showcase">
-          {/* 圖片展示區 - 雙層：外層邊緣模糊、內層中心清晰 */}
+          {/* 圖片展示區 */}
           <div className="showcase-image-container">
-            {/* 清晰的底層 */}
+            {/* 清晰圖片 - 平躺在後面 */}
             <img
               src={currentImage}
               alt={activeProduct?.name || '課程圖片'}
@@ -110,7 +110,7 @@ function Products() {
               className="wireframe-cube"
               style={{ transform: `rotateX(${cubePitch}deg) rotateY(${cubeRotation}deg)` }}
             >
-              {/* 6 個濾鏡面 */}
+              {/* 6 個濾鏡面 - 用 backdrop-filter 看後面的圖 */}
               <div className="cube-face front"></div>
               <div className="cube-face back"></div>
               <div className="cube-face left"></div>
