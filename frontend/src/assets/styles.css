@@ -1215,123 +1215,156 @@ body {
   position: relative;
 }
 
-/* 第一區塊：標題區 - FIXED 在背後 */
-.products-hero {
+/* 固定的展示區 */
+.products-fixed-section {
   position: fixed;
   top: 80px;
   left: 0;
   right: 0;
-  padding: 32px 24px;
-  text-align: center;
-  background: var(--md-surface);
-  z-index: 0;
-}
-
-.products-hero-content {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.products-hero h1 {
-  font-size: 48px;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -1px;
-  margin-bottom: 12px;
-}
-
-.products-hero p {
-  font-size: 16px;
-  color: var(--md-on-surface-variant);
-  max-width: 560px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-/* 第二區塊：內容區 - FIXED 在底部（同聯絡頁） */
-.products-content-section {
-  position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100vh;
-  background: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 24px;
-  padding-top: 80px;
-  overflow: hidden;
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* 內容容器 - 由外層滾動控制位置 */
-.products-content-wrapper {
-  width: 100%;
-  max-width: 1200px;
-  pointer-events: auto;
-}
-
-/* 內容區 */
-.products-content-scroll {
-  padding: 20px 0;
-  padding-top: 160px;
-}
-
-/* Products 頁面滾動空間 - 讓 Footer 可以上浮 */
-.products-footer-spacer {
-  height: 250vh;
-  position: relative;
-  z-index: 5;
-  pointer-events: none;
-}
-
-/* ==================== Products Showcase ==================== */
-.products-showcase {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 48px;
   align-items: center;
-  min-height: 500px;
+  padding: 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+  z-index: 1;
 }
 
-/* 左側：課程列表 */
-.products-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+/* 滾動空間 */
+.products-scroll-spacer {
+  position: relative;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.product-item {
+/* ==================== Wireframe Cube ==================== */
+.wireframe-cube-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  padding: 24px;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+}
+
+/* 發光背景 */
+.wireframe-glow {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(
+    circle,
+    rgba(102, 126, 234, 0.4) 0%,
+    rgba(118, 75, 162, 0.25) 40%,
+    transparent 70%
+  );
+  filter: blur(50px);
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.15); }
+}
+
+/* 線框方塊 */
+.wireframe-cube {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  transform-style: preserve-3d;
+  animation: cubeRotate 15s linear infinite;
+}
+
+@keyframes cubeRotate {
+  0% { transform: rotateX(-15deg) rotateY(0deg); }
+  100% { transform: rotateX(-15deg) rotateY(360deg); }
+}
+
+/* 12 條邊 */
+.cube-edge {
+  position: absolute;
+  background: linear-gradient(90deg, #667eea, #f093fb, #667eea);
+  background-size: 200% 100%;
+  animation: edgeGlow 3s linear infinite;
+  transform-origin: 0 0;
+}
+
+@keyframes edgeGlow {
+  0% { background-position: 200% 0; opacity: 0.5; }
+  50% { opacity: 0.9; }
+  100% { background-position: 0 0; opacity: 0.5; }
+}
+
+/* 前面 4 條邊 */
+.cube-edge.e1 { width: 220px; height: 2px; transform: translate3d(-110px, -110px, 110px); }
+.cube-edge.e2 { width: 2px; height: 220px; transform: translate3d(110px, -110px, 110px); }
+.cube-edge.e3 { width: 220px; height: 2px; transform: translate3d(-110px, 110px, 110px); }
+.cube-edge.e4 { width: 2px; height: 220px; transform: translate3d(-110px, -110px, 110px); }
+
+/* 後面 4 條邊 */
+.cube-edge.e5 { width: 220px; height: 2px; transform: translate3d(-110px, -110px, -110px); }
+.cube-edge.e6 { width: 2px; height: 220px; transform: translate3d(110px, -110px, -110px); }
+.cube-edge.e7 { width: 220px; height: 2px; transform: translate3d(-110px, 110px, -110px); }
+.cube-edge.e8 { width: 2px; height: 220px; transform: translate3d(-110px, -110px, -110px); }
+
+/* 連接前後的 4 條邊 */
+.cube-edge.e9 { width: 2px; height: 220px; transform: translate3d(-110px, -110px, -110px) rotateX(90deg); }
+.cube-edge.e10 { width: 2px; height: 220px; transform: translate3d(110px, -110px, -110px) rotateX(90deg); }
+.cube-edge.e11 { width: 2px; height: 220px; transform: translate3d(110px, 110px, -110px) rotateX(90deg); }
+.cube-edge.e12 { width: 2px; height: 220px; transform: translate3d(-110px, 110px, -110px) rotateX(90deg); }
+
+/* 濾鏡效果層 */
+.wireframe-filter {
+  position: absolute;
+  inset: -50px;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 20%,
+    rgba(19, 19, 20, 0.6) 80%
+  );
+  pointer-events: none;
+}
+
+/* ==================== Product Display ==================== */
+.product-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.product-card-large {
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  opacity: 0.6;
-}
-
-.product-item:hover {
-  opacity: 0.85;
-  border-color: rgba(102, 126, 234, 0.3);
-}
-
-.product-item.active {
-  opacity: 1;
-  border: 2px solid rgba(102, 126, 234, 0.5);
+  padding: 48px;
+  border: 2px solid rgba(102, 126, 234, 0.4);
   box-shadow:
-    0 0 20px rgba(102, 126, 234, 0.3),
-    0 0 40px rgba(118, 75, 162, 0.2);
+    0 0 30px rgba(102, 126, 234, 0.3),
+    0 0 60px rgba(118, 75, 162, 0.2);
+  max-width: 480px;
+  text-align: center;
+  animation: cardFadeIn 0.4s ease-out;
 }
 
-.product-item-icon {
-  font-size: 32px;
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
   background: linear-gradient(
     90deg,
     #667eea 0%,
@@ -1345,122 +1378,41 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: gradientFlow 3s linear infinite;
-  flex-shrink: 0;
 }
 
-.product-item-content h3 {
-  font-size: 18px;
-  font-weight: 600;
+.product-card-large h2 {
+  font-size: 28px;
+  font-weight: 700;
   color: var(--md-on-surface);
-  margin-bottom: 8px;
+  margin-bottom: 16px;
 }
 
-.product-item-content p {
-  font-size: 14px;
+.product-card-large p {
+  font-size: 16px;
   color: var(--md-on-surface-variant);
-  line-height: 1.6;
+  line-height: 1.7;
+  margin-bottom: 32px;
 }
 
-/* 右側：線框方塊容器 */
-.wireframe-cube-container {
-  position: relative;
-  width: 100%;
-  height: 400px;
+.product-card-dots {
   display: flex;
-  align-items: center;
   justify-content: center;
-  perspective: 1000px;
+  gap: 10px;
 }
 
-/* 發光背景 */
-.wireframe-glow {
-  position: absolute;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(
-    circle,
-    rgba(102, 126, 234, 0.3) 0%,
-    rgba(118, 75, 162, 0.2) 40%,
-    transparent 70%
-  );
-  filter: blur(40px);
-  animation: glowPulse 4s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.1); }
-}
-
-/* 線框方塊 */
-.wireframe-cube {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  transform-style: preserve-3d;
-  animation: cubeRotate 20s linear infinite;
-}
-
-@keyframes cubeRotate {
-  0% { transform: rotateX(-20deg) rotateY(0deg); }
-  100% { transform: rotateX(-20deg) rotateY(360deg); }
-}
-
-/* 8 個頂點 */
-.cube-vertex {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: #667eea;
+.product-card-dots .dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  box-shadow: 0 0 10px #667eea, 0 0 20px #764ba2;
+  background: var(--md-outline-variant);
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-.cube-vertex.v1 { transform: translate3d(-100px, -100px, 100px); }
-.cube-vertex.v2 { transform: translate3d(100px, -100px, 100px); }
-.cube-vertex.v3 { transform: translate3d(100px, 100px, 100px); }
-.cube-vertex.v4 { transform: translate3d(-100px, 100px, 100px); }
-.cube-vertex.v5 { transform: translate3d(-100px, -100px, -100px); }
-.cube-vertex.v6 { transform: translate3d(100px, -100px, -100px); }
-.cube-vertex.v7 { transform: translate3d(100px, 100px, -100px); }
-.cube-vertex.v8 { transform: translate3d(-100px, 100px, -100px); }
-
-/* 12 條邊 */
-.cube-edge {
-  position: absolute;
-  background: linear-gradient(90deg, #667eea, #f093fb);
-  transform-origin: 0 0;
-  opacity: 0.6;
-}
-
-/* 前面 4 條邊 */
-.cube-edge.e1 { width: 200px; height: 2px; transform: translate3d(-100px, -100px, 100px); }
-.cube-edge.e2 { width: 2px; height: 200px; transform: translate3d(100px, -100px, 100px); }
-.cube-edge.e3 { width: 200px; height: 2px; transform: translate3d(-100px, 100px, 100px); }
-.cube-edge.e4 { width: 2px; height: 200px; transform: translate3d(-100px, -100px, 100px); }
-
-/* 後面 4 條邊 */
-.cube-edge.e5 { width: 200px; height: 2px; transform: translate3d(-100px, -100px, -100px); }
-.cube-edge.e6 { width: 2px; height: 200px; transform: translate3d(100px, -100px, -100px); }
-.cube-edge.e7 { width: 200px; height: 2px; transform: translate3d(-100px, 100px, -100px); }
-.cube-edge.e8 { width: 2px; height: 200px; transform: translate3d(-100px, -100px, -100px); }
-
-/* 連接前後的 4 條邊 */
-.cube-edge.e9 { width: 2px; height: 200px; transform: translate3d(-100px, -100px, -100px) rotateX(90deg); }
-.cube-edge.e10 { width: 2px; height: 200px; transform: translate3d(100px, -100px, -100px) rotateX(90deg); }
-.cube-edge.e11 { width: 2px; height: 200px; transform: translate3d(100px, 100px, -100px) rotateX(90deg); }
-.cube-edge.e12 { width: 2px; height: 200px; transform: translate3d(-100px, 100px, -100px) rotateX(90deg); }
-
-/* 濾鏡效果層 */
-.wireframe-filter {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 30%,
-    rgba(19, 19, 20, 0.5) 100%
-  );
-  pointer-events: none;
+.product-card-dots .dot.active {
+  background: linear-gradient(135deg, #667eea, #f093fb);
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+  transform: scale(1.2);
 }
 
 /* ==================== Products Grid (Legacy) ==================== */
@@ -2601,58 +2553,57 @@ body {
     height: 200vh;
   }
 
-  .products-showcase {
+  /* Products Page Mobile */
+  .products-fixed-section {
     grid-template-columns: 1fr;
-    gap: 32px;
+    padding: 24px;
+    gap: 24px;
   }
 
   .wireframe-cube-container {
-    height: 300px;
-    order: -1;
+    height: 200px;
   }
 
   .wireframe-cube {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
   }
 
-  .cube-vertex.v1 { transform: translate3d(-75px, -75px, 75px); }
-  .cube-vertex.v2 { transform: translate3d(75px, -75px, 75px); }
-  .cube-vertex.v3 { transform: translate3d(75px, 75px, 75px); }
-  .cube-vertex.v4 { transform: translate3d(-75px, 75px, 75px); }
-  .cube-vertex.v5 { transform: translate3d(-75px, -75px, -75px); }
-  .cube-vertex.v6 { transform: translate3d(75px, -75px, -75px); }
-  .cube-vertex.v7 { transform: translate3d(75px, 75px, -75px); }
-  .cube-vertex.v8 { transform: translate3d(-75px, 75px, -75px); }
-
-  .cube-edge.e1 { width: 150px; transform: translate3d(-75px, -75px, 75px); }
-  .cube-edge.e2 { height: 150px; transform: translate3d(75px, -75px, 75px); }
-  .cube-edge.e3 { width: 150px; transform: translate3d(-75px, 75px, 75px); }
-  .cube-edge.e4 { height: 150px; transform: translate3d(-75px, -75px, 75px); }
-  .cube-edge.e5 { width: 150px; transform: translate3d(-75px, -75px, -75px); }
-  .cube-edge.e6 { height: 150px; transform: translate3d(75px, -75px, -75px); }
-  .cube-edge.e7 { width: 150px; transform: translate3d(-75px, 75px, -75px); }
-  .cube-edge.e8 { height: 150px; transform: translate3d(-75px, -75px, -75px); }
-  .cube-edge.e9 { height: 150px; transform: translate3d(-75px, -75px, -75px) rotateX(90deg); }
-  .cube-edge.e10 { height: 150px; transform: translate3d(75px, -75px, -75px) rotateX(90deg); }
-  .cube-edge.e11 { height: 150px; transform: translate3d(75px, 75px, -75px) rotateX(90deg); }
-  .cube-edge.e12 { height: 150px; transform: translate3d(-75px, 75px, -75px) rotateX(90deg); }
-
-  .product-item {
-    padding: 16px;
-    gap: 16px;
+  .wireframe-glow {
+    width: 200px;
+    height: 200px;
   }
 
-  .product-item-icon {
-    font-size: 24px;
+  .cube-edge.e1 { width: 140px; transform: translate3d(-70px, -70px, 70px); }
+  .cube-edge.e2 { height: 140px; transform: translate3d(70px, -70px, 70px); }
+  .cube-edge.e3 { width: 140px; transform: translate3d(-70px, 70px, 70px); }
+  .cube-edge.e4 { height: 140px; transform: translate3d(-70px, -70px, 70px); }
+  .cube-edge.e5 { width: 140px; transform: translate3d(-70px, -70px, -70px); }
+  .cube-edge.e6 { height: 140px; transform: translate3d(70px, -70px, -70px); }
+  .cube-edge.e7 { width: 140px; transform: translate3d(-70px, 70px, -70px); }
+  .cube-edge.e8 { height: 140px; transform: translate3d(-70px, -70px, -70px); }
+  .cube-edge.e9 { height: 140px; transform: translate3d(-70px, -70px, -70px) rotateX(90deg); }
+  .cube-edge.e10 { height: 140px; transform: translate3d(70px, -70px, -70px) rotateX(90deg); }
+  .cube-edge.e11 { height: 140px; transform: translate3d(70px, 70px, -70px) rotateX(90deg); }
+  .cube-edge.e12 { height: 140px; transform: translate3d(-70px, 70px, -70px) rotateX(90deg); }
+
+  .product-card-large {
+    padding: 32px 24px;
   }
 
-  .product-item-content h3 {
-    font-size: 16px;
+  .product-card-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
   }
 
-  .product-item-content p {
-    font-size: 13px;
+  .product-card-large h2 {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .product-card-large p {
+    font-size: 14px;
+    margin-bottom: 24px;
   }
 
   .products-grid {
