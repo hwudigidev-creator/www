@@ -12,8 +12,41 @@
  */
 
 // 設定 Google Sheets ID（從 URL 取得）
-const SHEET_ID = '你的_GOOGLE_SHEETS_ID';
+const SHEET_ID = '1CsHaNCLsdaoQlKes-ezJ_K522HvHNkpGNWt_EyeKgWU';
 const SHEET_NAME = '聯絡表單';
+
+/**
+ * 建立標頭 - 在 Apps Script 編輯器中執行一次
+ * 執行方式：選擇此函數 > 點擊「執行」按鈕
+ */
+function createHeaders() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  let sheet = ss.getSheetByName(SHEET_NAME);
+
+  // 如果工作表不存在，建立新的
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+  }
+
+  // 設定標題列
+  sheet.getRange(1, 1, 1, 9).setValues([[
+    '時間戳記', '學校', '科別', '姓名', '手機', 'Email', '想成為', '職涯描述', '留言'
+  ]]);
+
+  // 設定標題列格式（藍底白字粗體）
+  sheet.getRange(1, 1, 1, 9)
+    .setBackground('#4285f4')
+    .setFontColor('#ffffff')
+    .setFontWeight('bold');
+
+  // 凍結標題列
+  sheet.setFrozenRows(1);
+
+  // 自動調整欄寬
+  sheet.autoResizeColumns(1, 9);
+
+  console.log('標頭建立完成！');
+}
 
 /**
  * 處理 GET 請求（用於測試）

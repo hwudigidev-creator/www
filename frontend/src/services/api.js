@@ -151,9 +151,11 @@ export async function submitContact(data) {
       const response = await fetch(CONTACT_API_URL, {
         method: 'POST',
         headers: {
-          'Content-Type': 'text/plain', // Google Apps Script 需要 text/plain 避免 CORS preflight
+          'Content-Type': 'text/plain;charset=UTF-8', // Google Apps Script 需要 text/plain 避免 CORS preflight
         },
         body: JSON.stringify(data),
+        redirect: 'follow',
+        mode: 'cors',
       })
 
       const result = await response.json()

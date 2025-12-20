@@ -213,6 +213,8 @@ function Contact() {
     try {
       const submitData = {
         ...formData,
+        school: schoolInput,  // 使用顯示的學校名稱
+        department: deptInput,  // 使用顯示的科別名稱
         career: careerTypes[formData.careerIndex].label,
         careerDescription: careerTypes[formData.careerIndex].description
       }
