@@ -45,7 +45,7 @@ function Products() {
     if (activeIndex !== prevIndexRef.current) {
       const direction = activeIndex > prevIndexRef.current ? 1 : -1
       setCubeRotation(prev => prev + (90 * direction))
-      setCubePitch(prev => prev - (10 * direction))
+      setCubePitch(prev => prev + (10 * direction))
       prevIndexRef.current = activeIndex
     }
   }, [activeIndex])
@@ -59,6 +59,12 @@ function Products() {
 
   return (
     <div className="products">
+      {/* 標題區 */}
+      <section className="products-hero">
+        <h1 className="gradient-text">課程特色</h1>
+        <p>探索數位設計系的專業課程與學習內容</p>
+      </section>
+
       {/* 固定的展示區 */}
       <section className="products-fixed-section">
         {/* 左側：方塊與圖片區 */}
@@ -126,11 +132,14 @@ function Products() {
         </div>
       </section>
 
-      {/* 滾動空間 */}
+      {/* 滾動空間 - 多一個卡片高度讓 Footer 可以上來 */}
       <div
         className="products-scroll-spacer"
-        style={{ height: `${(products?.length || 1) * 60}vh` }}
+        style={{ height: `${((products?.length || 1) + 1) * 60}vh` }}
       ></div>
+
+      {/* Footer 滾動空間 */}
+      <div className="products-footer-spacer"></div>
     </div>
   )
 }

@@ -1216,9 +1216,32 @@ body {
 }
 
 /* 固定的展示區 */
-.products-fixed-section {
+/* 標題區 */
+.products-hero {
   position: fixed;
   top: 80px;
+  left: 0;
+  right: 0;
+  padding: 24px 48px;
+  text-align: center;
+  z-index: 10;
+  background: linear-gradient(to bottom, var(--md-surface) 0%, transparent 100%);
+}
+
+.products-hero h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.products-hero p {
+  font-size: 16px;
+  color: var(--md-on-surface-variant);
+}
+
+.products-fixed-section {
+  position: fixed;
+  top: 180px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -1237,6 +1260,11 @@ body {
   position: relative;
   z-index: 0;
   pointer-events: none;
+}
+
+/* Footer 空間 */
+.products-footer-spacer {
+  height: 100vh;
 }
 
 /* ==================== Cube Showcase ==================== */
@@ -1261,6 +1289,9 @@ body {
   border-radius: 16px;
   overflow: hidden;
   z-index: 0;
+  /* 橢圓形遮罩淡化邊緣 */
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 40%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 40%, transparent 100%);
 }
 
 .showcase-image {
@@ -2609,6 +2640,7 @@ body {
 
   /* Products Page Mobile */
   .products-fixed-section {
+    top: 140px;
     grid-template-columns: 1fr;
     padding: 16px;
     gap: 16px;
