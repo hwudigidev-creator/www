@@ -6,7 +6,17 @@ import Loading from '../components/Loading'
 // 圖片基礎路徑
 const imgBase = import.meta.env.BASE_URL + 'images/products/'
 
-// 課程對應的示意圖片（本地）
+// 課程對應的示意影片（本地）
+const productVideos = [
+  imgBase + 'V01.mp4',  // AI 創意設計
+  imgBase + 'V02.mp4',  // 3D 動畫
+  imgBase + 'V03.mp4',  // 遊戲設計
+  imgBase + 'V04.mp4',  // 影視特效
+  imgBase + 'V05.mp4',  // AR/VR
+  imgBase + 'V06.mp4'   // UI/UX
+]
+
+// 備用圖片（影片無法播放時使用）
 const productImages = [
   imgBase + 'P01.webp',  // AI 創意設計
   imgBase + 'P02.webp',  // 3D 動畫
@@ -27,6 +37,7 @@ function Products() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [cubeRotation, setCubeRotation] = useState(60)
   const [cubePitch, setCubePitch] = useState(-30)
+  const [videoErrors, setVideoErrors] = useState({})  // 追蹤影片載入錯誤
   const prevIndexRef = useRef(0)
 
   // 根據滾動位置切換當前卡片
@@ -64,7 +75,14 @@ function Products() {
 
   const { products } = data || {}
   const activeProduct = products?.[activeIndex]
+  const currentVideo = productVideos[activeIndex % productVideos.length]
   const currentImage = productImages[activeIndex % productImages.length]
+  const useImage = videoErrors[activeIndex]  // 該索引的影片是否載入失敗
+
+  // 影片載入錯誤時切換到圖片
+  const handleVideoError = () => {
+    setVideoErrors(prev => ({ ...prev, [activeIndex]: true }))
+  }
 
   return (
     <div className="products">
@@ -84,15 +102,29 @@ function Products() {
       <section className="products-fixed-section">
         {/* 左側：方塊與圖片區 */}
         <div className="cube-showcase">
-          {/* 圖片展示區 */}
+          {/* 影片/圖片展示區 */}
           <div className="showcase-image-container">
-            {/* 清晰圖片 - 平躺在後面 */}
-            <img
-              src={currentImage}
-              alt={activeProduct?.name || '課程圖片'}
-              className="showcase-image showcase-image-clear"
-              key={`clear-${activeIndex}`}
-            />
+            {/* 清晰影片或圖片 - 平躺在後面 */}
+            {useImage ? (
+              <img
+                src={currentImage}
+                alt={activeProduct?.name || '課程圖片'}
+                className="showcase-image showcase-image-clear"
+                key={`img-${activeIndex}`}
+              />
+            ) : (
+              <video
+                src={currentVideo}
+                className="showcase-image showcase-image-clear"
+                key={`video-${activeIndex}`}
+                autoPlay
+                loop
+                muted
+                playsInline
+                poster={currentImage}
+                onError={handleVideoError}
+              />
+            )}
             {/* 外層 - 自動循環滾動背景 */}
             <div className="showcase-image-blur-wrapper">
               <img

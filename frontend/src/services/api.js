@@ -75,43 +75,43 @@ function getMockData(action) {
       products: [
         {
           id: 1,
-          name: 'AI 創意設計實務',
-          description: '學習 Midjourney、Stable Diffusion、ChatGPT 等 AI 工具在設計領域的應用。',
+          name: 'AI 輔助設計',
+          description: '學習運用 AI 工具加速創作流程，掌握 AIGC 生成式 AI 技術，提升設計效率與創意表現。',
           price: null,
           image: ''
         },
         {
           id: 2,
-          name: '3D 動畫與角色設計',
-          description: '使用 Maya、Blender 進行 3D 建模、骨架綁定、動畫製作。',
+          name: '動畫設計',
+          description: '從 2D 動畫到 3D 動畫，學習角色設計、動態捕捉、動畫製作全流程技術。',
           price: null,
           image: ''
         },
         {
           id: 3,
-          name: '遊戲設計與開發',
-          description: 'Unity、Unreal Engine 遊戲引擎實戰，從企劃到上架完整流程。',
+          name: '遊戲開發',
+          description: '遊戲企劃、關卡設計、Unity/Unreal 引擎開發，打造沉浸式遊戲體驗。',
           price: null,
           image: ''
         },
         {
           id: 4,
-          name: '影視後製與特效',
-          description: 'After Effects、Nuke 視覺特效合成，電影級後製技術。',
+          name: '影視特效',
+          description: 'VFX 視覺特效、合成技術、動態圖像設計，創造震撼視覺效果。',
           price: null,
           image: ''
         },
         {
           id: 5,
-          name: 'AR/VR 互動體驗設計',
-          description: '擴增實境與虛擬實境應用開發，創造沉浸式互動體驗。',
+          name: '互動多媒體',
+          description: 'AR/VR 擴增實境、互動裝置、數位展演，探索新媒體藝術可能性。',
           price: null,
           image: ''
         },
         {
           id: 6,
-          name: 'UI/UX 介面設計',
-          description: '使用者體驗研究、介面設計、原型製作與可用性測試。',
+          name: 'AI 工作流',
+          description: '建立高效的 AI 創作工作流程，整合多種 AI 工具實現自動化設計流程。',
           price: null,
           image: ''
         }
