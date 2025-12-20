@@ -1177,6 +1177,84 @@ body {
   line-height: 1.6;
 }
 
+/* ==================== Products Page ==================== */
+.products {
+  background: var(--md-surface);
+  position: relative;
+}
+
+/* 第一區塊：標題區 - FIXED 在背後 */
+.products-hero {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+  padding: 32px 24px;
+  text-align: center;
+  background: var(--md-surface);
+  z-index: 0;
+}
+
+.products-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.products-hero h1 {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+
+.products-hero p {
+  font-size: 16px;
+  color: var(--md-on-surface-variant);
+  max-width: 560px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* 第二區塊：內容區 - FIXED 在底部（同聯絡頁） */
+.products-content-section {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px;
+  padding-top: 80px;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* 內容容器 - 由外層滾動控制位置 */
+.products-content-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  pointer-events: auto;
+}
+
+/* 內容區 */
+.products-content-scroll {
+  padding: 20px 0;
+  padding-top: 160px;
+}
+
+/* Products 頁面滾動空間 - 讓 Footer 可以上浮 */
+.products-footer-spacer {
+  height: 250vh;
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
+}
+
 /* ==================== Products Grid ==================== */
 .products-grid {
   display: grid;
@@ -2184,6 +2262,39 @@ body {
     gap: 32px;
   }
 
+  /* Products Page Mobile */
+  .products-hero {
+    top: 64px;
+    padding: 20px 16px;
+  }
+
+  .products-hero h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .products-hero p {
+    font-size: 14px;
+  }
+
+  .products-content-section {
+    padding: 16px;
+    padding-top: 64px;
+  }
+
+  .products-content-scroll {
+    padding-top: 120px;
+  }
+
+  .products-footer-spacer {
+    height: 200vh;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Contact Page Mobile */
   .contact-hero {
     top: 64px; /* 手機版導覽列高度 */
     padding: 20px 16px;
