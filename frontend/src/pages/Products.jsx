@@ -3,20 +3,29 @@ import { useFetch } from '../hooks/useFetch'
 import { getProducts } from '../services/api'
 import Loading from '../components/Loading'
 
-// 課程對應的示意圖片
+// 圖片基礎路徑
+const imgBase = import.meta.env.BASE_URL + 'images/products/'
+
+// 課程對應的示意圖片（本地）
 const productImages = [
-  'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
-  'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
-  'https://images.unsplash.com/photo-1556438064-2d7646166914?w=800',
-  'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800',
-  'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=800',
-  'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800'
+  imgBase + 'P01.webp',  // AI 創意設計
+  imgBase + 'P02.webp',  // 3D 動畫
+  imgBase + 'P03.webp',  // 遊戲設計
+  imgBase + 'P04.webp',  // 影視特效
+  imgBase + 'P05.webp',  // AR/VR
+  imgBase + 'P06.webp'   // UI/UX
 ]
+
+// 外層滾動背景圖
+const bgImage = imgBase + 'P00.webp'
+
+// 頁面底圖
+const pageBg = imgBase + 'BG.webp'
 
 function Products() {
   const { data, loading, error } = useFetch(getProducts)
   const [activeIndex, setActiveIndex] = useState(0)
-  const [cubeRotation, setCubeRotation] = useState(45)
+  const [cubeRotation, setCubeRotation] = useState(60)
   const [cubePitch, setCubePitch] = useState(-30)
   const prevIndexRef = useRef(0)
 
@@ -59,6 +68,12 @@ function Products() {
 
   return (
     <div className="products">
+      {/* 全螢幕背景底圖 */}
+      <div
+        className="products-bg"
+        style={{ backgroundImage: `url(${pageBg})` }}
+      />
+
       {/* 標題區 */}
       <section className="products-hero">
         <h1 className="gradient-text">課程特色</h1>
@@ -69,14 +84,23 @@ function Products() {
       <section className="products-fixed-section">
         {/* 左側：方塊與圖片區 */}
         <div className="cube-showcase">
-          {/* 圖片展示區 */}
+          {/* 圖片展示區 - 雙層：外層邊緣模糊、內層中心清晰 */}
           <div className="showcase-image-container">
+            {/* 清晰的底層 */}
             <img
               src={currentImage}
               alt={activeProduct?.name || '課程圖片'}
-              className="showcase-image"
-              key={activeIndex}
+              className="showcase-image showcase-image-clear"
+              key={`clear-${activeIndex}`}
             />
+            {/* 外層 - 自動循環滾動背景 */}
+            <div className="showcase-image-blur-wrapper">
+              <img
+                src={bgImage}
+                alt=""
+                className="showcase-image-blur-img"
+              />
+            </div>
           </div>
 
           {/* 漂浮的線框方塊 */}
@@ -86,7 +110,7 @@ function Products() {
               className="wireframe-cube"
               style={{ transform: `rotateX(${cubePitch}deg) rotateY(${cubeRotation}deg)` }}
             >
-              {/* 6 個半透明濾鏡面 */}
+              {/* 6 個濾鏡面 */}
               <div className="cube-face front"></div>
               <div className="cube-face back"></div>
               <div className="cube-face left"></div>

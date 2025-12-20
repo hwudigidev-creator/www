@@ -1216,6 +1216,19 @@ body {
 }
 
 /* 固定的展示區 */
+/* 全螢幕背景底圖 */
+.products-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
 /* 標題區 */
 .products-hero {
   position: fixed;
@@ -1225,7 +1238,6 @@ body {
   padding: 24px 48px;
   text-align: center;
   z-index: 10;
-  background: linear-gradient(to bottom, var(--md-surface) 0%, transparent 100%);
 }
 
 .products-hero h1 {
@@ -1284,26 +1296,71 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 320px;
-  height: 420px;
+  width: 550px;
+  height: 750px;
   border-radius: 16px;
   overflow: hidden;
   z-index: 0;
-  /* 橢圓形遮罩淡化邊緣 */
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 40%, transparent 100%);
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 40%, transparent 100%);
 }
 
+/* 共用圖片樣式 */
 .showcase-image {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   object-fit: cover;
+  object-position: center;
   animation: imageFadeIn 0.5s ease-out;
 }
 
+/* 清晰的底層圖片 */
+.showcase-image-clear {
+  z-index: 1;
+  filter: contrast(1.1) saturate(1.1);
+  transform: translate(-50%, -50%) scale(1.05);
+  animation: imageFadeIn 0.4s ease-out;
+}
+
+/* 外層圖片容器 */
+.showcase-image-blur-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 2;
+  /* 中心透明，邊緣顯示，外緣淡化消失 */
+  -webkit-mask-image: radial-gradient(ellipse 45% 32% at 50% 50%, transparent 55%, black 70%, transparent 95%);
+  mask-image: radial-gradient(ellipse 45% 32% at 50% 50%, transparent 55%, black 70%, transparent 95%);
+}
+
+/* 外層圖片 - 自動循環滾動 */
+.showcase-image-blur-img {
+  position: absolute;
+  width: 100%;
+  height: auto;
+  min-height: 2790px;
+  left: 50%;
+  transform: translateX(-50%);
+  object-fit: cover;
+  filter: blur(1px) saturate(1.02);
+  animation: bgScroll 30s linear infinite;
+}
+
+@keyframes bgScroll {
+  0% { top: 0; }
+  100% { top: -1790px; }
+}
+
+/* 邊緣淡化 - 移除實色遮罩 */
+
 @keyframes imageFadeIn {
-  from { opacity: 0; transform: scale(1.05); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ==================== Wireframe Cube ==================== */
@@ -1351,7 +1408,7 @@ body {
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 6 個濾鏡面 */
+/* 6 個濾鏡面 - 清晰 + 放大 + 色彩分離效果 */
 .cube-face {
   position: absolute;
   width: 180px;
@@ -1360,15 +1417,35 @@ body {
   top: 50%;
   margin-left: -90px;
   margin-top: -90px;
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.08) 0%,
-    rgba(240, 147, 251, 0.05) 50%,
-    rgba(102, 126, 234, 0.08) 100%
-  );
-  backdrop-filter: blur(4px) saturate(1.2) contrast(1.05);
-  -webkit-backdrop-filter: blur(4px) saturate(1.2) contrast(1.05);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  /* 抵消外部模糊，讓內部清晰 + 放大 */
+  backdrop-filter: blur(0px) contrast(1.1);
+  -webkit-backdrop-filter: blur(0px) contrast(1.1);
+  transform-style: preserve-3d;
+}
+
+/* 紅色色彩分離層 */
+.cube-face::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: rgba(255, 80, 80, 0.08);
+  transform: translate(4px, 2px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* 青色色彩分離層 */
+.cube-face::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: rgba(80, 200, 255, 0.08);
+  transform: translate(-4px, -2px);
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 
 .cube-face.front  { transform: translate3d(0, 0, 90px); }
@@ -2647,12 +2724,12 @@ body {
   }
 
   .cube-showcase {
-    height: 280px;
+    height: 320px;
   }
 
   .showcase-image-container {
-    width: 200px;
-    height: 260px;
+    width: 280px;
+    height: 380px;
   }
 
   .wireframe-cube {
