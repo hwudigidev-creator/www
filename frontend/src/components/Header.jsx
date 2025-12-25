@@ -44,8 +44,8 @@ function Header() {
     <header className={`header ${isExpanded ? 'expanded' : ''}`}>
       <div className="header-container">
         <Link to="/" className="logo" onClick={closeNav}>
-          <div className="logo-icon"></div>
-          <span>數位設計系</span>
+          <img src={import.meta.env.BASE_URL + "DD_LOGO.svg"} alt="數位設計系" className="logo-icon" />
+          <span>HWU 數位設計系</span>
         </Link>
 
         {/* 桌面版導覽 - 純 icon */}
