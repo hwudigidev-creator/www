@@ -2,29 +2,83 @@ import { useFetch } from '../hooks/useFetch'
 import { getHomeData } from '../services/api'
 import Loading from '../components/Loading'
 import Cube3D from '../components/Cube3D'
-import { useEffect, useState } from 'react'
+import Footer from '../components/Footer'
+import { useEffect, useState, useCallback, useRef } from 'react'
 
 function Home() {
   const { data, loading, error } = useFetch(getHomeData)
-  const [scrollProgress, setScrollProgress] = useState(0)
+  const [stage, setStage] = useState(0)
+  const [animProgress, setAnimProgress] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [showFooter, setShowFooter] = useState(false)
+  const [cardResetKey, setCardResetKey] = useState(0)
+  const animationRef = useRef(null)
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      const windowHeight = window.innerHeight
-      // 計算滾動進度 (0 到 1)，在第一個畫面高度內完成
-      const progress = Math.min(1, scrollY / (windowHeight * 0.8))
-      setScrollProgress(progress)
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
     }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const scrollToFeatures = (e) => {
-    e.preventDefault()
-    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })
-  }
+  const animateTo = useCallback((targetProgress, duration = 2000) => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current)
+    }
+    setIsAnimating(true)
+
+    const startProgress = animProgress
+    const startTime = performance.now()
+
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime
+      const t = Math.min(1, elapsed / duration)
+      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+
+      const newProgress = startProgress + (targetProgress - startProgress) * eased
+      setAnimProgress(newProgress)
+
+      if (t < 1) {
+        animationRef.current = requestAnimationFrame(animate)
+      } else {
+        setIsAnimating(false)
+        animationRef.current = null
+      }
+    }
+
+    animationRef.current = requestAnimationFrame(animate)
+  }, [animProgress])
+
+  const goNext = useCallback(() => {
+    if (isAnimating) return
+    if (stage === 0) {
+      setStage(1)
+      animateTo(1, 4000)
+    }
+  }, [stage, isAnimating, animateTo])
+
+  const goPrev = useCallback(() => {
+    if (isAnimating) return
+    if (stage === 1) {
+      setStage(0)
+      setAnimProgress(0)
+      setShowFooter(false)
+      setCardResetKey(k => k + 1)
+    }
+  }, [stage, isAnimating])
+
+  const toggleFooter = useCallback((show) => {
+    setShowFooter(show)
+  }, [])
+
+  const goToTop = useCallback(() => {
+    setShowFooter(false)
+    setStage(0)
+    setAnimProgress(0)
+    setCardResetKey(k => k + 1)
+  }, [])
 
   if (loading) return <Loading />
   if (error) return <div className="error">載入首頁資料時發生錯誤</div>
@@ -32,31 +86,27 @@ function Home() {
   const { hero, features } = data || {}
 
   return (
-    <div className="home">
-      {/* Hero Section - sticky 讓滾動時可見毛玻璃效果 */}
-      <section className="hero">
-        {/* 滾動時漸進毛玻璃效果 */}
-        <div
-          className="hero-blur-overlay"
-          style={{
-            opacity: scrollProgress,
-            backdropFilter: `blur(${scrollProgress * 20}px)`,
-            WebkitBackdropFilter: `blur(${scrollProgress * 20}px)`
-          }}
-        />
+    <div className="home no-scroll">
+      <section
+        className="hero"
+        style={{
+          opacity: stage === 0 ? 1 : 0,
+          pointerEvents: stage === 0 ? 'auto' : 'none',
+          transition: 'opacity 0.8s ease'
+        }}
+      >
         <div className="hero-content">
           <h1>
             <span className="gradient-text">AI 時代的設計教育</span>
           </h1>
           <p>{hero?.subtitle || '培養數位時代的創意設計人才'}</p>
           <div className="hero-actions">
-            <button onClick={scrollToFeatures} className="btn btn-outline-gradient">
+            <button onClick={goNext} className="btn btn-outline-gradient">
               {hero?.buttonText || '探索課程'}
             </button>
           </div>
         </div>
-        {/* 向下滾動指示器 */}
-        <div className="scroll-indicator" style={{ opacity: 1 - scrollProgress }}>
+        <div className="scroll-indicator" onClick={goNext} style={{ cursor: 'pointer' }}>
           <div className="scroll-icons">
             <span className="scroll-icon">▼</span>
             <span className="scroll-icon">▼</span>
@@ -65,11 +115,35 @@ function Home() {
         </div>
       </section>
 
-      {/* 3D Cube Section - 固定在底部 */}
-      <Cube3D features={features} />
+      <Cube3D
+        key={cardResetKey}
+        features={features}
+        stage={stage}
+        animProgress={animProgress}
+        onPrev={goPrev}
+        isAnimating={isAnimating}
+        showFooter={showFooter}
+        onToggleFooter={toggleFooter}
+      />
 
-      {/* Footer 滾動空間 - 為 fixed cube-section 創造滾動空間 */}
-      <div id="features" className="footer-spacer"></div>
+      <div
+        className="home-footer-wrapper"
+        style={{
+          opacity: showFooter ? 1 : 0,
+          pointerEvents: showFooter ? 'auto' : 'none',
+          transform: showFooter ? 'translateY(0)' : 'translateY(100px)',
+          transition: 'all 0.5s ease'
+        }}
+      >
+        <div className="footer-top-arrow" onClick={goToTop}>
+          <div className="cube-scroll-icons">
+            <span className="cube-scroll-icon">▲</span>
+            <span className="cube-scroll-icon">▲</span>
+            <span className="cube-scroll-icon">▲</span>
+          </div>
+        </div>
+        <Footer />
+      </div>
     </div>
   )
 }

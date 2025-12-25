@@ -451,6 +451,20 @@ body {
   z-index: 100;
 }
 
+/* 上方箭頭 */
+.cube-scroll-up {
+  bottom: auto;
+  top: 40px;
+}
+
+.cube-scroll-up .cube-scroll-icons {
+  flex-direction: column-reverse;
+}
+
+.cube-scroll-up .cube-scroll-icon {
+  animation-name: cubeScrollBounceUp;
+}
+
 .cube-scroll-icons {
   display: flex;
   flex-direction: column;
@@ -482,6 +496,16 @@ body {
   0%, 100% {
     opacity: 0;
     transform: translateY(-8px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes cubeScrollBounceUp {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(8px);
   }
   50% {
     opacity: 1;
@@ -2977,4 +3001,32 @@ body {
     flex-wrap: wrap;
     justify-content: center;
   }
+}
+
+
+/* 首頁 Footer 包裝 */
+.home-footer-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+}
+
+.footer-top-arrow {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+  cursor: pointer;
+  background: linear-gradient(to bottom, transparent, rgba(19, 19, 20, 0.9));
+}
+
+.footer-top-arrow .cube-scroll-icons {
+  flex-direction: column-reverse;
+}
+
+.footer-top-arrow .cube-scroll-icon {
+  color: var(--md-primary);
+  animation: cubeScrollBounceUp 2s ease-in-out infinite;
+  text-shadow: 0 0 10px rgba(102, 126, 234, 0.6), 0 0 20px rgba(102, 126, 234, 0.4);
 }
