@@ -45,7 +45,8 @@
       "Bash(cmd //c \"taskkill /PID 156628 /F\")",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm install:*)"
     ]
   }
 }
