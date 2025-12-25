@@ -22,6 +22,7 @@ function Contact() {
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false)
   const [deptInput, setDeptInput] = useState('')
   const [showDeptDropdown, setShowDeptDropdown] = useState(false)
+  const [activeRow, setActiveRow] = useState(0)
   const [showFooter, setShowFooter] = useState(false)
   const schoolInputRef = useRef(null)
   const dropdownRef = useRef(null)
@@ -30,6 +31,7 @@ function Contact() {
 
   const { careerTypes } = contactOptions
   const schools = hslist.filter(s => s.value !== '-1')
+  const totalRows = 4 // 校名科別, 姓名手機, Email, 職涯留言+送出
 
   const filteredSchools = schools.filter(school =>
     school.label.toLowerCase().includes(schoolInput.toLowerCase())
@@ -66,25 +68,34 @@ function Contact() {
   }, [])
 
   // 導航
-  const goToFooter = useCallback(() => {
-    if (!showFooter) setShowFooter(true)
-  }, [showFooter])
+  const nextRow = useCallback(() => {
+    if (showFooter) return
+    if (activeRow < totalRows - 1) {
+      setActiveRow(activeRow + 1)
+    } else {
+      setShowFooter(true)
+    }
+  }, [activeRow, showFooter])
 
-  const goBack = useCallback(() => {
-    if (showFooter) setShowFooter(false)
-  }, [showFooter])
+  const prevRow = useCallback(() => {
+    if (showFooter) {
+      setShowFooter(false)
+    } else if (activeRow > 0) {
+      setActiveRow(activeRow - 1)
+    }
+  }, [activeRow, showFooter])
 
   const goToTop = useCallback(() => {
     setShowFooter(false)
+    setActiveRow(0)
   }, [])
 
-  // 驗證手機格式
+  // 驗證函數
   const validatePhone = (phone) => {
     const phoneRegex = /^09\d{8}$/
     return phoneRegex.test(phone.replace(/-/g, ''))
   }
 
-  // 驗證 Email 格式
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
@@ -95,25 +106,16 @@ function Contact() {
     setFormData(prev => ({ ...prev, school: school.value }))
     setSchoolInput(school.label)
     setShowSchoolDropdown(false)
-    if (errors.school) {
-      setErrors(prev => ({ ...prev, school: '' }))
-    }
+    if (errors.school) setErrors(prev => ({ ...prev, school: '' }))
   }
 
-  // 學校輸入變更
   const handleSchoolInputChange = (e) => {
     const value = e.target.value
     setSchoolInput(value)
     setShowSchoolDropdown(true)
     const exactMatch = schools.find(s => s.label === value)
-    if (exactMatch) {
-      setFormData(prev => ({ ...prev, school: exactMatch.value }))
-    } else {
-      setFormData(prev => ({ ...prev, school: value }))
-    }
-    if (errors.school) {
-      setErrors(prev => ({ ...prev, school: '' }))
-    }
+    setFormData(prev => ({ ...prev, school: exactMatch ? exactMatch.value : value }))
+    if (errors.school) setErrors(prev => ({ ...prev, school: '' }))
   }
 
   // 選擇科別
@@ -121,51 +123,34 @@ function Contact() {
     setFormData(prev => ({ ...prev, department: dept.value }))
     setDeptInput(dept.label)
     setShowDeptDropdown(false)
-    if (errors.department) {
-      setErrors(prev => ({ ...prev, department: '' }))
-    }
+    if (errors.department) setErrors(prev => ({ ...prev, department: '' }))
   }
 
-  // 科別輸入變更
   const handleDeptInputChange = (e) => {
     const value = e.target.value
     setDeptInput(value)
     setShowDeptDropdown(true)
     const exactMatch = departmentList.find(d => d.label === value)
-    if (exactMatch) {
-      setFormData(prev => ({ ...prev, department: exactMatch.value }))
-    } else {
-      setFormData(prev => ({ ...prev, department: value }))
-    }
-    if (errors.department) {
-      setErrors(prev => ({ ...prev, department: '' }))
-    }
+    setFormData(prev => ({ ...prev, department: exactMatch ? exactMatch.value : value }))
+    if (errors.department) setErrors(prev => ({ ...prev, department: '' }))
   }
 
   // 驗證表單
   const validateForm = () => {
     const newErrors = {}
-
-    if (!schoolInput.trim()) {
-      newErrors.school = '請輸入或選擇學校'
-    }
-    if (!deptInput.trim()) {
-      newErrors.department = '請輸入或選擇科別'
-    }
-    if (!formData.name.trim()) {
-      newErrors.name = '請輸入姓名'
-    }
+    if (!schoolInput.trim()) newErrors.school = '請輸入或選擇學校'
+    if (!deptInput.trim()) newErrors.department = '請輸入或選擇科別'
+    if (!formData.name.trim()) newErrors.name = '請輸入姓名'
     if (!formData.phone.trim()) {
       newErrors.phone = '請輸入手機號碼'
     } else if (!validatePhone(formData.phone)) {
-      newErrors.phone = '手機格式不正確 (例：0912345678)'
+      newErrors.phone = '手機格式不正確'
     }
     if (!formData.email.trim()) {
       newErrors.email = '請輸入電子郵件'
     } else if (!validateEmail(formData.email)) {
       newErrors.email = '電子郵件格式不正確'
     }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -173,12 +158,9 @@ function Contact() {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }))
-    }
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
   }
 
-  // 左右箭頭切換職涯類型
   const handleCareerChange = (direction) => {
     setFormData(prev => {
       let newIndex = prev.careerIndex + direction
@@ -190,10 +172,7 @@ function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
+    if (!validateForm()) return
 
     setSubmitting(true)
     setResult(null)
@@ -208,15 +187,7 @@ function Contact() {
       }
       const response = await submitContact(submitData)
       setResult({ success: true, message: response.message || '感謝您的留言！' })
-      setFormData({
-        school: '',
-        department: '',
-        name: '',
-        phone: '',
-        email: '',
-        careerIndex: 0,
-        message: ''
-      })
+      setFormData({ school: '', department: '', name: '', phone: '', email: '', careerIndex: 0, message: '' })
       setSchoolInput('')
       setDeptInput('')
       setErrors({})
@@ -228,12 +199,14 @@ function Contact() {
   }
 
   const currentCareer = careerTypes[formData.careerIndex]
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+  const rowHeight = isMobile ? 140 : 120
 
   return (
     <div className="contact no-scroll">
       {/* 上方箭頭 */}
-      {showFooter && (
-        <div className="cube-scroll-indicator cube-scroll-up" onClick={goBack} style={{ cursor: 'pointer' }}>
+      {(activeRow > 0 || showFooter) && (
+        <div className="cube-scroll-indicator cube-scroll-up" onClick={prevRow} style={{ cursor: 'pointer' }}>
           <div className="cube-scroll-icons">
             <span className="cube-scroll-icon">▲</span>
             <span className="cube-scroll-icon">▲</span>
@@ -243,7 +216,7 @@ function Contact() {
 
       {/* 下方箭頭 */}
       {!showFooter && (
-        <div className="cube-scroll-indicator" onClick={goToFooter} style={{ cursor: 'pointer' }}>
+        <div className="cube-scroll-indicator" onClick={nextRow} style={{ cursor: 'pointer' }}>
           <div className="cube-scroll-icons">
             <span className="cube-scroll-icon">▼</span>
             <span className="cube-scroll-icon">▼</span>
@@ -251,7 +224,7 @@ function Contact() {
         </div>
       )}
 
-      {/* 第一區塊：標題區 */}
+      {/* 標題區 */}
       <section
         className="contact-hero"
         style={{
@@ -265,21 +238,28 @@ function Contact() {
         </div>
       </section>
 
-      {/* 第二區塊：表單區 */}
+      {/* 表單區 */}
       <section
-        className="contact-form-section contact-form-fixed"
+        className="contact-form-section contact-form-rows"
         style={{
           opacity: showFooter ? 0 : 1,
           pointerEvents: showFooter ? 'none' : 'auto',
           transition: 'opacity 0.5s ease'
         }}
       >
-        <div className="contact-form-wrapper">
-          <div className="contact-form-scroll">
-            <form className="contact-form" onSubmit={handleSubmit}>
-              {/* 校名 + 科別 並列 */}
+
+        <div className="contact-form-viewport">
+          <form
+            className="contact-form contact-form-track"
+            onSubmit={handleSubmit}
+            style={{
+              transform: `translateY(${-activeRow * rowHeight}px)`,
+              transition: 'transform 0.4s ease-out'
+            }}
+          >
+            {/* Row 0: 校名 + 科別 */}
+            <div className={`form-row-item ${activeRow === 0 ? 'active' : ''}`}>
               <div className="form-row">
-                {/* 校名 */}
                 <div className="form-group">
                   <label htmlFor="school">校名 <span className="required">*</span></label>
                   <div className="autocomplete-wrapper">
@@ -297,12 +277,9 @@ function Contact() {
                     />
                     {showSchoolDropdown && filteredSchools.length > 0 && (
                       <ul className="autocomplete-dropdown" ref={dropdownRef}>
-                        {filteredSchools.map(school => (
-                          <li
-                            key={school.value}
-                            onClick={() => handleSchoolSelect(school)}
-                            className={formData.school === school.value ? 'selected' : ''}
-                          >
+                        {filteredSchools.slice(0, 6).map(school => (
+                          <li key={school.value} onClick={() => handleSchoolSelect(school)}
+                              className={formData.school === school.value ? 'selected' : ''}>
                             {school.label}
                           </li>
                         ))}
@@ -312,7 +289,6 @@ function Contact() {
                   {errors.school && <span className="error-message">{errors.school}</span>}
                 </div>
 
-                {/* 科別 */}
                 <div className="form-group">
                   <label htmlFor="department">科別 <span className="required">*</span></label>
                   <div className="autocomplete-wrapper">
@@ -330,12 +306,9 @@ function Contact() {
                     />
                     {showDeptDropdown && filteredDepts.length > 0 && (
                       <ul className="autocomplete-dropdown" ref={deptDropdownRef}>
-                        {filteredDepts.map(dept => (
-                          <li
-                            key={dept.value}
-                            onClick={() => handleDeptSelect(dept)}
-                            className={formData.department === dept.value ? 'selected' : ''}
-                          >
+                        {filteredDepts.slice(0, 6).map(dept => (
+                          <li key={dept.value} onClick={() => handleDeptSelect(dept)}
+                              className={formData.department === dept.value ? 'selected' : ''}>
                             {dept.label}
                           </li>
                         ))}
@@ -345,117 +318,88 @@ function Contact() {
                   {errors.department && <span className="error-message">{errors.department}</span>}
                 </div>
               </div>
+            </div>
 
-              {/* 姓名 + 手機 並列 */}
+            {/* Row 1: 姓名 + 手機 */}
+            <div className={`form-row-item ${activeRow === 1 ? 'active' : ''}`}>
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="name">姓名 <span className="required">*</span></label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="請輸入您的姓名"
-                    className={errors.name ? 'error' : ''}
-                  />
+                  <input type="text" id="name" name="name" value={formData.name}
+                         onChange={handleChange} placeholder="請輸入您的姓名"
+                         className={errors.name ? 'error' : ''} />
                   {errors.name && <span className="error-message">{errors.name}</span>}
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="phone">手機 <span className="required">*</span></label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="例：0912345678"
-                    className={errors.phone ? 'error' : ''}
-                  />
+                  <input type="tel" id="phone" name="phone" value={formData.phone}
+                         onChange={handleChange} placeholder="例：0912345678"
+                         className={errors.phone ? 'error' : ''} />
                   {errors.phone && <span className="error-message">{errors.phone}</span>}
                 </div>
               </div>
+            </div>
 
-              {/* Email */}
+            {/* Row 2: Email */}
+            <div className={`form-row-item ${activeRow === 2 ? 'active' : ''}`}>
               <div className="form-group">
                 <label htmlFor="email">Email <span className="required">*</span></label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="請輸入您的電子郵件"
-                  className={errors.email ? 'error' : ''}
-                />
+                <input type="email" id="email" name="email" value={formData.email}
+                       onChange={handleChange} placeholder="請輸入您的電子郵件"
+                       className={errors.email ? 'error' : ''} />
                 {errors.email && <span className="error-message">{errors.email}</span>}
               </div>
+            </div>
 
-              {/* 你想成為 + 留言 並排 */}
+            {/* Row 3: 你想成為 + 留言 + 送出 */}
+            <div className={`form-row-item ${activeRow === 3 ? 'active' : ''}`}>
               <div className="form-row career-message-row">
                 <div className="form-group career-group">
                   <label>你想成為</label>
                   <div className="career-selector">
                     <div className="career-selector-controls">
-                      <button
-                        type="button"
-                        className="arrow-btn"
-                        onClick={() => handleCareerChange(-1)}
-                        aria-label="上一個選項"
-                      >
-                        ◀
-                      </button>
+                      <button type="button" className="arrow-btn" onClick={() => handleCareerChange(-1)}>◀</button>
                       <div className="career-display">
                         <i className={`career-icon ${currentCareer.icon}`}></i>
                         <span className="career-label">{currentCareer.label}</span>
                         <span className="career-description">{currentCareer.description}</span>
                       </div>
-                      <button
-                        type="button"
-                        className="arrow-btn"
-                        onClick={() => handleCareerChange(1)}
-                        aria-label="下一個選項"
-                      >
-                        ▶
-                      </button>
+                      <button type="button" className="arrow-btn" onClick={() => handleCareerChange(1)}>▶</button>
                     </div>
                     <div className="career-dots">
                       {careerTypes.map((_, index) => (
-                        <span
-                          key={index}
-                          className={`dot ${index === formData.careerIndex ? 'active' : ''}`}
-                          onClick={() => setFormData(prev => ({ ...prev, careerIndex: index }))}
-                        />
+                        <span key={index}
+                              className={`dot ${index === formData.careerIndex ? 'active' : ''}`}
+                              onClick={() => setFormData(prev => ({ ...prev, careerIndex: index }))} />
                       ))}
                     </div>
                   </div>
                 </div>
-
                 <div className="form-group message-group">
-                  <label htmlFor="message">留言（其他想說的話）</label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    placeholder="有什麼想告訴我們的嗎？"
-                    rows={4}
-                  />
+                  <label htmlFor="message">留言（選填）</label>
+                  <textarea id="message" name="message" value={formData.message}
+                            onChange={handleChange} placeholder="有什麼想告訴我們的嗎？" rows={3} />
                 </div>
               </div>
-
               <button type="submit" className="submit-btn" disabled={submitting}>
                 {submitting ? '發送中...' : '發送訊息'}
               </button>
-
               {result && (
                 <div className={`form-message ${result.success ? 'success' : 'error'}`}>
                   {result.message}
                 </div>
               )}
-            </form>
-          </div>
+            </div>
+          </form>
+        </div>
+
+        {/* 進度指示點 */}
+        <div className="contact-form-dots">
+          {[...Array(totalRows)].map((_, index) => (
+            <span key={index}
+                  className={`dot ${index === activeRow ? 'active' : ''}`}
+                  onClick={() => setActiveRow(index)} />
+          ))}
         </div>
       </section>
 
@@ -469,13 +413,7 @@ function Contact() {
           transition: 'all 0.5s ease'
         }}
       >
-        <div className="footer-top-arrow" onClick={goToTop}>
-          <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▲</span>
-            <span className="cube-scroll-icon">▲</span>
-          </div>
-        </div>
-        <Footer />
+        <Footer onTop={goToTop} />
       </div>
     </div>
   )

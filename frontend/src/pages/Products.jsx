@@ -252,13 +252,7 @@ function Products() {
           transition: 'all 0.5s ease'
         }}
       >
-        <div className="footer-top-arrow" onClick={goToTop}>
-          <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▲</span>
-            <span className="cube-scroll-icon">▲</span>
-          </div>
-        </div>
-        <Footer />
+        <Footer onTop={goToTop} />
       </div>
     </div>
   )

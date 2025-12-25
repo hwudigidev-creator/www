@@ -1,10 +1,17 @@
 import { Link } from 'react-router-dom'
 
-function Footer() {
+function Footer({ onTop }) {
   const currentYear = new Date().getFullYear()
 
   return (
     <footer className="footer">
+      {/* TOP 箭頭 */}
+      {onTop && (
+        <div className="footer-top-arrow" onClick={onTop}>
+          <span className="cube-scroll-icon">▲</span>
+        </div>
+      )}
+
       <div className="footer-content">
         <div className="footer-main">
           <div className="footer-brand">
