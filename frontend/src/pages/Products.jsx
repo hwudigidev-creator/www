@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useFetch } from '../hooks/useFetch'
 import { getProducts } from '../services/api'
 import Loading from '../components/Loading'
+import Footer from '../components/Footer'
 
 // 圖片基礎路徑
 const imgBase = import.meta.env.BASE_URL + 'images/products/'
@@ -37,28 +38,22 @@ function Products() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [cubeRotation, setCubeRotation] = useState(60)
   const [cubePitch, setCubePitch] = useState(-30)
-  const [videoErrors, setVideoErrors] = useState({})  // 追蹤影片載入錯誤
+  const [videoErrors, setVideoErrors] = useState({})
+  const [showFooter, setShowFooter] = useState(false)
   const prevIndexRef = useRef(0)
 
-  // 根據滾動位置切換當前卡片
+  const products = data?.products || []
+  const maxIndex = products.length - 1
+
+  // 禁止頁面捲動
   useEffect(() => {
-    const handleScroll = () => {
-      const products = data?.products || []
-      if (products.length === 0) return
-
-      const scrollY = window.scrollY
-      const windowHeight = window.innerHeight
-      const scrollPerCard = windowHeight * 0.6
-
-      const index = Math.floor(scrollY / scrollPerCard)
-      setActiveIndex(Math.min(Math.max(0, index), products.length - 1))
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
     }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [data])
+  }, [])
 
   // 切換卡片時觸發方塊旋轉 + 俯仰變化
   useEffect(() => {
@@ -70,14 +65,38 @@ function Products() {
     }
   }, [activeIndex])
 
+  // 下一張卡片
+  const nextCard = useCallback(() => {
+    if (showFooter) return
+    if (activeIndex < maxIndex) {
+      setActiveIndex(activeIndex + 1)
+    } else {
+      setShowFooter(true)
+    }
+  }, [activeIndex, maxIndex, showFooter])
+
+  // 上一張卡片
+  const prevCard = useCallback(() => {
+    if (showFooter) {
+      setShowFooter(false)
+    } else if (activeIndex > 0) {
+      setActiveIndex(activeIndex - 1)
+    }
+  }, [activeIndex, showFooter])
+
+  // 回到頂部
+  const goToTop = useCallback(() => {
+    setShowFooter(false)
+    setActiveIndex(0)
+  }, [])
+
   if (loading) return <Loading />
   if (error) return <div className="error">載入課程資料時發生錯誤</div>
 
-  const { products } = data || {}
   const activeProduct = products?.[activeIndex]
   const currentVideo = productVideos[activeIndex % productVideos.length]
   const currentImage = productImages[activeIndex % productImages.length]
-  const useImage = videoErrors[activeIndex]  // 該索引的影片是否載入失敗
+  const useImage = videoErrors[activeIndex]
 
   // 影片載入錯誤時切換到圖片
   const handleVideoError = () => {
@@ -85,7 +104,7 @@ function Products() {
   }
 
   return (
-    <div className="products">
+    <div className="products no-scroll">
       {/* 全螢幕背景底圖 */}
       <div
         className="products-bg"
@@ -93,13 +112,46 @@ function Products() {
       />
 
       {/* 標題區 */}
-      <section className="products-hero">
+      <section
+        className="products-hero"
+        style={{
+          opacity: showFooter ? 0 : 1,
+          transition: 'opacity 0.5s ease'
+        }}
+      >
         <h1 className="gradient-text">課程特色</h1>
         <p>探索數位設計系的專業課程與學習內容</p>
       </section>
 
+      {/* 上方箭頭 */}
+      {(activeIndex > 0 || showFooter) && (
+        <div className="cube-scroll-indicator cube-scroll-up" onClick={prevCard} style={{ cursor: 'pointer' }}>
+          <div className="cube-scroll-icons">
+            <span className="cube-scroll-icon">▲</span>
+            <span className="cube-scroll-icon">▲</span>
+          </div>
+        </div>
+      )}
+
+      {/* 下方箭頭 */}
+      {!showFooter && (
+        <div className="cube-scroll-indicator" onClick={nextCard} style={{ cursor: 'pointer' }}>
+          <div className="cube-scroll-icons">
+            <span className="cube-scroll-icon">▼</span>
+            <span className="cube-scroll-icon">▼</span>
+          </div>
+        </div>
+      )}
+
       {/* 固定的展示區 */}
-      <section className="products-fixed-section">
+      <section
+        className="products-fixed-section"
+        style={{
+          opacity: showFooter ? 0 : 1,
+          pointerEvents: showFooter ? 'none' : 'auto',
+          transition: 'opacity 0.5s ease'
+        }}
+      >
         {/* 左側：方塊與圖片區 */}
         <div className="cube-showcase">
           {/* 影片/圖片展示區 */}
@@ -180,6 +232,8 @@ function Products() {
                   <span
                     key={index}
                     className={`dot ${index === activeIndex ? 'active' : ''}`}
+                    onClick={() => setActiveIndex(index)}
+                    style={{ cursor: 'pointer' }}
                   />
                 ))}
               </div>
@@ -188,14 +242,24 @@ function Products() {
         </div>
       </section>
 
-      {/* 滾動空間 - 多一個卡片高度讓 Footer 可以上來 */}
+      {/* Footer */}
       <div
-        className="products-scroll-spacer"
-        style={{ height: `${((products?.length || 1) + 1) * 60}vh` }}
-      ></div>
-
-      {/* Footer 滾動空間 */}
-      <div className="products-footer-spacer"></div>
+        className="home-footer-wrapper"
+        style={{
+          opacity: showFooter ? 1 : 0,
+          pointerEvents: showFooter ? 'auto' : 'none',
+          transform: showFooter ? 'translateY(0)' : 'translateY(100px)',
+          transition: 'all 0.5s ease'
+        }}
+      >
+        <div className="footer-top-arrow" onClick={goToTop}>
+          <div className="cube-scroll-icons">
+            <span className="cube-scroll-icon">▲</span>
+            <span className="cube-scroll-icon">▲</span>
+          </div>
+        </div>
+        <Footer />
+      </div>
     </div>
   )
 }

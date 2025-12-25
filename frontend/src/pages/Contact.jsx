@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { submitContact } from '../services/api'
 import contactOptions from '../data/contactOptions.json'
 import hslist from '../data/hslist.json'
 import departmentList from '../data/departments.json'
+import Footer from '../components/Footer'
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -21,56 +22,30 @@ function Contact() {
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false)
   const [deptInput, setDeptInput] = useState('')
   const [showDeptDropdown, setShowDeptDropdown] = useState(false)
-  const [formOffset, setFormOffset] = useState(0)
+  const [showFooter, setShowFooter] = useState(false)
   const schoolInputRef = useRef(null)
   const dropdownRef = useRef(null)
   const deptInputRef = useRef(null)
   const deptDropdownRef = useRef(null)
-  const formRef = useRef(null)
 
   const { careerTypes } = contactOptions
-  // 使用 hslist.json 的學校清單，排除第一項（請輸入或選擇學校）
   const schools = hslist.filter(s => s.value !== '-1')
 
-  // 過濾符合的學校選項
   const filteredSchools = schools.filter(school =>
     school.label.toLowerCase().includes(schoolInput.toLowerCase())
   )
 
-  // 過濾符合的科別選項
   const filteredDepts = departmentList.filter(dept =>
     dept.label.toLowerCase().includes(deptInput.toLowerCase())
   )
 
-  // 用外層頁面滾動控制表單位置（同首頁卡片）
+  // 禁止頁面捲動
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      const windowHeight = window.innerHeight
-
-      // 可視區域高度（扣除 header + 標題區）
-      const isMobile = window.innerWidth <= 768
-      const visibleHeight = windowHeight - (isMobile ? 140 : 180)
-
-      // 表單實際高度
-      const formHeight = formRef.current?.scrollHeight || 800
-
-      // 表單可以移動的最大距離
-      const maxOffset = Math.max(0, formHeight - visibleHeight + 100)
-
-      // 根據頁面滾動計算表單移動量（限制在 0 到 maxOffset 之間）
-      const offset = Math.min(scrollY, maxOffset)
-      setFormOffset(offset)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', handleScroll, { passive: true })
-    // 延遲執行一次，確保表單已渲染
-    setTimeout(handleScroll, 100)
-
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
     return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleScroll)
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
     }
   }, [])
 
@@ -90,7 +65,20 @@ function Contact() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // 驗證手機格式 (台灣手機 09xx-xxx-xxx)
+  // 導航
+  const goToFooter = useCallback(() => {
+    if (!showFooter) setShowFooter(true)
+  }, [showFooter])
+
+  const goBack = useCallback(() => {
+    if (showFooter) setShowFooter(false)
+  }, [showFooter])
+
+  const goToTop = useCallback(() => {
+    setShowFooter(false)
+  }, [])
+
+  // 驗證手機格式
   const validatePhone = (phone) => {
     const phoneRegex = /^09\d{8}$/
     return phoneRegex.test(phone.replace(/-/g, ''))
@@ -213,8 +201,8 @@ function Contact() {
     try {
       const submitData = {
         ...formData,
-        school: schoolInput,  // 使用顯示的學校名稱
-        department: deptInput,  // 使用顯示的科別名稱
+        school: schoolInput,
+        department: deptInput,
         career: careerTypes[formData.careerIndex].label,
         careerDescription: careerTypes[formData.careerIndex].description
       }
@@ -242,28 +230,56 @@ function Contact() {
   const currentCareer = careerTypes[formData.careerIndex]
 
   return (
-    <div className="contact">
-      {/* 第一區塊：標題區 - FIXED 不動 */}
-      <section className="contact-hero">
+    <div className="contact no-scroll">
+      {/* 上方箭頭 */}
+      {showFooter && (
+        <div className="cube-scroll-indicator cube-scroll-up" onClick={goBack} style={{ cursor: 'pointer' }}>
+          <div className="cube-scroll-icons">
+            <span className="cube-scroll-icon">▲</span>
+            <span className="cube-scroll-icon">▲</span>
+          </div>
+        </div>
+      )}
+
+      {/* 下方箭頭 */}
+      {!showFooter && (
+        <div className="cube-scroll-indicator" onClick={goToFooter} style={{ cursor: 'pointer' }}>
+          <div className="cube-scroll-icons">
+            <span className="cube-scroll-icon">▼</span>
+            <span className="cube-scroll-icon">▼</span>
+          </div>
+        </div>
+      )}
+
+      {/* 第一區塊：標題區 */}
+      <section
+        className="contact-hero"
+        style={{
+          opacity: showFooter ? 0 : 1,
+          transition: 'opacity 0.5s ease'
+        }}
+      >
         <div className="contact-hero-content">
           <h1 className="gradient-text">聯絡我們</h1>
           <p>對數位設計系或AI工作流有興趣，或任何想了解的？</p>
         </div>
       </section>
 
-      {/* 第二區塊：表單區 - FIXED 在底部，由外層滾動控制 */}
-      <section className="contact-form-section">
-        <div
-          className="contact-form-wrapper"
-          style={{
-            transform: `translateY(${-formOffset}px)`,
-          }}
-        >
-          <div className="contact-form-scroll" ref={formRef}>
+      {/* 第二區塊：表單區 */}
+      <section
+        className="contact-form-section contact-form-fixed"
+        style={{
+          opacity: showFooter ? 0 : 1,
+          pointerEvents: showFooter ? 'none' : 'auto',
+          transition: 'opacity 0.5s ease'
+        }}
+      >
+        <div className="contact-form-wrapper">
+          <div className="contact-form-scroll">
             <form className="contact-form" onSubmit={handleSubmit}>
               {/* 校名 + 科別 並列 */}
               <div className="form-row">
-                {/* 校名 - 可搜尋輸入 */}
+                {/* 校名 */}
                 <div className="form-group">
                   <label htmlFor="school">校名 <span className="required">*</span></label>
                   <div className="autocomplete-wrapper">
@@ -296,7 +312,7 @@ function Contact() {
                   {errors.school && <span className="error-message">{errors.school}</span>}
                 </div>
 
-                {/* 科別 - 可搜尋輸入 */}
+                {/* 科別 */}
                 <div className="form-group">
                   <label htmlFor="department">科別 <span className="required">*</span></label>
                   <div className="autocomplete-wrapper">
@@ -332,7 +348,6 @@ function Contact() {
 
               {/* 姓名 + 手機 並列 */}
               <div className="form-row">
-                {/* 姓名 */}
                 <div className="form-group">
                   <label htmlFor="name">姓名 <span className="required">*</span></label>
                   <input
@@ -347,7 +362,6 @@ function Contact() {
                   {errors.name && <span className="error-message">{errors.name}</span>}
                 </div>
 
-                {/* 手機 */}
                 <div className="form-group">
                   <label htmlFor="phone">手機 <span className="required">*</span></label>
                   <input
@@ -380,7 +394,6 @@ function Contact() {
 
               {/* 你想成為 + 留言 並排 */}
               <div className="form-row career-message-row">
-                {/* 你想成為 - 左右箭頭切換 */}
                 <div className="form-group career-group">
                   <label>你想成為</label>
                   <div className="career-selector">
@@ -407,7 +420,6 @@ function Contact() {
                         ▶
                       </button>
                     </div>
-                    {/* 圓點在框內底部 */}
                     <div className="career-dots">
                       {careerTypes.map((_, index) => (
                         <span
@@ -420,7 +432,6 @@ function Contact() {
                   </div>
                 </div>
 
-                {/* 留言 */}
                 <div className="form-group message-group">
                   <label htmlFor="message">留言（其他想說的話）</label>
                   <textarea
@@ -448,8 +459,24 @@ function Contact() {
         </div>
       </section>
 
-      {/* Footer 滾動空間 - 讓 Footer 可以上浮 */}
-      <div className="contact-footer-spacer"></div>
+      {/* Footer */}
+      <div
+        className="home-footer-wrapper"
+        style={{
+          opacity: showFooter ? 1 : 0,
+          pointerEvents: showFooter ? 'auto' : 'none',
+          transform: showFooter ? 'translateY(0)' : 'translateY(100px)',
+          transition: 'all 0.5s ease'
+        }}
+      >
+        <div className="footer-top-arrow" onClick={goToTop}>
+          <div className="cube-scroll-icons">
+            <span className="cube-scroll-icon">▲</span>
+            <span className="cube-scroll-icon">▲</span>
+          </div>
+        </div>
+        <Footer />
+      </div>
     </div>
   )
 }

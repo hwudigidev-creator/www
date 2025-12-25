@@ -139,7 +139,6 @@ function Home() {
           <div className="cube-scroll-icons">
             <span className="cube-scroll-icon">▲</span>
             <span className="cube-scroll-icon">▲</span>
-            <span className="cube-scroll-icon">▲</span>
           </div>
         </div>
         <Footer />

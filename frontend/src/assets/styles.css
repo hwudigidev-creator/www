@@ -1292,6 +1292,12 @@ body {
 .products {
   background: var(--md-surface);
   position: relative;
+  min-height: 100vh;
+}
+
+.products.no-scroll {
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* 固定的展示區 */
@@ -1859,6 +1865,142 @@ body {
   font-size: 14px;
 }
 
+
+/* About 頁面 - 箭頭導航版本 */
+.about.no-scroll {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.about-main {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1;
+}
+
+.about-section-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 2px solid rgb(102, 126, 234);
+  border-radius: var(--md-radius-lg);
+  padding: 48px;
+  max-width: 700px;
+  width: 100%;
+  text-align: center;
+  box-shadow:
+    0 0 20px rgba(102, 126, 234, 0.4),
+    0 0 40px rgba(118, 75, 162, 0.3),
+    0 0 60px rgba(240, 147, 251, 0.2);
+  animation: aboutCardFadeIn 0.5s ease-out;
+}
+
+@keyframes aboutCardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.about-section-icon {
+  font-size: 48px;
+  margin-bottom: 24px;
+  background: linear-gradient(
+    90deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #764ba2 75%,
+    #667eea 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 3s linear infinite;
+}
+
+.about-section-card h1 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.about-section-subtitle {
+  font-size: 14px;
+  color: var(--md-on-surface-variant);
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.about-section-content {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 24px;
+}
+
+.about-section-content p {
+  font-size: 16px;
+  color: var(--md-on-surface);
+  line-height: 1.8;
+  text-align: left;
+}
+
+.about-section-dots {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.about-section-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--md-outline-variant);
+  transition: all 0.3s ease;
+}
+
+.about-section-dots .dot.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+}
+
+/* 手機版 About */
+@media (max-width: 768px) {
+  .about-section-card {
+    padding: 32px 24px;
+  }
+
+  .about-section-icon {
+    font-size: 36px;
+    margin-bottom: 16px;
+  }
+
+  .about-section-card h1 {
+    font-size: 28px;
+  }
+
+  .about-section-content {
+    max-height: 250px;
+  }
+
+  .about-section-content p {
+    font-size: 14px;
+  }
+}
+
 /* ==================== Contact Page ==================== */
 .contact {
   background: var(--md-surface);
@@ -2365,6 +2507,34 @@ body {
 
 .version-info:hover {
   opacity: 1;
+}
+
+
+/* Contact 頁面 - 箭頭導航版本 */
+.contact.no-scroll {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.contact-form-fixed {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 800px;
+  padding: 24px;
+  z-index: 1;
+}
+
+.contact-form-fixed .contact-form-wrapper {
+  transform: none;
+}
+
+.contact-form-fixed .contact-form-scroll {
+  padding-top: 0;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
 }
 
 /* ==================== Footer ==================== */

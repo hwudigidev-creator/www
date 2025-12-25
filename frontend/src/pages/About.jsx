@@ -1,89 +1,153 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useFetch } from '../hooks/useFetch'
 import { getAbout } from '../services/api'
 import Loading from '../components/Loading'
+import Footer from '../components/Footer'
 
 function About() {
   const { data, loading, error } = useFetch(getAbout)
-  const [contentOffset, setContentOffset] = useState(0)
-  const contentRef = useRef(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [showFooter, setShowFooter] = useState(false)
 
-  // 用外層頁面滾動控制內容位置（同聯絡頁）
+  // 區塊數量（簡介、使命、願景）
+  const totalSections = 3
+  const maxIndex = totalSections - 1
+
+  // 禁止頁面捲動
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      const windowHeight = window.innerHeight
-
-      // 可視區域高度（扣除 header + 標題區）
-      const isMobile = window.innerWidth <= 768
-      const visibleHeight = windowHeight - (isMobile ? 140 : 180)
-
-      // 內容實際高度
-      const contentHeight = contentRef.current?.scrollHeight || 800
-
-      // 內容可以移動的最大距離
-      const maxOffset = Math.max(0, contentHeight - visibleHeight + 100)
-
-      // 根據頁面滾動計算內容移動量（限制在 0 到 maxOffset 之間）
-      const offset = Math.min(scrollY, maxOffset)
-      setContentOffset(offset)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', handleScroll, { passive: true })
-    // 延遲執行一次，確保內容已渲染
-    setTimeout(handleScroll, 100)
-
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
     return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleScroll)
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
     }
-  }, [data])
+  }, [])
+
+  // 下一個區塊
+  const nextSection = useCallback(() => {
+    if (showFooter) return
+    if (activeIndex < maxIndex) {
+      setActiveIndex(activeIndex + 1)
+    } else {
+      setShowFooter(true)
+    }
+  }, [activeIndex, maxIndex, showFooter])
+
+  // 上一個區塊
+  const prevSection = useCallback(() => {
+    if (showFooter) {
+      setShowFooter(false)
+    } else if (activeIndex > 0) {
+      setActiveIndex(activeIndex - 1)
+    }
+  }, [activeIndex, showFooter])
+
+  // 回到頂部
+  const goToTop = useCallback(() => {
+    setShowFooter(false)
+    setActiveIndex(0)
+  }, [])
 
   if (loading) return <Loading />
   if (error) return <div className="error">載入關於我們資料時發生錯誤</div>
 
-  return (
-    <div className="about">
-      {/* 第一區塊：標題區 - FIXED 不動 */}
-      <section className="about-hero">
-        <div className="about-hero-content">
-          <h1 className="gradient-text">{data?.title || '關於我們'}</h1>
-          <p>隨著時代變遷的靈活教學</p>
-        </div>
-      </section>
+  // 區塊內容
+  const sections = [
+    {
+      title: '關於我們',
+      subtitle: '隨著時代變遷的靈活教學',
+      content: data?.content,
+      icon: 'fa-building'
+    },
+    {
+      title: '我們的使命',
+      subtitle: 'Our Mission',
+      content: data?.mission,
+      icon: 'fa-bullseye'
+    },
+    {
+      title: '我們的願景',
+      subtitle: 'Our Vision',
+      content: data?.vision,
+      icon: 'fa-eye'
+    }
+  ]
 
-      {/* 第二區塊：內容區 - FIXED 在底部，由外層滾動控制 */}
-      <section className="about-content-section">
-        <div
-          className="about-content-wrapper"
-          style={{
-            transform: `translateY(${-contentOffset}px)`,
-          }}
-        >
-          <div className="about-content-scroll" ref={contentRef}>
-            <div className="about-card">
-              <div className="about-text">
-                <p>{data?.content}</p>
-                <div className="about-block">
-                  <h3>我們的使命</h3>
-                  <p>{data?.mission}</p>
-                </div>
-                <div className="about-block">
-                  <h3>我們的願景</h3>
-                  <p>{data?.vision}</p>
-                </div>
-              </div>
-              <div className="about-image">
-                公司形象圖片
-              </div>
-            </div>
+  const currentSection = sections[activeIndex]
+
+  return (
+    <div className="about no-scroll">
+      {/* 上方箭頭 */}
+      {(activeIndex > 0 || showFooter) && (
+        <div className="cube-scroll-indicator cube-scroll-up" onClick={prevSection} style={{ cursor: 'pointer' }}>
+          <div className="cube-scroll-icons">
+            <span className="cube-scroll-icon">▲</span>
+            <span className="cube-scroll-icon">▲</span>
+          </div>
+        </div>
+      )}
+
+      {/* 下方箭頭 */}
+      {!showFooter && (
+        <div className="cube-scroll-indicator" onClick={nextSection} style={{ cursor: 'pointer' }}>
+          <div className="cube-scroll-icons">
+            <span className="cube-scroll-icon">▼</span>
+            <span className="cube-scroll-icon">▼</span>
+          </div>
+        </div>
+      )}
+
+      {/* 主要內容區 */}
+      <section
+        className="about-main"
+        style={{
+          opacity: showFooter ? 0 : 1,
+          pointerEvents: showFooter ? 'none' : 'auto',
+          transition: 'opacity 0.5s ease'
+        }}
+      >
+        {/* 區塊卡片 */}
+        <div className="about-section-card" key={activeIndex}>
+          <div className="about-section-icon">
+            <i className={`fa-solid ${currentSection.icon}`}></i>
+          </div>
+          <h1 className="gradient-text">{currentSection.title}</h1>
+          <p className="about-section-subtitle">{currentSection.subtitle}</p>
+          <div className="about-section-content">
+            <p>{currentSection.content}</p>
+          </div>
+          {/* 指示點 */}
+          <div className="about-section-dots">
+            {sections.map((_, index) => (
+              <span
+                key={index}
+                className={`dot ${index === activeIndex ? 'active' : ''}`}
+                onClick={() => setActiveIndex(index)}
+                style={{ cursor: 'pointer' }}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Footer 滾動空間 - 讓 Footer 可以上浮 */}
-      <div className="about-footer-spacer"></div>
+      {/* Footer */}
+      <div
+        className="home-footer-wrapper"
+        style={{
+          opacity: showFooter ? 1 : 0,
+          pointerEvents: showFooter ? 'auto' : 'none',
+          transform: showFooter ? 'translateY(0)' : 'translateY(100px)',
+          transition: 'all 0.5s ease'
+        }}
+      >
+        <div className="footer-top-arrow" onClick={goToTop}>
+          <div className="cube-scroll-icons">
+            <span className="cube-scroll-icon">▲</span>
+            <span className="cube-scroll-icon">▲</span>
+          </div>
+        </div>
+        <Footer />
+      </div>
     </div>
   )
 }

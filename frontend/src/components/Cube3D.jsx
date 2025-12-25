@@ -147,7 +147,6 @@ function Cube3D({ features, stage, animProgress, onPrev, isAnimating, showFooter
           <div className="cube-scroll-icons">
             <span className="cube-scroll-icon">▲</span>
             <span className="cube-scroll-icon">▲</span>
-            <span className="cube-scroll-icon">▲</span>
           </div>
         </div>
       )}
@@ -155,7 +154,6 @@ function Cube3D({ features, stage, animProgress, onPrev, isAnimating, showFooter
       {isAnimationComplete && !isAnimating && !showFooter && (
         <div className="cube-scroll-indicator" onClick={nextCard} style={{ cursor: 'pointer' }}>
           <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▼</span>
             <span className="cube-scroll-icon">▼</span>
             <span className="cube-scroll-icon">▼</span>
           </div>
