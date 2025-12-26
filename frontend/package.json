@@ -1,7 +1,7 @@
 {
   "name": "dynamic-homepage",
   "private": true,
-  "version": "0.5.7a",
+  "version": "0.6.0a",
   "type": "module",
   "scripts": {
     "dev": "vite",
