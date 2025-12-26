@@ -1002,7 +1002,11 @@ body {
   }
 
   .scroll-card p {
-    font-size: 12px;
+    font-size: 14px;
+  }
+
+  .face-content p {
+    font-size: 14px;
   }
 
   /* 手機版角色圖 */
@@ -2741,7 +2745,7 @@ body {
   }
 
   .career-description {
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 
@@ -2751,7 +2755,7 @@ body {
   right: 16px;
   bottom: 16px;
   padding: 6px 12px;
-  font-size: 11px;
+  font-size: 10px;
   font-family: 'Courier New', monospace;
   color: var(--md-on-surface-variant);
   background: var(--glass-bg);
@@ -2798,57 +2802,25 @@ body {
 }
 
 
-/* Contact 表單逐行導航 */
+/* Contact 表單逐行導航 - 參考 about-main 結構 */
 .contact-form-rows {
   position: fixed;
-  top: 230px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 800px;
-  padding: 0 24px;
-  bottom: 100px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  padding-top: 200px;
+  padding-bottom: 120px;
   z-index: 1;
 }
 
 .contact-form-viewport {
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-}
-
-/* 上方毛玻璃遮罩 - 在視窗邊緣 */
-.contact-form-viewport::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -24px;
-  right: -24px;
-  height: 60px;
-  background: linear-gradient(to bottom,
-    var(--md-surface) 0%,
-    rgba(19, 19, 20, 0.8) 40%,
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: 10;
-}
-
-/* 下方毛玻璃遮罩 - 在視窗邊緣 */
-.contact-form-viewport::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: -24px;
-  right: -24px;
-  height: 60px;
-  background: linear-gradient(to top,
-    var(--md-surface) 0%,
-    rgba(19, 19, 20, 0.8) 40%,
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: 10;
+  width: 100%;
+  max-width: 800px;
 }
 
 .contact-form-track {
@@ -2903,8 +2875,21 @@ body {
 /* 手機版調整 */
 @media (max-width: 768px) {
   .contact-form-rows {
-    top: 150px;
-    bottom: 80px;
+    padding: 16px;
+    padding-top: 140px;
+    padding-bottom: 100px;
+  }
+
+  .contact-form-viewport {
+    max-width: none;
+  }
+
+  .contact-form {
+    padding: 24px 16px;
+  }
+
+  .error-message {
+    font-size: 14px;
   }
 }
 
@@ -3598,6 +3583,27 @@ body {
   .footer-links {
     flex-wrap: wrap;
     justify-content: center;
+  }
+
+  /* 手機版 Footer 字級調整 */
+  .footer-brand-en {
+    font-size: 14px;
+  }
+
+  .footer-address p {
+    font-size: 14px;
+  }
+
+  .footer-address-en {
+    font-size: 14px;
+  }
+
+  .footer-bottom > p {
+    font-size: 14px;
+  }
+
+  .powered-by {
+    font-size: 14px;
   }
 }
 

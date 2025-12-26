@@ -46,7 +46,8 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(node:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(sort:*)"
     ]
   }
 }
