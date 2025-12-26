@@ -29,10 +29,14 @@ function Contact() {
   const dropdownRef = useRef(null)
   const deptInputRef = useRef(null)
   const deptDropdownRef = useRef(null)
+  const formViewportRef = useRef(null)
+  const formTrackRef = useRef(null)
 
   const { careerTypes } = contactOptions
   const schools = hslist.filter(s => s.value !== '-1')
-  const totalRows = 4 // 校名科別, 姓名手機, Email, 職涯留言+送出
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+  const totalRows = 5 // 校名科別, 姓名手機, Email, 職涯留言, 送出
+  const rowHeight = isMobile ? 140 : 120
 
   const filteredSchools = schools.filter(school =>
     school.label.toLowerCase().includes(schoolInput.toLowerCase())
@@ -68,15 +72,28 @@ function Contact() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // 檢測是否還有內容在可視區域外
+  const hasContentBelow = useCallback(() => {
+    if (!formViewportRef.current || !formTrackRef.current) return true
+    const viewportHeight = formViewportRef.current.clientHeight
+    const trackHeight = formTrackRef.current.scrollHeight
+    const currentOffset = activeRow * rowHeight
+    const remainingContent = trackHeight - currentOffset - viewportHeight
+    return remainingContent > 10 // 超過 10px 才算有內容
+  }, [activeRow, rowHeight])
+
   // 導航
   const nextRow = useCallback(() => {
     if (showFooter) return
-    if (activeRow < totalRows - 1) {
+    // PC版：如果沒有內容在畫面外，直接彈出 Footer
+    if (!isMobile && !hasContentBelow()) {
+      setShowFooter(true)
+    } else if (activeRow < totalRows - 1) {
       setActiveRow(activeRow + 1)
     } else {
       setShowFooter(true)
     }
-  }, [activeRow, showFooter])
+  }, [activeRow, showFooter, isMobile, totalRows, hasContentBelow])
 
   const prevRow = useCallback(() => {
     if (showFooter) {
@@ -200,8 +217,6 @@ function Contact() {
   }
 
   const currentCareer = careerTypes[formData.careerIndex]
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
-  const rowHeight = isMobile ? 140 : 120
 
   return (
     <div className="contact no-scroll">
@@ -239,10 +254,11 @@ function Contact() {
         }}
       >
 
-        <div className="contact-form-viewport">
+        <div className="contact-form-viewport" ref={formViewportRef}>
           <form
             className="contact-form contact-form-track"
             onSubmit={handleSubmit}
+            ref={formTrackRef}
             style={{
               transform: `translateY(${-activeRow * rowHeight}px)`,
               transition: 'transform 0.4s ease-out'
@@ -342,7 +358,7 @@ function Contact() {
               </div>
             </div>
 
-            {/* Row 3: 你想成為 + 留言 + 送出 */}
+            {/* Row 3: 你想成為 + 留言 */}
             <div className={`form-row-item ${activeRow === 3 ? 'active' : ''}`}>
               <div className="form-row career-message-row">
                 <div className="form-group career-group">
@@ -372,6 +388,10 @@ function Contact() {
                             onChange={handleChange} placeholder="有什麼想告訴我們的嗎？" rows={3} />
                 </div>
               </div>
+            </div>
+
+            {/* Row 4: 送出 */}
+            <div className={`form-row-item ${activeRow === 4 ? 'active' : ''}`}>
               <button type="submit" className="submit-btn" disabled={submitting}>
                 {submitting ? '發送中...' : '發送訊息'}
               </button>
