@@ -38,7 +38,7 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,webp,mp4}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,webp}'],
         skipWaiting: true,
         clientsClaim: true,
         runtimeCaching: [
@@ -65,6 +65,18 @@ export default defineConfig({
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
               }
+            }
+          },
+          {
+            urlPattern: /\.(?:mp4|webm)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'videos-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+              },
+              rangeRequests: true
             }
           }
         ]
