@@ -129,10 +129,10 @@ function Home() {
       <div
         className="home-footer-wrapper"
         style={{
-          opacity: showFooter ? 1 : 0,
+          visibility: showFooter ? 'visible' : 'hidden',
           pointerEvents: showFooter ? 'auto' : 'none',
-          transform: showFooter ? 'translateY(0)' : 'translateY(100px)',
-          transition: 'all 0.5s ease'
+          transform: showFooter ? 'translateY(0)' : 'translateY(100%)',
+          transition: 'transform 0.5s ease, visibility 0.5s'
         }}
       >
         <Footer onTop={goToTop} />

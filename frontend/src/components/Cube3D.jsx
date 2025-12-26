@@ -180,7 +180,7 @@ function Cube3D({ features, stage, animProgress, onPrev, isAnimating, showFooter
       </div>
 
       <div className="cube-container" style={{ transform: `translateX(${cubeOffsetX}px)` }}>
-        <div className="cube-wrapper">
+        <div className={`cube-wrapper ${isAnimationComplete ? 'settled' : ''}`}>
           <div
             className="cube"
             style={{
@@ -201,7 +201,7 @@ function Cube3D({ features, stage, animProgress, onPrev, isAnimating, showFooter
           </div>
 
           {showExploding && (
-            <div className="exploding-faces" style={{ perspective: '1000px' }}>
+            <div className={`exploding-faces ${isAnimationComplete ? 'settled' : ''}`} style={{ perspective: '1000px' }}>
               {safeFeatures.map((feature, index) => {
                 const styleData = getCardStyle(index)
                 const progress = styleData._progress || 0

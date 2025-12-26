@@ -51,10 +51,10 @@
   --gradient-glow: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #667eea);
 
   /* 標準化毛玻璃效果 - 調整這裡影響全站 */
-  --glass-opacity: 0.1;
+  --glass-opacity: 0.4;
   --glass-blur: 16px;
   --glass-bg: rgba(19, 19, 20, var(--glass-opacity));
-  --glass-bg-hover: rgba(30, 31, 32, calc(var(--glass-opacity) + 0.1));
+  --glass-bg-hover: rgba(30, 31, 32, calc(var(--glass-opacity) + 0.15));
 
   /* CodeWiki 深色模式色彩系統 */
   --md-primary: #a8c7fa;
@@ -751,6 +751,11 @@ body {
   transition: opacity 0.4s ease;
 }
 
+/* 動畫完成後移除 preserve-3d，讓子元素可使用 backdrop-filter */
+.cube-wrapper.settled {
+  transform-style: flat;
+}
+
 .cube {
   width: var(--cube-size);
   height: var(--cube-size);
@@ -829,6 +834,11 @@ body {
   transform-style: preserve-3d;
 }
 
+/* 動畫完成後移除 preserve-3d，啟用毛玻璃 */
+.exploding-faces.settled {
+  transform-style: flat;
+}
+
 /* 垂直捲動卡片外層 - 含上下霧化遮罩 */
 .cards-scroll-wrapper {
   position: absolute;
@@ -893,7 +903,9 @@ body {
   flex: 0 0 280px;
   width: 280px;
   height: 280px;
-  background: rgba(19, 19, 20, 0.95);
+  background: rgba(40, 40, 45, 0.4);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
   border: 2px solid;
   display: flex;
   flex-direction: column;
@@ -1025,7 +1037,7 @@ body {
   /* 尺寸由 JS 控制：width, height, marginLeft, marginTop */
   left: 50%;
   top: 50%;
-  background: rgba(19, 19, 20, 0.5); /* 50% 不透明，與方塊統一 */
+  background: rgba(40, 40, 45, 0.4);
   border: 2px solid #f5b800;
   border-radius: 0;
   display: flex;
@@ -1033,6 +1045,12 @@ body {
   justify-content: center;
   transform-origin: center center;
   /* 邊框顏色和發光由 JS 控制 */
+}
+
+/* 動畫完成後啟用毛玻璃 */
+.exploding-faces.settled .face-to-card {
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
 }
 
 .face-question {
@@ -1473,7 +1491,7 @@ body {
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 6 個濾鏡面 - backdrop-filter 看後面的圖 */
+/* 6 個濾鏡面 - 毛玻璃 + 濾鏡效果 */
 .cube-face {
   position: absolute;
   width: 240px;
@@ -1482,17 +1500,17 @@ body {
   top: 50%;
   margin-left: -120px;
   margin-top: -120px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(40, 40, 45, 0.25);
   border: 2px solid #f5b800;
   overflow: hidden;
-  /* backdrop-filter 讓面變成濾鏡窗口 */
-  backdrop-filter: contrast(1.15) saturate(1.2) brightness(1.1);
-  -webkit-backdrop-filter: contrast(1.15) saturate(1.2) brightness(1.1);
+  /* 毛玻璃 + 濾鏡效果合併 */
+  backdrop-filter: blur(24px) saturate(1.4) contrast(1.1) brightness(1.05);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4) contrast(1.1) brightness(1.05);
   box-shadow:
     0 0 20px rgba(245, 184, 0, 0.4),
     0 0 40px rgba(245, 184, 0, 0.2),
     inset 0 0 15px rgba(245, 184, 0, 0.1);
-  transform-style: preserve-3d;
+  /* 注意：不可加 transform-style: preserve-3d，會導致 backdrop-filter 失效 */
 }
 
 /* 紅色色彩分離層 */
@@ -3167,14 +3185,14 @@ body {
     justify-content: center;
     gap: 24px;
     padding: 12px 0 20px;
-    opacity: 0;
-    transform: translateY(-10px);
+    visibility: hidden;
+    transform: translateY(-20px);
     pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: transform 0.3s ease, visibility 0.3s;
   }
 
   .nav-mobile.show {
-    opacity: 1;
+    visibility: visible;
     transform: translateY(0);
     pointer-events: auto;
   }
@@ -3183,9 +3201,11 @@ body {
     position: relative;
     width: 56px;
     height: 56px;
-    background: transparent;
+    background: rgba(40, 40, 45, 0.5);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
     border-radius: var(--md-radius-lg);
-    z-index: 1;
+    z-index: 101;
     /* 外圍發光效果 */
     box-shadow:
       0 0 12px rgba(102, 126, 234, 0.4),
@@ -3209,16 +3229,14 @@ body {
     animation: borderRotate 4s linear infinite;
   }
 
-  /* 毛玻璃背景 */
+  /* 內部填充層（邊框內） */
   .nav-mobile .nav-icon-link::after {
     content: '';
     position: absolute;
     inset: 2px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
+    background: transparent;
     border-radius: calc(var(--md-radius-lg) - 2px);
-    z-index: -1;
+    z-index: 0;
   }
 
   .nav-mobile .nav-icon-link svg {
@@ -3240,16 +3258,17 @@ body {
     filter: brightness(1.3);
   }
 
-  .nav-mobile .nav-icon-link:hover::after {
-    background: var(--glass-bg-hover);
+  .nav-mobile .nav-icon-link:hover {
+    background: rgba(60, 60, 70, 0.6);
+    box-shadow:
+      0 0 20px rgba(102, 126, 234, 0.6),
+      0 0 40px rgba(118, 75, 162, 0.5),
+      0 0 60px rgba(240, 147, 251, 0.4);
   }
 
   .nav-mobile .nav-icon-link.active {
     color: var(--md-primary);
-  }
-
-  .nav-mobile .nav-icon-link.active::after {
-    background: rgba(102, 126, 234, 0.2);
+    background: rgba(102, 126, 234, 0.4);
   }
 
   .hero {
