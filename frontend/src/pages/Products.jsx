@@ -3,6 +3,7 @@ import { useFetch } from '../hooks/useFetch'
 import { getProducts } from '../services/api'
 import Loading from '../components/Loading'
 import Footer from '../components/Footer'
+import ScrollIndicator from '../components/ScrollIndicator'
 
 // 圖片基礎路徑
 const imgBase = import.meta.env.BASE_URL + 'images/products/'
@@ -127,22 +128,12 @@ function Products() {
 
       {/* 上方箭頭 */}
       {(activeIndex > 0 || showFooter) && (
-        <div className="cube-scroll-indicator cube-scroll-up" onClick={prevCard} style={{ cursor: 'pointer' }}>
-          <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▲</span>
-            <span className="cube-scroll-icon">▲</span>
-          </div>
-        </div>
+        <ScrollIndicator direction="up" onClick={prevCard} />
       )}
 
       {/* 下方箭頭 */}
       {!showFooter && (
-        <div className="cube-scroll-indicator" onClick={nextCard} style={{ cursor: 'pointer' }}>
-          <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▼</span>
-            <span className="cube-scroll-icon">▼</span>
-          </div>
-        </div>
+        <ScrollIndicator direction="down" onClick={nextCard} />
       )}
 
       {/* 固定的展示區 */}

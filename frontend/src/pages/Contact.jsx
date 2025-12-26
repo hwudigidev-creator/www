@@ -4,6 +4,7 @@ import contactOptions from '../data/contactOptions.json'
 import hslist from '../data/hslist.json'
 import departmentList from '../data/departments.json'
 import Footer from '../components/Footer'
+import ScrollIndicator from '../components/ScrollIndicator'
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -206,22 +207,12 @@ function Contact() {
     <div className="contact no-scroll">
       {/* 上方箭頭 */}
       {(activeRow > 0 || showFooter) && (
-        <div className="cube-scroll-indicator cube-scroll-up" onClick={prevRow} style={{ cursor: 'pointer' }}>
-          <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▲</span>
-            <span className="cube-scroll-icon">▲</span>
-          </div>
-        </div>
+        <ScrollIndicator direction="up" onClick={prevRow} />
       )}
 
       {/* 下方箭頭 */}
       {!showFooter && (
-        <div className="cube-scroll-indicator" onClick={nextRow} style={{ cursor: 'pointer' }}>
-          <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▼</span>
-            <span className="cube-scroll-icon">▼</span>
-          </div>
-        </div>
+        <ScrollIndicator direction="down" onClick={nextRow} />
       )}
 
       {/* 標題區 */}

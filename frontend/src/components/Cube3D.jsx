@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ScrollIndicator from './ScrollIndicator'
 
 function Cube3D({ features, stage, animProgress, onPrev, isAnimating, showFooter, onToggleFooter }) {
   const [focusedCardIndex, setFocusedCardIndex] = useState(0)
@@ -148,21 +149,11 @@ function Cube3D({ features, stage, animProgress, onPrev, isAnimating, showFooter
   return (
     <div className="cube-section" style={{ opacity: 1 }}>
       {isAnimationComplete && !isAnimating && (
-        <div className="cube-scroll-indicator cube-scroll-up" onClick={prevCard} style={{ cursor: 'pointer' }}>
-          <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▲</span>
-            <span className="cube-scroll-icon">▲</span>
-          </div>
-        </div>
+        <ScrollIndicator direction="up" onClick={prevCard} />
       )}
 
       {isAnimationComplete && !isAnimating && !showFooter && (
-        <div className="cube-scroll-indicator" onClick={nextCard} style={{ cursor: 'pointer' }}>
-          <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▼</span>
-            <span className="cube-scroll-icon">▼</span>
-          </div>
-        </div>
+        <ScrollIndicator direction="down" onClick={nextCard} />
       )}
 
       <div

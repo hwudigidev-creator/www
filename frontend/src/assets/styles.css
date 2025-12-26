@@ -414,7 +414,7 @@ body {
   user-select: none;
   -webkit-user-select: none;
   position: absolute;
-  bottom: 40px;
+  bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -428,7 +428,7 @@ body {
 /* 上方箭頭 */
 .cube-scroll-up {
   bottom: auto;
-  top: 40px;
+  top: 100px;
 }
 
 .cube-scroll-up .cube-scroll-icons {
@@ -437,6 +437,24 @@ body {
 
 .cube-scroll-up .cube-scroll-icon {
   animation-name: cubeScrollBounceUp;
+}
+
+.cube-scroll-up .cube-scroll-text {
+  order: 1;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+/* 提示文字 */
+.cube-scroll-text {
+  font-size: 11px;
+  color: #f5b800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0;
+  animation: cubeScrollTextFade 2s ease-in-out infinite;
+  text-shadow: 0 0 10px rgba(245, 184, 0, 0.5);
 }
 
 .cube-scroll-icons {
@@ -462,28 +480,44 @@ body {
   animation-delay: 0.15s;
 }
 
-.cube-scroll-icon:nth-child(3) {
-  animation-delay: 0.3s;
+/* 文字獨立循環 */
+@keyframes cubeScrollTextFade {
+  0%, 20% {
+    opacity: 0.8;
+  }
+  35%, 100% {
+    opacity: 0;
+  }
 }
 
+/* 箭頭動畫 - 中間短暫出現 */
 @keyframes cubeScrollBounce {
-  0%, 100% {
+  0%, 40% {
     opacity: 0;
     transform: translateY(-8px);
   }
-  50% {
+  50%, 70% {
     opacity: 1;
     transform: translateY(0);
   }
+  80%, 100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 }
+
 @keyframes cubeScrollBounceUp {
-  0%, 100% {
+  0%, 40% {
     opacity: 0;
     transform: translateY(8px);
   }
-  50% {
+  50%, 70% {
     opacity: 1;
     transform: translateY(0);
+  }
+  80%, 100% {
+    opacity: 0;
+    transform: translateY(8px);
   }
 }
 

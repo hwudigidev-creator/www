@@ -4,6 +4,7 @@ import { getAbout } from '../services/api'
 import Loading from '../components/Loading'
 import Footer from '../components/Footer'
 import TextRain from '../components/TextRain'
+import ScrollIndicator from '../components/ScrollIndicator'
 
 function About() {
   const { data, loading, error } = useFetch(getAbout)
@@ -104,22 +105,12 @@ function About() {
 
       {/* 上方箭頭 */}
       {(activeIndex > 0 || showFooter) && (
-        <div className="cube-scroll-indicator cube-scroll-up" onClick={prevSection} style={{ cursor: 'pointer' }}>
-          <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▲</span>
-            <span className="cube-scroll-icon">▲</span>
-          </div>
-        </div>
+        <ScrollIndicator direction="up" onClick={prevSection} />
       )}
 
       {/* 下方箭頭 */}
       {!showFooter && (
-        <div className="cube-scroll-indicator" onClick={nextSection} style={{ cursor: 'pointer' }}>
-          <div className="cube-scroll-icons">
-            <span className="cube-scroll-icon">▼</span>
-            <span className="cube-scroll-icon">▼</span>
-          </div>
-        </div>
+        <ScrollIndicator direction="down" onClick={nextSection} />
       )}
 
       {/* 標題區 */}
