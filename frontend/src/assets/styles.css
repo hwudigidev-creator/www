@@ -2816,11 +2816,14 @@ body {
   padding-top: 200px;
   padding-bottom: 120px;
   z-index: 1;
+  overflow: visible; /* 讓光暈可以溢出 */
 }
 
 .contact-form-viewport {
   width: 100%;
   max-width: 800px;
+  padding: 20px; /* 留空間給光暈 */
+  overflow: visible;
 }
 
 .contact-form-track {
@@ -2875,17 +2878,25 @@ body {
 /* 手機版調整 */
 @media (max-width: 768px) {
   .contact-form-rows {
-    padding: 16px;
-    padding-top: 140px;
-    padding-bottom: 100px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    top: 200px; /* 副標題下方 */
+    bottom: 60px;
+    padding: 0 16px;
+    overflow: visible;
   }
 
   .contact-form-viewport {
     max-width: none;
+    width: 100%;
+    padding: 20px 0; /* 上下留空間給光暈 */
+    overflow: visible;
   }
 
   .contact-form {
     padding: 24px 16px;
+    margin: 0 auto;
   }
 
   .error-message {
@@ -3524,16 +3535,11 @@ body {
   }
 
   .contact-form-section {
-    height: calc(100vh - 140px); /* 手機版扣除 header + 標題區 */
-    padding: 16px;
+    /* 由 .contact-form-rows 控制 */
   }
 
   .contact-form-scroll {
     padding: 40px 0;
-  }
-
-  .contact-form {
-    padding: 24px 16px;
   }
 
   .contact-footer-spacer {
