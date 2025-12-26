@@ -40,6 +40,9 @@ function TextRain() {
     return rangeStart + Math.random() * rangeWidth
   }, [])
 
+  // 判斷是否為手機
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+
   const createDrop = useCallback(() => {
     // 隨機組合 2-3 個詞句
     const count = 2 + Math.floor(Math.random() * 2)
@@ -54,7 +57,8 @@ function TextRain() {
 
     const id = Date.now() + Math.random()
     const left = findNonOverlappingPosition()
-    const duration = 6 + Math.random() * 5
+    // 手機速度更慢
+    const duration = isMobile ? (12 + Math.random() * 6) : (10 + Math.random() * 5)
     const delay = Math.random() * 0.5
     const opacity = 0.3 + Math.random() * 0.3 // 最大 0.6
     const fontSize = 12 + Math.random() * 4
@@ -66,25 +70,31 @@ function TextRain() {
     usedPositions.current = usedPositions.current.filter(pos => Date.now() - pos.time < 8000)
 
     return { id, text: combinedText, color, left, duration, delay, opacity, fontSize, blur }
-  }, [textsWithColor, findNonOverlappingPosition])
+  }, [textsWithColor, findNonOverlappingPosition, isMobile])
 
   useEffect(() => {
-    const initialDrops = Array.from({ length: 25 }, () => createDrop())
+    // 手機版數量減少
+    const initialCount = isMobile ? 3 : 5
+    const maxCount = isMobile ? 18 : 30
+    const intervalTime = isMobile ? 1200 : 700
+
+    // 初始少量，逐漸增加
+    const initialDrops = Array.from({ length: initialCount }, () => createDrop())
     setDrops(initialDrops)
 
     const interval = setInterval(() => {
       setDrops(prev => {
         const newDrop = createDrop()
         const updated = [...prev, newDrop]
-        if (updated.length > 50) {
-          return updated.slice(-50)
+        if (updated.length > maxCount) {
+          return updated.slice(-maxCount)
         }
         return updated
       })
-    }, 500)
+    }, intervalTime)
 
     return () => clearInterval(interval)
-  }, [createDrop])
+  }, [createDrop, isMobile])
 
   const handleAnimationEnd = (id) => {
     setDrops(prev => prev.filter(drop => drop.id !== id))
