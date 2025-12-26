@@ -9,6 +9,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['DD_LOGO.svg', 'DD_LOGO.png'],
       manifest: {
+        id: '/www/',
         name: 'HWU 數位設計系',
         short_name: '數位設計系',
         description: '醒吾科技大學數位設計系 - AI輔助設計、動畫、遊戲、互動多媒體',
