@@ -2148,6 +2148,96 @@ body {
   box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
 }
 
+/* ==================== 文字雨效果 ==================== */
+.text-rain-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  /* 頂部和底部漸層透明 */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 75%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 75%, transparent 100%);
+}
+
+.text-rain-drop {
+  position: absolute;
+  top: -350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-weight: 500;
+  animation: textRainFall linear forwards;
+}
+
+/* 動畫類 - 藍色 (低彩度) */
+.text-rain-blue {
+  color: rgba(120, 140, 200, 0.8);
+  text-shadow: 0 0 8px rgba(120, 140, 200, 0.4);
+}
+
+/* 影視類 - 藍綠色 (低彩度) */
+.text-rain-cyan {
+  color: rgba(100, 180, 190, 0.8);
+  text-shadow: 0 0 8px rgba(100, 180, 190, 0.4);
+}
+
+/* 遊戲互動類 - 紫色 (低彩度) */
+.text-rain-purple {
+  color: rgba(150, 120, 190, 0.8);
+  text-shadow: 0 0 8px rgba(150, 120, 190, 0.4);
+}
+
+/* 設計與AI類 - 金色 (低彩度) */
+.text-rain-gold {
+  color: rgba(200, 170, 80, 0.8);
+  text-shadow: 0 0 8px rgba(200, 170, 80, 0.4);
+}
+
+.text-rain-drop span {
+  display: block;
+  line-height: 1.4;
+  animation: textRainGlow 2s ease-in-out infinite;
+}
+
+.text-rain-drop span:nth-child(odd) {
+  animation-delay: 0.5s;
+}
+
+@keyframes textRainFall {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+    filter: blur(var(--start-blur, 3px));
+  }
+  15% {
+    opacity: var(--base-opacity, 0.5);
+    filter: blur(var(--base-blur, 0.5px));
+  }
+  85% {
+    opacity: var(--base-opacity, 0.5);
+    filter: blur(var(--base-blur, 0.5px));
+  }
+  100% {
+    transform: translateY(calc(100vh + 500px));
+    opacity: 0;
+    filter: blur(var(--start-blur, 3px));
+  }
+}
+
+@keyframes textRainGlow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 /* 手機版 About */
 
 

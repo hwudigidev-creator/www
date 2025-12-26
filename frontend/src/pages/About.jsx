@@ -3,6 +3,7 @@ import { useFetch } from '../hooks/useFetch'
 import { getAbout } from '../services/api'
 import Loading from '../components/Loading'
 import Footer from '../components/Footer'
+import TextRain from '../components/TextRain'
 
 function About() {
   const { data, loading, error } = useFetch(getAbout)
@@ -98,6 +99,9 @@ function About() {
 
   return (
     <div className="about no-scroll">
+      {/* 背景文字雨 */}
+      <TextRain />
+
       {/* 上方箭頭 */}
       {(activeIndex > 0 || showFooter) && (
         <div className="cube-scroll-indicator cube-scroll-up" onClick={prevSection} style={{ cursor: 'pointer' }}>
