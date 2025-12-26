@@ -226,13 +226,13 @@ function Contact() {
 
       {/* 標題區 */}
       <section
-        className="contact-hero"
+        className="page-hero contact-hero"
         style={{
           opacity: showFooter ? 0 : 1,
           transition: 'opacity 0.5s ease'
         }}
       >
-        <div className="contact-hero-content">
+        <div className="page-hero-content">
           <h1 className="gradient-text">聯絡我們</h1>
           <p>對數位設計系或AI工作流有興趣，或任何想了解的？</p>
         </div>

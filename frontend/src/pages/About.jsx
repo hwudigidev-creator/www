@@ -65,8 +65,8 @@ function About() {
   // 區塊內容
   const sections = [
     {
-      title: '關於我們',
-      subtitle: '隨著時代變遷的靈活教學',
+      title: '關於數位設計',
+      subtitle: 'DigiDesign',
       content: '醒吾科技大學數位設計系成立於數位內容產業蓬勃發展之際，致力於培養具備創意思維與技術能力的數位設計人才，讓學生在動畫、遊戲、互動多媒體、影視特效等領域具備專業競爭力。\n\n過去我們培養許多【T型】人材，傳統設計團隊的中流砥柱。在一個領域做到極致，具備廣泛知識協作；是團隊中穩定的執行起點。',
       icon: 'fa-building',
       bgLetter: 'T'
@@ -121,6 +121,20 @@ function About() {
           </div>
         </div>
       )}
+
+      {/* 標題區 */}
+      <section
+        className="page-hero"
+        style={{
+          opacity: showFooter ? 0 : 1,
+          transition: 'opacity 0.5s ease'
+        }}
+      >
+        <div className="page-hero-content">
+          <h1 className="gradient-text">關於我們</h1>
+          <p>隨著時代變遷的靈活教學</p>
+        </div>
+      </section>
 
       {/* 主要內容區 */}
       <section

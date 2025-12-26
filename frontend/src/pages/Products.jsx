@@ -113,14 +113,16 @@ function Products() {
 
       {/* 標題區 */}
       <section
-        className="products-hero"
+        className="page-hero products-hero"
         style={{
           opacity: showFooter ? 0 : 1,
           transition: 'opacity 0.5s ease'
         }}
       >
-        <h1 className="gradient-text">課程特色</h1>
-        <p>探索數位設計系的專業課程與學習內容</p>
+        <div className="page-hero-content">
+          <h1 className="gradient-text">課程特色</h1>
+          <p>探索數位設計系的專業課程與學習內容</p>
+        </div>
       </section>
 
       {/* 上方箭頭 */}
