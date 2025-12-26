@@ -1456,12 +1456,12 @@ body {
   width: 400px;
   height: 400px;
   object-fit: cover;
-  filter: contrast(1.05) saturate(1.1);
+  filter: contrast(1.05) saturate(1.1) brightness(1.15);
   transform: translate(-50%, -50%);
   animation: imageFadeIn 0.4s ease-out;
   /* 中心顯示，向外淡化消失 - 跟方塊差不多大 */
-  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, black 0%, black 60%, transparent 100%);
-  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, black 0%, black 60%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, black 0%, black 60%, rgba(0,0,0,0.5) 80%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, black 0%, black 60%, rgba(0,0,0,0.5) 80%, transparent 100%);
 }
 
 /* 外層圖片容器 - 中心透明讓 P01 顯示 */
@@ -1473,9 +1473,9 @@ body {
   left: 0;
   overflow: hidden;
   z-index: 2;
-  /* 中心透明（方塊大小），向外漸層顯示 P00，最外緣淡化 - 比方塊大許多 */
-  -webkit-mask-image: radial-gradient(ellipse 45% 32% at 50% 50%, transparent 50%, black 70%, transparent 95%);
-  mask-image: radial-gradient(ellipse 45% 32% at 50% 50%, transparent 50%, black 70%, transparent 95%);
+  /* 快速淡出曲線 */
+  -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 50%, transparent 0%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.3) 35%, rgba(0,0,0,0.4) 50%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 55% at 50% 50%, transparent 0%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.3) 35%, rgba(0,0,0,0.4) 50%, transparent 100%);
 }
 
 /* 外層圖片 - 自動循環滾動 */
@@ -1548,7 +1548,7 @@ body {
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 6 個濾鏡面 - 毛玻璃 + 濾鏡效果 */
+/* Products 6 個濾鏡面 - 完全透明，底下內容清晰可見 */
 .cube-face {
   position: absolute;
   width: 240px;
@@ -1557,17 +1557,14 @@ body {
   top: 50%;
   margin-left: -120px;
   margin-top: -120px;
-  background: rgba(40, 40, 45, 0.25);
+  background: rgba(40, 40, 45, 0.08); /* 極透明 */
   border: 2px solid #f5b800;
   overflow: hidden;
-  /* 毛玻璃 + 濾鏡效果合併 */
-  backdrop-filter: blur(24px) saturate(1.4) contrast(1.1) brightness(1.05);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4) contrast(1.1) brightness(1.05);
+  /* 無模糊，保持清晰 */
   box-shadow:
     0 0 20px rgba(245, 184, 0, 0.4),
     0 0 40px rgba(245, 184, 0, 0.2),
     inset 0 0 15px rgba(245, 184, 0, 0.1);
-  /* 注意：不可加 transform-style: preserve-3d，會導致 backdrop-filter 失效 */
 }
 
 /* 紅色色彩分離層 */

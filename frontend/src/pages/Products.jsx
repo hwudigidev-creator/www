@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useFetch } from '../hooks/useFetch'
 import { getProducts } from '../services/api'
 import Loading from '../components/Loading'
@@ -33,17 +33,27 @@ const bgImage = imgBase + 'P00.webp'
 // 頁面底圖
 const pageBg = imgBase + 'BG.webp'
 
+// 每張卡片對應的固定方塊角度 [rotateY, rotateX]
+const cubeAngles = [
+  [60, -30],   // P01: AI 創意設計
+  [150, -20],  // P02: 3D 動畫
+  [240, -10],  // P03: 遊戲設計
+  [330, 0],    // P04: 影視特效
+  [420, 10],   // P05: AR/VR
+  [510, 20],   // P06: UI/UX
+]
+
 function Products() {
   const { data, loading, error } = useFetch(getProducts)
   const [activeIndex, setActiveIndex] = useState(0)
-  const [cubeRotation, setCubeRotation] = useState(60)
-  const [cubePitch, setCubePitch] = useState(-30)
   const [videoErrors, setVideoErrors] = useState({})
   const [showFooter, setShowFooter] = useState(false)
-  const prevIndexRef = useRef(0)
 
   const products = data?.products || []
   const maxIndex = products.length - 1
+
+  // 根據 activeIndex 取得固定角度
+  const [cubeRotation, cubePitch] = cubeAngles[activeIndex] || cubeAngles[0]
 
   // 禁止頁面捲動
   useEffect(() => {
@@ -54,16 +64,6 @@ function Products() {
       document.documentElement.style.overflow = ''
     }
   }, [])
-
-  // 切換卡片時觸發方塊旋轉 + 俯仰變化
-  useEffect(() => {
-    if (activeIndex !== prevIndexRef.current) {
-      const direction = activeIndex > prevIndexRef.current ? 1 : -1
-      setCubeRotation(prev => prev + (90 * direction))
-      setCubePitch(prev => prev + (10 * direction))
-      prevIndexRef.current = activeIndex
-    }
-  }, [activeIndex])
 
   // 下一張卡片
   const nextCard = useCallback(() => {
