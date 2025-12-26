@@ -5,10 +5,12 @@ function Footer({ onTop }) {
 
   return (
     <footer className="footer">
-      {/* TOP 箭頭 */}
+      {/* TOP 按鈕 - 放在 Footer 內部頂端 */}
       {onTop && (
-        <div className="footer-top-arrow" onClick={onTop}>
-          <span className="cube-scroll-icon">▲</span>
+        <div className="footer-top-btn" onClick={onTop}>
+          <span className="top-arrow">▲</span>
+          <span className="top-text">TOP</span>
+          <span className="top-arrow">▲</span>
         </div>
       )}
 

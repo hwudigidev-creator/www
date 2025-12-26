@@ -2915,9 +2915,64 @@ body {
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border-top: 1px solid var(--md-outline-variant);
-  padding: 60px 24px 40px;
+  padding: 24px 24px 40px;
   position: relative;
   z-index: 10;
+}
+
+/* TOP 按鈕 - 流光漸層效果 */
+.footer-top-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 0;
+  margin-bottom: 16px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.3s ease;
+}
+
+.footer-top-btn:hover {
+  transform: scale(1.05);
+}
+
+.footer-top-btn:active {
+  transform: scale(0.98);
+}
+
+.footer-top-btn .top-arrow,
+.footer-top-btn .top-text {
+  background: linear-gradient(
+    90deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #764ba2 75%,
+    #667eea 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 3s linear infinite;
+}
+
+.footer-top-btn .top-arrow {
+  font-size: 18px;
+  animation: gradientFlow 3s linear infinite, topArrowBounce 1.5s ease-in-out infinite;
+}
+
+.footer-top-btn .top-text {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+@keyframes topArrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 .footer-content {
@@ -3556,21 +3611,3 @@ body {
   z-index: 200;
 }
 
-.footer-top-arrow {
-  user-select: none;
-  -webkit-user-select: none;
-  position: absolute;
-  top: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  cursor: pointer;
-  z-index: 11;
-}
-
-
-
-.footer-top-arrow .cube-scroll-icon {
-  color: var(--md-primary);
-  animation: cubeScrollBounceUp 2s ease-in-out infinite;
-  text-shadow: 0 0 10px rgba(102, 126, 234, 0.6), 0 0 20px rgba(102, 126, 234, 0.4);
-}
