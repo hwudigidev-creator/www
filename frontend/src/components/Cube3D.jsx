@@ -98,11 +98,16 @@ function Cube3D({ features, stage, animProgress, onPrev, isAnimating, showFooter
     const focusScale = isFocused ? 1.05 : 1
     const focusGlow = isFocused ? 0.6 : 0.4
 
+    // 動畫完成後改用 2D transform，讓 backdrop-filter 生效
+    const transform = isAnimationComplete
+      ? `translate(${currentX}px, ${currentY}px) scale(${focusScale})`
+      : `translate3d(${currentX}px, ${currentY}px, ${currentZ}px) rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg) scale(${focusScale})`
+
     return {
       position: 'absolute',
       left: '50%',
       top: '50%',
-      transform: `translate3d(${currentX}px, ${currentY}px, ${currentZ}px) rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg) scale(${focusScale})`,
+      transform,
       width: `${currentWidth}px`,
       height: `${currentHeight}px`,
       marginLeft: `${-currentWidth / 2}px`,
@@ -201,7 +206,10 @@ function Cube3D({ features, stage, animProgress, onPrev, isAnimating, showFooter
           </div>
 
           {showExploding && (
-            <div className={`exploding-faces ${isAnimationComplete ? 'settled' : ''}`} style={{ perspective: '1000px' }}>
+            <div
+              className={`exploding-faces ${isAnimationComplete ? 'settled' : ''}`}
+              style={isAnimationComplete ? {} : { perspective: '1000px' }}
+            >
               {safeFeatures.map((feature, index) => {
                 const styleData = getCardStyle(index)
                 const progress = styleData._progress || 0

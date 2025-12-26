@@ -730,11 +730,11 @@ body {
   right: 0;
   bottom: 0;
   width: 100%;
-  z-index: 1; /* 高於背景遮罩 */
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  perspective: 1000px; /* 與 Products 方塊一致的透視 */
   transition: transform 0.1s ease-out;
   z-index: 10;
   pointer-events: none;
@@ -756,16 +756,20 @@ body {
   transform-style: flat;
 }
 
+.cube-wrapper.settled .cube {
+  transform-style: flat;
+}
+
 .cube {
   width: var(--cube-size);
   height: var(--cube-size);
   position: relative;
   transform-style: preserve-3d;
-  transform: rotateX(-25deg) rotateY(45deg);
+  transform: rotateX(-30deg) rotateY(45deg); /* 調整俯視角度增加立體感 */
   transition: transform 0.1s ease-out;
 }
 
-/* 首頁專用方塊面樣式 */
+/* 首頁專用方塊面樣式 - 比 Products 更暗 */
 .home-face {
   position: absolute;
   width: var(--cube-size);
@@ -774,11 +778,15 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20%;
-  background: rgba(19, 19, 20, 0.5); /* 50% 不透明 */
-  border: 2px solid;
-  border-color: #f5b800;
-  border-radius: 0; /* 無圓角，緊密拼接 */
+  background: rgba(19, 19, 20, 0.55); /* 比 Products 更暗 */
+  border: 2px solid #f5b800;
+  border-radius: 0;
   backface-visibility: visible;
+  overflow: hidden;
+  /* 毛玻璃 + 濾鏡效果 */
+  backdrop-filter: blur(24px) saturate(1.3) contrast(1.05) brightness(0.95);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3) contrast(1.05) brightness(0.95);
+  /* 注意：不可加 transform-style: preserve-3d，會導致 backdrop-filter 失效 */
   box-shadow:
     0 0 30px rgba(245, 184, 0, 0.6),
     0 0 60px rgba(245, 184, 0, 0.4),
@@ -786,6 +794,28 @@ body {
     inset 0 0 40px rgba(245, 184, 0, 0.2);
   transition: transform 0.15s ease-out, opacity 0.3s ease-out;
   will-change: transform, opacity;
+}
+
+/* 紅色色彩分離層 */
+.home-face::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: rgba(255, 80, 80, 0.08);
+  transform: translate(4px, 2px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* 青色色彩分離層 */
+.home-face::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: rgba(80, 200, 255, 0.08);
+  transform: translate(-4px, -2px);
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 
 .home-face span {
@@ -1035,13 +1065,17 @@ body {
   }
 }
 
-/* 從面變成卡片 */
+/* 從面變成卡片 - 比 Products 更暗 */
 .face-to-card {
   position: absolute;
   /* 尺寸由 JS 控制：width, height, marginLeft, marginTop */
   left: 50%;
   top: 50%;
-  background: rgba(40, 40, 45, 0.4);
+  background: rgba(19, 19, 20, 0.55); /* 比 Products 更暗 */
+  overflow: hidden;
+  /* 毛玻璃 + 濾鏡效果 */
+  backdrop-filter: blur(24px) saturate(1.3) contrast(1.05) brightness(0.95);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3) contrast(1.05) brightness(0.95);
   border: 2px solid #f5b800;
   border-radius: 0;
   display: flex;
@@ -1049,12 +1083,31 @@ body {
   justify-content: center;
   transform-origin: center center;
   /* 邊框顏色和發光由 JS 控制 */
+  /* 注意：不可加 transform-style: preserve-3d */
 }
 
-/* 動畫完成後啟用毛玻璃 */
-.exploding-faces.settled .face-to-card {
-  backdrop-filter: blur(20px) saturate(1.5);
-  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+/* 紅色色彩分離層 */
+.face-to-card::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: rgba(255, 80, 80, 0.08);
+  transform: translate(4px, 2px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 青色色彩分離層 */
+.face-to-card::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: rgba(80, 200, 255, 0.08);
+  transform: translate(-4px, -2px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .face-question {
