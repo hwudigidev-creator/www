@@ -3451,9 +3451,17 @@ body {
   /* Products Page Mobile */
   .products-fixed-section {
     top: 140px;
+    bottom: auto;
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    align-items: start;
     padding: 16px;
     gap: 16px;
+  }
+
+  .product-display {
+    align-items: start;
+    height: auto;
   }
 
   .cube-showcase {
