@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useFetch } from '../hooks/useFetch'
+import { usePageNavigation } from '../hooks/usePageNavigation'
 import { getProducts } from '../services/api'
 import Loading from '../components/Loading'
 import Footer from '../components/Footer'
@@ -46,15 +47,13 @@ const cubeAngles = [
 
 function Products() {
   const { data, loading, error } = useFetch(getProducts)
-  const [activeIndex, setActiveIndex] = useState(0)
   const [videoErrors, setVideoErrors] = useState({})
-  const [showFooter, setShowFooter] = useState(false)
 
   const products = data?.products || []
-  const maxIndex = products.length - 1
+  const nav = usePageNavigation(products.length || 6)
 
   // 根據 activeIndex 取得固定角度
-  const [cubeRotation, cubePitch] = cubeAngles[activeIndex] || cubeAngles[0]
+  const [cubeRotation, cubePitch] = cubeAngles[nav.activeIndex] || cubeAngles[0]
 
   // 禁止頁面捲動
   useEffect(() => {
@@ -66,42 +65,17 @@ function Products() {
     }
   }, [])
 
-  // 下一張卡片
-  const nextCard = useCallback(() => {
-    if (showFooter) return
-    if (activeIndex < maxIndex) {
-      setActiveIndex(activeIndex + 1)
-    } else {
-      setShowFooter(true)
-    }
-  }, [activeIndex, maxIndex, showFooter])
-
-  // 上一張卡片
-  const prevCard = useCallback(() => {
-    if (showFooter) {
-      setShowFooter(false)
-    } else if (activeIndex > 0) {
-      setActiveIndex(activeIndex - 1)
-    }
-  }, [activeIndex, showFooter])
-
-  // 回到頂部
-  const goToTop = useCallback(() => {
-    setShowFooter(false)
-    setActiveIndex(0)
-  }, [])
-
   if (loading) return <Loading />
   if (error) return <div className="error">載入課程資料時發生錯誤</div>
 
-  const activeProduct = products?.[activeIndex]
-  const currentVideo = productVideos[activeIndex % productVideos.length]
-  const currentImage = productImages[activeIndex % productImages.length]
-  const useImage = videoErrors[activeIndex]
+  const activeProduct = products?.[nav.activeIndex]
+  const currentVideo = productVideos[nav.activeIndex % productVideos.length]
+  const currentImage = productImages[nav.activeIndex % productImages.length]
+  const useImage = videoErrors[nav.activeIndex]
 
   // 影片載入錯誤時切換到圖片
   const handleVideoError = () => {
-    setVideoErrors(prev => ({ ...prev, [activeIndex]: true }))
+    setVideoErrors(prev => ({ ...prev, [nav.activeIndex]: true }))
   }
 
   return (
@@ -116,7 +90,7 @@ function Products() {
       <section
         className="page-hero products-hero"
         style={{
-          opacity: showFooter ? 0 : 1,
+          opacity: nav.showFooter ? 0 : 1,
           transition: 'opacity 0.5s ease'
         }}
       >
@@ -126,22 +100,20 @@ function Products() {
         </div>
       </section>
 
-      {/* 上方箭頭 */}
-      {(activeIndex > 0 || showFooter) && (
-        <ScrollIndicator direction="up" onClick={prevCard} />
-      )}
-
-      {/* 下方箭頭 */}
-      {!showFooter && (
-        <ScrollIndicator direction="down" onClick={nextCard} />
-      )}
+      {/* 浮動翻頁工具 */}
+      <ScrollIndicator
+        showUp={nav.showUp}
+        showDown={nav.showDown}
+        onUp={nav.prev}
+        onDown={nav.next}
+      />
 
       {/* 固定的展示區 */}
       <section
         className="products-fixed-section"
         style={{
-          opacity: showFooter ? 0 : 1,
-          pointerEvents: showFooter ? 'none' : 'auto',
+          opacity: nav.showFooter ? 0 : 1,
+          pointerEvents: nav.showFooter ? 'none' : 'auto',
           transition: 'opacity 0.5s ease'
         }}
       >
@@ -155,13 +127,13 @@ function Products() {
                 src={currentImage}
                 alt={activeProduct?.name || '課程圖片'}
                 className="showcase-image showcase-image-clear"
-                key={`img-${activeIndex}`}
+                key={`img-${nav.activeIndex}`}
               />
             ) : (
               <video
                 src={currentVideo}
                 className="showcase-image showcase-image-clear"
-                key={`video-${activeIndex}`}
+                key={`video-${nav.activeIndex}`}
                 autoPlay
                 loop
                 muted
@@ -214,9 +186,9 @@ function Products() {
         {/* 右側：當前課程卡片 */}
         <div className="product-display">
           {activeProduct && (
-            <div className="product-card-large" key={activeIndex}>
+            <div className="product-card-large" key={nav.activeIndex}>
               <div className="product-card-icon">
-                <i className={`fa-solid ${getIconForProduct(activeIndex)}`}></i>
+                <i className={`fa-solid ${getIconForProduct(nav.activeIndex)}`}></i>
               </div>
               <h2>{activeProduct.name}</h2>
               <p>{activeProduct.description}</p>
@@ -224,8 +196,8 @@ function Products() {
                 {products?.map((_, index) => (
                   <span
                     key={index}
-                    className={`dot ${index === activeIndex ? 'active' : ''}`}
-                    onClick={() => setActiveIndex(index)}
+                    className={`dot ${index === nav.activeIndex ? 'active' : ''}`}
+                    onClick={() => nav.goTo(index)}
                     style={{ cursor: 'pointer' }}
                   />
                 ))}
@@ -239,13 +211,13 @@ function Products() {
       <div
         className="home-footer-wrapper"
         style={{
-          visibility: showFooter ? 'visible' : 'hidden',
-          pointerEvents: showFooter ? 'auto' : 'none',
-          transform: showFooter ? 'translateY(0)' : 'translateY(100%)',
+          visibility: nav.showFooter ? 'visible' : 'hidden',
+          pointerEvents: nav.showFooter ? 'auto' : 'none',
+          transform: nav.showFooter ? 'translateY(0)' : 'translateY(100%)',
           transition: 'transform 0.5s ease, visibility 0.5s'
         }}
       >
-        <Footer onTop={goToTop} />
+        <Footer onTop={nav.goToTop} />
       </div>
     </div>
   )

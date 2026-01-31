@@ -220,15 +220,13 @@ function Contact() {
 
   return (
     <div className="contact no-scroll">
-      {/* 上方箭頭 */}
-      {(activeRow > 0 || showFooter) && (
-        <ScrollIndicator direction="up" onClick={prevRow} />
-      )}
-
-      {/* 下方箭頭 */}
-      {!showFooter && (
-        <ScrollIndicator direction="down" onClick={nextRow} />
-      )}
+      {/* 浮動翻頁工具 */}
+      <ScrollIndicator
+        showUp={activeRow > 0 || showFooter}
+        showDown={!showFooter}
+        onUp={prevRow}
+        onDown={nextRow}
+      />
 
       {/* 標題區 */}
       <section

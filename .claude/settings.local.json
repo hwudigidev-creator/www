@@ -47,7 +47,10 @@
       "Bash(findstr:*)",
       "Bash(node:*)",
       "Bash(npm install:*)",
-      "Bash(sort:*)"
+      "Bash(sort:*)",
+      "Bash(cmd /c \"taskkill /F /PID 143176\")",
+      "mcp__claude_ai_Cloudflare_Developer_Platform__search_cloudflare_documentation",
+      "Bash(timeout:*)"
     ]
   }
 }

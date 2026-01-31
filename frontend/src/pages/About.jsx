@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { useFetch } from '../hooks/useFetch'
+import { usePageNavigation } from '../hooks/usePageNavigation'
 import { getAbout } from '../services/api'
 import Loading from '../components/Loading'
 import Footer from '../components/Footer'
@@ -8,12 +9,7 @@ import ScrollIndicator from '../components/ScrollIndicator'
 
 function About() {
   const { data, loading, error } = useFetch(getAbout)
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [showFooter, setShowFooter] = useState(false)
-
-  // 區塊數量（簡介、使命、融合動畫、願景）
-  const totalSections = 4
-  const maxIndex = totalSections - 1
+  const nav = usePageNavigation(4) // 4 個區塊
 
   // 禁止頁面捲動
   useEffect(() => {
@@ -25,40 +21,15 @@ function About() {
     }
   }, [])
 
-  // 下一個區塊
-  const nextSection = useCallback(() => {
-    if (showFooter) return
-    if (activeIndex < maxIndex) {
-      setActiveIndex(activeIndex + 1)
-    } else {
-      setShowFooter(true)
-    }
-  }, [activeIndex, maxIndex, showFooter])
-
-  // 上一個區塊
-  const prevSection = useCallback(() => {
-    if (showFooter) {
-      setShowFooter(false)
-    } else if (activeIndex > 0) {
-      setActiveIndex(activeIndex - 1)
-    }
-  }, [activeIndex, showFooter])
-
-  // 回到頂部
-  const goToTop = useCallback(() => {
-    setShowFooter(false)
-    setActiveIndex(0)
-  }, [])
-
   // 融合動畫結束後自動切換下一張 (index 2 是融合卡片)
   useEffect(() => {
-    if (activeIndex === 2) {
+    if (nav.activeIndex === 2) {
       const timer = setTimeout(() => {
-        setActiveIndex(3)
+        nav.setActiveIndex(3)
       }, 3500) // 動畫約3.5秒後切換
       return () => clearTimeout(timer)
     }
-  }, [activeIndex])
+  }, [nav.activeIndex, nav.setActiveIndex])
 
   if (loading) return <Loading />
   if (error) return <div className="error">載入關於我們資料時發生錯誤</div>
@@ -96,28 +67,26 @@ function About() {
     }
   ]
 
-  const currentSection = sections[activeIndex]
+  const currentSection = sections[nav.activeIndex]
 
   return (
     <div className="about no-scroll">
       {/* 背景文字雨 */}
       <TextRain />
 
-      {/* 上方箭頭 */}
-      {(activeIndex > 0 || showFooter) && (
-        <ScrollIndicator direction="up" onClick={prevSection} />
-      )}
-
-      {/* 下方箭頭 */}
-      {!showFooter && (
-        <ScrollIndicator direction="down" onClick={nextSection} />
-      )}
+      {/* 浮動翻頁工具 */}
+      <ScrollIndicator
+        showUp={nav.showUp}
+        showDown={nav.showDown}
+        onUp={nav.prev}
+        onDown={nav.next}
+      />
 
       {/* 標題區 */}
       <section
         className="page-hero"
         style={{
-          opacity: showFooter ? 0 : 1,
+          opacity: nav.showFooter ? 0 : 1,
           transition: 'opacity 0.5s ease'
         }}
       >
@@ -131,13 +100,13 @@ function About() {
       <section
         className="about-main"
         style={{
-          opacity: showFooter ? 0 : 1,
-          pointerEvents: showFooter ? 'none' : 'auto',
+          opacity: nav.showFooter ? 0 : 1,
+          pointerEvents: nav.showFooter ? 'none' : 'auto',
           transition: 'opacity 0.5s ease'
         }}
       >
         {/* 區塊卡片 */}
-        <div className={`about-section-card ${currentSection.type === 'fusion' ? 'fusion-card' : ''}`} key={activeIndex}>
+        <div className={`about-section-card ${currentSection.type === 'fusion' ? 'fusion-card' : ''}`} key={nav.activeIndex}>
           {currentSection.type === 'fusion' ? (
             <>
               {/* 融合動畫 */}
@@ -176,13 +145,13 @@ function About() {
       <div
         className="home-footer-wrapper"
         style={{
-          visibility: showFooter ? 'visible' : 'hidden',
-          pointerEvents: showFooter ? 'auto' : 'none',
-          transform: showFooter ? 'translateY(0)' : 'translateY(100%)',
+          visibility: nav.showFooter ? 'visible' : 'hidden',
+          pointerEvents: nav.showFooter ? 'auto' : 'none',
+          transform: nav.showFooter ? 'translateY(0)' : 'translateY(100%)',
           transition: 'transform 0.5s ease, visibility 0.5s'
         }}
       >
-        <Footer onTop={goToTop} />
+        <Footer onTop={nav.goToTop} />
       </div>
     </div>
   )

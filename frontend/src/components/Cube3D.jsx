@@ -148,12 +148,14 @@ function Cube3D({ features, stage, animProgress, onPrev, isAnimating, showFooter
 
   return (
     <div className="cube-section" style={{ opacity: 1 }}>
+      {/* 浮動翻頁工具 */}
       {isAnimationComplete && !isAnimating && (
-        <ScrollIndicator direction="up" onClick={prevCard} />
-      )}
-
-      {isAnimationComplete && !isAnimating && !showFooter && (
-        <ScrollIndicator direction="down" onClick={nextCard} />
+        <ScrollIndicator
+          showUp={true}
+          showDown={!showFooter}
+          onUp={prevCard}
+          onDown={nextCard}
+        />
       )}
 
       <div
