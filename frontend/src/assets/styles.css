@@ -3118,8 +3118,9 @@ body {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 8px 0;
-  margin-bottom: 16px;
+  padding: 8px 24px;
+  margin: 0 auto 16px;
+  width: fit-content;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -3796,6 +3797,18 @@ body {
 
 
 /* 首頁 Footer 包裝 */
+/* Footer Overlay - 點擊收回 */
+.footer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 199;
+  cursor: pointer;
+}
+
 .home-footer-wrapper {
   position: fixed;
   bottom: 0;

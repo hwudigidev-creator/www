@@ -412,6 +412,11 @@ function Contact() {
         </div>
       </section>
 
+      {/* Footer Overlay - 點擊收回 */}
+      {showFooter && (
+        <div className="footer-overlay" onClick={() => setShowFooter(false)} />
+      )}
+
       {/* Footer */}
       <div
         className="home-footer-wrapper"
@@ -422,7 +427,7 @@ function Contact() {
           transition: 'transform 0.5s ease, visibility 0.5s'
         }}
       >
-        <Footer onTop={goToTop} />
+        <Footer onTop={goToTop} onClose={() => setShowFooter(false)} />
       </div>
     </div>
   )

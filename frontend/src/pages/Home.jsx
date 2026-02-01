@@ -126,6 +126,11 @@ function Home() {
         onToggleFooter={toggleFooter}
       />
 
+      {/* Footer Overlay - 點擊收回 */}
+      {showFooter && (
+        <div className="footer-overlay" onClick={() => setShowFooter(false)} />
+      )}
+
       <div
         className="home-footer-wrapper"
         style={{
@@ -135,7 +140,7 @@ function Home() {
           transition: 'transform 0.5s ease, visibility 0.5s'
         }}
       >
-        <Footer onTop={goToTop} />
+        <Footer onTop={goToTop} onClose={() => setShowFooter(false)} />
       </div>
     </div>
   )

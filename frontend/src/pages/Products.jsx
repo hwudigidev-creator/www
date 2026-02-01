@@ -207,6 +207,11 @@ function Products() {
         </div>
       </section>
 
+      {/* Footer Overlay - 點擊收回 */}
+      {nav.showFooter && (
+        <div className="footer-overlay" onClick={() => nav.setShowFooter(false)} />
+      )}
+
       {/* Footer */}
       <div
         className="home-footer-wrapper"
@@ -217,7 +222,7 @@ function Products() {
           transition: 'transform 0.5s ease, visibility 0.5s'
         }}
       >
-        <Footer onTop={nav.goToTop} />
+        <Footer onTop={nav.goToTop} onClose={() => nav.setShowFooter(false)} />
       </div>
     </div>
   )

@@ -1,10 +1,52 @@
 import { Link } from 'react-router-dom'
+import { useRef, useEffect } from 'react'
 
-function Footer({ onTop }) {
+function Footer({ onTop, onClose }) {
   const currentYear = new Date().getFullYear()
+  const footerRef = useRef(null)
+  const touchStartY = useRef(0)
+  const touchDeltaY = useRef(0)
+
+  // 手機版下拉收回
+  useEffect(() => {
+    const footer = footerRef.current
+    if (!footer || !onClose) return
+
+    const isMobile = window.innerWidth <= 768
+
+    const handleTouchStart = (e) => {
+      touchStartY.current = e.touches[0].clientY
+      touchDeltaY.current = 0
+    }
+
+    const handleTouchMove = (e) => {
+      touchDeltaY.current = e.touches[0].clientY - touchStartY.current
+    }
+
+    const handleTouchEnd = () => {
+      // 下拉超過 80px 就收回
+      if (touchDeltaY.current > 80) {
+        onClose()
+      }
+    }
+
+    if (isMobile) {
+      footer.addEventListener('touchstart', handleTouchStart, { passive: true })
+      footer.addEventListener('touchmove', handleTouchMove, { passive: true })
+      footer.addEventListener('touchend', handleTouchEnd)
+    }
+
+    return () => {
+      if (isMobile) {
+        footer.removeEventListener('touchstart', handleTouchStart)
+        footer.removeEventListener('touchmove', handleTouchMove)
+        footer.removeEventListener('touchend', handleTouchEnd)
+      }
+    }
+  }, [onClose])
 
   return (
-    <footer className="footer">
+    <footer className="footer" ref={footerRef}>
       {/* TOP 按鈕 - 放在 Footer 內部頂端 */}
       {onTop && (
         <div className="footer-top-btn" onClick={onTop}>
